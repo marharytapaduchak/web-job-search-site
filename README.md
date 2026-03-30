@@ -25,6 +25,12 @@ npm install
 npm run dev
 ```
 
+6. Build the project
+
+```shell
+npm run build
+```
+
 ## Useful Materials
 
 Some useful links for learning stuff we're dealing with:
