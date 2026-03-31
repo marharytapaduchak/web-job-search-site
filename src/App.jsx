@@ -1,5 +1,13 @@
+import Header from "./components/Header";
+import UsefulMaterials from "./pages/UsefulMaterials";
+
 function App() {
-    return <h1>Job Search Site</h1>;
-  }
-  
-  export default App;
+  return (
+    <>
+      <Header />
+      <UsefulMaterials />
+    </>
+  );
+}
+
+export default App;
