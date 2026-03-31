@@ -18,6 +18,9 @@ Technologies used:
 ```shell
 npm install
 ```
+```shell
+npm install react-router-dom
+```
 
 5. Start the project!
 
