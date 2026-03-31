@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Header.css';
 
 export default function Header() {
@@ -8,18 +9,18 @@ export default function Header() {
       </div>
 
       <nav className="header__nav">
-        <a href="#" className="header__link">
+        <Link to="/" className="header__link">
           Вакансії
-        </a>
-        <a href="#" className="header__link">
+        </Link>
+        <Link to="/responses_history" className="header__link">
           Історія відгуків
-        </a>
-        <a href="#" className="header__link header__link--active">
+        </Link>
+        <Link to="/useful_materials" className="header__link">
           Корисні матеріали
-        </a>
-        <a href="#" className="header__link">
+        </Link>
+        <Link to="/profile_page" className="header__link">
           Мій профіль
-        </a>
+        </Link>
       </nav>
     </header>
   );

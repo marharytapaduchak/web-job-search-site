@@ -1,0 +1,350 @@
+.profile-page {
+    background-color: #f3f3f3;
+    min-height: calc(100vh - 72px);
+    padding: 40px 70px 60px;
+  }
+  
+  .profile-page__container {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  
+  .profile-page__back {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 28px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111;
+    cursor: pointer;
+  }
+  
+  .profile-card {
+    background-color: #f3f3f3;
+  }
+  
+  .profile-card__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+    margin-bottom: 28px;
+  }
+  
+  .profile-card__photo {
+    width: 118px;
+    height: 118px;
+    background: linear-gradient(135deg, #b8b8b8, #8d8d8d);
+    flex-shrink: 0;
+  }
+  
+  .profile-card__main-info {
+    flex: 1;
+  }
+  
+  .profile-card__title {
+    margin: 0 0 20px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .profile-card__info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 22px;
+    max-width: 760px;
+  }
+  
+  .profile-card__info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .profile-card__info-item {
+    margin: 0;
+    font-size: 16px;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .profile-card__link {
+    font-size: 16px;
+    color: #8f1731;
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-card__info-svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .profile-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .profile-card__meta span::after {
+    content: "•";
+    margin-left: 10px;
+    color: #7a7a7a;
+  }
+  
+  .profile-card__meta span:last-child::after {
+    content: "";
+    margin: 0;
+  }
+  
+  .profile-card__about {
+    max-width: 900px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #d1d1d1;
+  }
+  
+  .profile-card__about p {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #222;
+  }
+  
+  .profile-card__about p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .profile-section {
+    padding: 24px 0;
+    border-bottom: 1px solid #d1d1d1;
+  }
+  
+  .profile-section__title {
+    margin: 0 0 18px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .profile-skill {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid #1b1b1b;
+    background-color: #111;
+    color: white;
+    min-height: 34px;
+  }
+  
+  .profile-skill__name {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 15px;
+  }
+  
+  .profile-skill__level {
+    min-width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: #8f1731;
+    font-size: 14px;
+    font-weight: 700;
+    border-left: 1px solid #1b1b1b;
+  }
+  
+  .profile-goals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .profile-goal {
+    border: 1px solid #8d8d8d;
+    background-color: white;
+    padding: 8px 14px;
+    font-size: 15px;
+    color: #222;
+  }
+  
+  .profile-project {
+    margin-bottom: 22px;
+  }
+  
+  .profile-project:last-child {
+    margin-bottom: 0;
+  }
+  
+  .profile-project__title {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .profile-project__text {
+    margin: 0;
+    max-width: 980px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #222;
+  }
+  
+  .profile-files {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 24px 0;
+    border-bottom: 1px solid #d1d1d1;
+  }
+  
+  .profile-file-block {
+    min-width: 0;
+  }
+  
+  .profile-file {
+    width: 100%;
+    min-height: 54px;
+    border: 1px solid #d0d0d0;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    text-decoration: none;
+    color: #111;
+    font-size: 15px;
+  }
+  
+  .profile-file--single {
+    max-width: 520px;
+  }
+  
+  .profile-file__arrow {
+    font-size: 22px;
+    color: #8f1731;
+    line-height: 1;
+  }
+  
+  .recommendation-card {
+    width: 100%;
+    max-width: 470px;
+    background-color: #ededed;
+    border: 1px solid #d0d0d0;
+    padding: 18px 18px 16px;
+  }
+  
+  .recommendation-card__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  
+  .recommendation-card__photo {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #c9c9c9, #8d8d8d);
+    flex-shrink: 0;
+  }
+  
+  .recommendation-card__name {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .recommendation-card__role {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+  }
+  
+  .recommendation-card__subtitle {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: #111;
+  }
+  
+  .recommendation-card__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .recommendation-card__skill {
+    background-color: #111;
+    color: white;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .recommendation-card__text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #222;
+  }
+  
+  .profile-page__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 34px;
+  }
+  
+  .profile-page__save-button {
+    width: 260px;
+    height: 54px;
+    border: none;
+    background-color: #8f1731;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .profile-page__save-button:hover {
+    background-color: #771229;
+  }
+  
+  @media (max-width: 900px) {
+    .profile-page {
+      padding: 30px 24px 50px;
+    }
+  
+    .profile-card__top {
+      flex-direction: column;
+    }
+  
+    .profile-card__info-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .profile-files {
+      grid-template-columns: 1fr;
+    }
+  
+    .profile-page__actions {
+      justify-content: flex-start;
+    }
+  }
