@@ -1,0 +1,23 @@
+:root {
+  --color-primary-red: #84112D;
+  --color-primary-red-hover: #751028;
+}
+
+.primary-button {
+  background-color: var(--color-primary-red);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500; 
+  padding: 14px 24px; 
+  border: none;
+  border-radius: 2px; 
+  cursor: pointer;
+  text-align: center;
+  width: auto; 
+}
+
+.primary-button:hover {
+  background-color: var(--color-primary-red-hover);
+}
+
