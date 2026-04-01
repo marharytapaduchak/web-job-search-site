@@ -71,9 +71,12 @@ const FilterSidebar = ({ onApplyFilters }) => {
   ];
 
   const englishOptions = [
+    { value: 'beginner', label: 'Beginner' },
+    { value: 'pre-intermediate', label: 'Pre-intermediate' },
     { value: 'intermediate', label: 'Intermediate' },
-    { value: 'upper', label: 'Upper-Intermediate' },
-    { value: 'advanced', label: 'Advanced' }
+    { value: 'upper-Intermediate', label: 'Upper-Intermediate' },
+    { value: 'advanced', label: 'Advanced' },
+    { value: 'proficient', label: 'Proficient' }
   ];
 
   return (
@@ -114,12 +117,12 @@ const FilterSidebar = ({ onApplyFilters }) => {
           {}
           <input 
             type="range" 
-            min="0" max="5000" step="100"
+            min="0" max="1000000" step="1000"
             className="salary-slider" 
             value={salary} 
             onChange={(e) => setSalary(e.target.value)} 
           />
-          <div className="salary-label">від {salary}$</div>
+          <div className="salary-label">від {salary}₴</div>
         </FilterGroup>
 
         <FilterGroup title="Рівень англійської">

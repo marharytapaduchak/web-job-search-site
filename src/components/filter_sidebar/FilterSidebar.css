@@ -1,6 +1,5 @@
 .filter-sidebar {
-  width: 100%;
-  max-width: 280px; 
+  width: 32.5vw;
   flex-shrink: 0; 
   background-color: #ffffff;
   padding: 30px 50px;
