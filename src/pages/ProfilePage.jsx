@@ -1,38 +1,38 @@
-import './ProfilePage.css';
-import arrowUp from '../img/arrow_up.svg';
-import ProfileIcon from '../img/profile.svg';
-import Location from '../img/location.svg';
-import Link from '../img/link.svg';
-import Phone from '../img/phone.svg';
+import "./ProfilePage.css";
 
-
-
+import arrowUp from "../img/arrow_up.svg";
+import ProfileIcon from "../img/profile.svg";
+import Location from "../img/location.svg";
+import LinkImg from "../img/link.svg";
+import Phone from "../img/phone.svg";
 
 const skills = [
-  { name: 'Figma', level: 4 },
-  { name: 'UI/UX', level: 3 },
-  { name: 'Prototyping', level: 3 },
-  { name: 'Product design', level: 3 },
-  { name: 'Wireframing', level: 4 },
-  { name: 'Тестування', level: 2 },
-  { name: 'Дослідження користувачів', level: 2 },
-  { name: 'Responsive design', level: 3 },
-  { name: 'Інформаційна архітектура', level: 3 },
-  { name: 'Adobe Photoshop', level: 4 },
-  { name: 'Adobe Illustrator', level: 4 },
+  { name: "Figma", level: 4 },
+  { name: "UI/UX", level: 3 },
+  { name: "Prototyping", level: 3 },
+  { name: "Product design", level: 3 },
+  { name: "Wireframing", level: 4 },
+  { name: "Тестування", level: 2 },
+  { name: "Дослідження користувачів", level: 2 },
+  { name: "Responsive design", level: 3 },
+  { name: "Інформаційна архітектура", level: 3 },
+  { name: "Adobe Photoshop", level: 4 },
+  { name: "Adobe Illustrator", level: 4 },
 ];
 
 const goals = [
-  'Покращити дослідження користувачів',
-  'Вдосконалювати свої навички у сфері UX',
-  'Розробляти інтуїтивно зрозумілі інтерфейси',
+  "Покращити дослідження користувачів",
+  "Вдосконалювати свої навички у сфері UX",
+  "Розробляти інтуїтивно зрозумілі інтерфейси",
 ];
 
 export default function Profile() {
   return (
     <main className="profile-page">
       <div className="profile-page__container">
-        <button className="profile-page__back">← До редагування</button>
+        <a href="/profile_edit_info" className="profile-page__back">
+          ← До редагування
+        </a>
 
         <section className="profile-card">
           <div className="profile-card__top">
@@ -44,30 +44,54 @@ export default function Profile() {
               <div className="profile-card__info-grid">
                 <div className="profile-card__info-column">
                   <p className="profile-card__info-item">
-                    <img src={ProfileIcon} alt="profileIcon" className="profile-card__info-svg"/>
+                    <img
+                      src={ProfileIcon}
+                      alt="profileIcon"
+                      className="profile-card__info-svg"
+                    />
                     Катерина Марчук
                   </p>
                   <p className="profile-card__info-item">
-                    <img src={ProfileIcon} alt="profileIcon" className="profile-card__info-svg"/>
+                    <img
+                      src={ProfileIcon}
+                      alt="profileIcon"
+                      className="profile-card__info-svg"
+                    />
                     katerynamarchuk@gmail.com
                   </p>
                   <p className="profile-card__info-item">
-                    <img src={Location} alt="location" className="profile-card__info-svg"/>
+                    <img
+                      src={Location}
+                      alt="location"
+                      className="profile-card__info-svg"
+                    />
                     Lviv, Україна
                   </p>
                 </div>
 
                 <div className="profile-card__info-column">
                   <p className="profile-card__info-item">
-                    <img src={Phone} alt="phone" className="profile-card__info-svg"/>
+                    <img
+                      src={Phone}
+                      alt="phone"
+                      className="profile-card__info-svg"
+                    />
                     +380976352445
                   </p>
                   <a href="#" className="profile-card__link">
-                   <img src={Link} alt="link" className="profile-card__info-svg"/>
+                    <img
+                      src={LinkImg}
+                      alt="link"
+                      className="profile-card__info-svg"
+                    />
                     www.behance.com
                   </a>
                   <a href="#" className="profile-card__link">
-                    <img src={Link} alt="link" className="profile-card__info-svg"/>
+                    <img
+                      src={LinkImg}
+                      alt="link"
+                      className="profile-card__info-svg"
+                    />
                     www.linkedin.com
                   </a>
                 </div>
@@ -87,16 +111,16 @@ export default function Profile() {
                   Я — junior UI/UX дизайнер із пристрастю до створення зручних,
                   сучасних і естетично привабливих інтерфейсів. Маю досвід
                   роботи з ключовими інструментами, такими як Figma, Adobe XD і
-                  Sketch, а також володію навичками UX-досліджень, прототипування
-                  й тестування.
+                  Sketch, а також володію навичками UX-досліджень,
+                  прототипування й тестування.
                 </p>
                 <p>
                   Прагну створювати рішення, що не лише відповідають потребам
                   користувачів, а й перевершують їхні очікування.
                 </p>
                 <p>
-                  У процесі роботи я ціную співпрацю з командою, увагу до деталей
-                  і готовність до вдосконалення.
+                  У процесі роботи я ціную співпрацю з командою, увагу до
+                  деталей і готовність до вдосконалення.
                 </p>
                 <p>
                   Моєю метою є постійний професійний розвиток у сфері UI/UX
@@ -141,8 +165,8 @@ export default function Profile() {
                 Я створила інтерактивні прототипи для застосунку, що допомагає
                 користувачам легко контролювати свої доходи і витрати. У мої
                 обов’язки входило розроблення адаптивного дизайну, тестування
-                прототипів на реальних користувачах та вдосконалення UX на основі
-                їхнього фідбеку.
+                прототипів на реальних користувачах та вдосконалення UX на
+                основі їхнього фідбеку.
               </p>
             </div>
 
@@ -166,7 +190,11 @@ export default function Profile() {
               <h2 className="profile-section__title">Резюме</h2>
               <a href="#" className="profile-file">
                 <span>CV Kateryna Marchuk.pdf</span>
-                <img src={arrowUp} alt="arrow" className="profile-file__arrow"/>
+                <img
+                  src={arrowUp}
+                  alt="arrow"
+                  className="profile-file__arrow"
+                />
               </a>
             </div>
 
@@ -174,7 +202,11 @@ export default function Profile() {
               <h2 className="profile-section__title">Портфоліо</h2>
               <a href="#" className="profile-file">
                 <span>Kateryna Marchuk.pdf</span>
-                <img src={arrowUp} alt="arrow" className="profile-file__arrow"/>
+                <img
+                  src={arrowUp}
+                  alt="arrow"
+                  className="profile-file__arrow"
+                />
               </a>
             </div>
           </section>
@@ -185,7 +217,7 @@ export default function Profile() {
             </h2>
             <a href="#" className="profile-file profile-file--single">
               <span>Курси IT School</span>
-              <img src={arrowUp} alt="arrow" className="profile-file__arrow"/>
+              <img src={arrowUp} alt="arrow" className="profile-file__arrow" />
             </a>
           </section>
 
@@ -217,15 +249,18 @@ export default function Profile() {
               <p className="recommendation-card__text">
                 Я рекомендую Катерину як талановиту і перспективну дизайнерку.
                 Вона успішно опанувала ключові інструменти, такі як Figma та
-                Adobe XD, і продемонструвала глибоке розуміння UX-досліджень.
-                Її проєкти вирізняються функціональністю та естетикою, а її
-                командна робота й увага до деталей заслуговують на високу оцінку.
+                Adobe XD, і продемонструвала глибоке розуміння UX-досліджень. Її
+                проєкти вирізняються функціональністю та естетикою, а її
+                командна робота й увага до деталей заслуговують на високу
+                оцінку.
               </p>
             </div>
           </section>
 
           <div className="profile-page__actions">
-            <button className="profile-page__save-button">Зберегти зміни</button>
+            <button className="profile-page__save-button">
+              Зберегти зміни
+            </button>
           </div>
         </section>
       </div>
