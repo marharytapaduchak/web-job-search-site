@@ -12,7 +12,7 @@ export default function Header() {
                 <Link to="/" className="header__link">
                     Вакансії
                 </Link>
-                <Link to="/responses_history" className="header__link">
+                <Link to="/feedback_history" className="header__link">
                     Історія відгуків
                 </Link>
                 <Link to="/useful_materials" className="header__link">

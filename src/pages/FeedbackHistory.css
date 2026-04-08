@@ -1,0 +1,99 @@
+.feedback-page {
+  min-height: calc(100vh - 72px);
+  background-color: #f3f3f3;
+  padding: 52px 70px 44px;
+}
+
+.feedback-page__container {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.feedback-card {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 20px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  background: #fff;
+}
+
+.feedback-card__logo {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.feedback-card__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feedback-card__title {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.feedback-card__company {
+  margin: 4px 0 8px;
+  color: #555;
+}
+
+.feedback-card__top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.feedback-card__match {
+  text-align: center;
+}
+
+.feedback-card__match-value {
+  font-size: 32px;
+  color: #8f1731;
+}
+
+.feedback-card__match-label {
+  font-size: 14px;
+  color: #777;
+}
+
+.feedback-card__tags {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.feedback-card__tag::after {
+  content: "•";
+  margin: 0 6px;
+}
+
+.feedback-card__tag:last-child::after {
+  content: "";
+}
+
+.feedback-card__description {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.feedback-card__meta {
+  font-size: 14px;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feedback-card__meta-icon {
+  width: 14px;
+}

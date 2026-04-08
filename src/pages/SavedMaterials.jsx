@@ -6,7 +6,7 @@ import bookmarkIcon from "../img/bookmark.svg";
 import arrowIcon from "../img/arrow.svg";
 import { articlesMock } from "../data/articles";
 
-function ArticleCard({ article }) {
+function SavedArticleCard({ article }) {
   return (
     <Link
       to={`/useful_materials/article/${article.id}`}
@@ -15,14 +15,12 @@ function ArticleCard({ article }) {
       <button
         type="button"
         className="materials-card__bookmark-button"
-        aria-label="Зберегти статтю"
+        aria-label="Збережена стаття"
       >
         <img
           src={bookmarkIcon}
           alt="bookmark"
-          className={`materials-card__bookmark ${
-            article.saved ? "materials-card__bookmark--active" : ""
-          }`}
+          className="materials-card__bookmark materials-card__bookmark--active"
         />
       </button>
 
@@ -47,43 +45,24 @@ function ArticleCard({ article }) {
   );
 }
 
-export default function UsefulMaterials() {
+export default function SavedMaterialsPage() {
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
-  const [sortBy, setSortBy] = useState("latest");
 
-  const filteredArticles = useMemo(() => {
-    const base = articlesMock.filter((article) => {
-      if (!submittedQuery.trim()) return true;
+  const savedArticles = useMemo(() => {
+    const onlySaved = articlesMock.filter((article) => article.saved);
 
-      const query = submittedQuery.toLowerCase();
-      return (
+    if (!submittedQuery.trim()) return onlySaved;
+
+    const query = submittedQuery.toLowerCase();
+
+    return onlySaved.filter(
+      (article) =>
         article.title.toLowerCase().includes(query) ||
         article.excerpt.toLowerCase().includes(query) ||
         article.tags.some((tag) => tag.toLowerCase().includes(query))
-      );
-    });
-
-    const sorted = [...base];
-
-    if (sortBy === "latest") {
-      return sorted;
-    }
-
-    if (sortBy === "popular") {
-      return sorted.sort((a, b) => b.views - a.views);
-    }
-
-    if (sortBy === "saved") {
-      return sorted.sort((a, b) => Number(b.saved) - Number(a.saved));
-    }
-
-    return sorted;
-  }, [submittedQuery, sortBy]);
-
-  const title = submittedQuery.trim()
-    ? "Шукати вакансії"
-    : "Шукати вакансії";
+    );
+  }, [submittedQuery]);
 
   return (
     <main className="materials-page">
@@ -108,7 +87,7 @@ export default function UsefulMaterials() {
       </div>
 
       <section className="materials-page__top">
-        <h1 className="materials-page__title">{title}</h1>
+        <h1 className="materials-page__title">Шукати через збережені статті</h1>
 
         <div className="materials-page__search-row">
           <div className="materials-page__search-input-wrapper">
@@ -138,44 +117,18 @@ export default function UsefulMaterials() {
 
       <section className="materials-content">
         <aside className="materials-sidebar">
-          <h2 className="materials-sidebar__title">Сортувати за</h2>
+          <h2 className="materials-sidebar__title">Сортування</h2>
 
           <div className="materials-sidebar__options">
-            <button
-              type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "latest" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("latest")}
-            >
-              Останні
-            </button>
-
-            <button
-              type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "saved" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("saved")}
-            >
-              Найбільше збережень
-            </button>
-
-            <button
-              type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "popular" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("popular")}
-            >
-              Найбільше переглядів
+            <button type="button" className="materials-sidebar__option materials-sidebar__option--active">
+              Збережені
             </button>
           </div>
         </aside>
 
         <div className="materials-list">
-          {filteredArticles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
+          {savedArticles.map((article) => (
+            <SavedArticleCard key={article.id} article={article} />
           ))}
         </div>
       </section>
