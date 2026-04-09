@@ -2,37 +2,37 @@ package main
 
 import (
 	"log/slog"
-	"net/http"
+//	"net/http"
 	"os"
-	"time"
 
-	"github.com/gin-gonic/gin"
+//	"github.com/gin-gonic/gin"
 
-	"jobs-server/internal/models"
+	"jobs-server/internal/db"
+	"jobs-server/internal/queries"
 )
 
 func main() {
 	logger := slog.Default()
-	conn, err := models.OpenDB(67, logger)
+	conn, err := db.OpenDB(67, logger)
 	if (err != nil) {
 		os.Exit(1)
 	}
 
-	migrMtdt, err := models.GetMigrationsMetadata(conn, logger)
+	migrations, err := db.GetPendingMigrations(queries.MigrationsFS, conn, logger)
 	if (err != nil) {
 		os.Exit(1)
 	}
 
-	logger.Info("Ok", "megimind", migrMtdt)
+	for _, migr := range migrations {
+		if err := migr.LoadSQL(queries.MigrationsFS); err != nil {
+			logger.Error("Failed to load migration.", "err", err)
+			os.Exit(1)
+		}
+		if err := migr.Apply(conn, logger); err != nil {
+			logger.Error("Failed to apply migration.", "err", err)
+			os.Exit(1)
+		}
+	}
 
-	time.Sleep(6 * time.Second)
-
-
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	router.Run()
+	logger.Info("finished")
 }

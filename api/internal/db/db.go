@@ -1,5 +1,5 @@
-// Package models contains the database data representation
-package models
+// Package db contatins the operations over the database
+package db
 
 import (
 	"context"
@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"jobs-server/internal/queries"
 )
 
 func OpenDB(attempts uint16, logger *slog.Logger) (*pgxpool.Pool, error) {
@@ -37,14 +35,14 @@ func OpenDB(attempts uint16, logger *slog.Logger) (*pgxpool.Pool, error) {
 
 	host := os.Getenv("POSTGRES_HOST")
 	if host == "" {
-		logger.Error("Failed to read db-password file", "err", err)
-		return nil, err
+		logger.Error("POSTGRES_HOST env var is not set")
+		return nil, fmt.Errorf("POSTGRES_HOST is required")
 	}
 
-	port:= os.Getenv("POSTGRES_PORT")
+	port := os.Getenv("POSTGRES_PORT")
 	if port == "" {
-		logger.Error("Failed to read db-password file", "err", err)
-		return nil, err
+		logger.Error("POSTGRES_PORT env var is not set")
+		return nil, fmt.Errorf("POSTGRES_PORT is required")
 	}
 
 	connectionString := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", user, pass, host, port, dbName)
@@ -61,47 +59,13 @@ func OpenDB(attempts uint16, logger *slog.Logger) (*pgxpool.Pool, error) {
 		err = conn.Ping(context.Background())
 		if err != nil {
 			logger.Warn("Unable to establish the connection to database", "err", err)
+			time.Sleep(6 * time.Second)
 			continue
 		}
 
-		time.Sleep(6 * time.Second)
-
-		return conn, err
+		return conn, nil
 	}
 
 	logger.Error("Could not connect to the databasea ;-;", "err", err)
 	return nil, err
-}
-
-func GetMigrationsMetadata(conn *pgxpool.Pool, logger *slog.Logger) ([]string, error) {
-	rows, err := conn.Query(context.Background(), queries.TryCreateMetadataSQL)
-	if err != nil {
-		logger.Error("Failed to create migration database", "err", err)
-		return nil, err
-	}
-	rows.Close()
-
-
-	rows, err = conn.Query(context.Background(), queries.GetMigrationsSQL)
-	if err != nil {
-		logger.Error("Failed to get migrations metadata", "err", err)
-		return nil, err
-	}
-
-	var migrations []string
-
-	for rows.Next() {
-		var migration string
-		err := rows.Scan(&migration)
-		if err != nil {
-			logger.Error("Failed to scan migration", 
-				"migration", migration,
-				"err", err)
-			continue
-		}
-		migrations = append(migrations, migration)
-	}
-	rows.Close()
-
-	return migrations, nil
 }

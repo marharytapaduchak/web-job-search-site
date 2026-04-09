@@ -1,3 +1,4 @@
+// Package models contains the database data representation
 package models
 
 
