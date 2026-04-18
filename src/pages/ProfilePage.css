@@ -328,24 +328,3 @@
     background-color: #771229;
   }
   
-  @media (max-width: 900px) {
-    .profile-page {
-      padding: 30px 24px 50px;
-    }
-  
-    .profile-card__top {
-      flex-direction: column;
-    }
-  
-    .profile-card__info-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .profile-files {
-      grid-template-columns: 1fr;
-    }
-  
-    .profile-page__actions {
-      justify-content: flex-start;
-    }
-  }

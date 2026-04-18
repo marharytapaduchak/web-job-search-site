@@ -10,7 +10,8 @@ const feedbackItems = [
     title: "UI / UX Designer",
     company: "PixelPath Studios",
     tags: ["Tag word", "Tag word", "Tag word", "Tag word", "Tag word", "Tag word"],
-    description: "...",
+    description:
+      "PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових продуктів...",
     views: "Views",
     date: "Date",
     match: 89,
@@ -21,7 +22,8 @@ const feedbackItems = [
     title: "UI/UX Designer (Mobile Apps)",
     company: "AppFlow",
     tags: ["Tag word", "Tag word", "Tag word", "Tag word", "Tag word", "Tag word"],
-    description: "...",
+    description:
+      "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків. У вас буде можливість працювати над продуктами, які охоплюють різні категорії користувачів...",
     views: "Views",
     date: "Date",
     match: 75,
@@ -32,7 +34,8 @@ const feedbackItems = [
     title: "UI/UX Designer (Fintech)",
     company: "BrandCraft",
     tags: ["Tag word", "Tag word", "Tag word", "Tag word", "Tag word", "Tag word"],
-    description: "...",
+    description:
+      "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами, які змінюють підхід до управління фінансами. Ви будете займатися розробкою інтуїтивних і зручних інтерфейсів...",
     views: "Views",
     date: "Date",
     match: 32,
@@ -44,14 +47,14 @@ function FeedbackCard({ item }) {
   return (
     <article className="feedback-card">
       <div className="feedback-card__left">
-        <div className={`feedback-card__logo feedback-card__logo--${item.logoVariant}`}>
-          <img src={item.logo} alt="company logo" />
+        <div className="feedback-card__logo">
+          <img src={item.logo} alt={`${item.company} logo`} />
         </div>
       </div>
 
       <div className="feedback-card__content">
         <div className="feedback-card__top">
-          <div>
+          <div className="feedback-card__heading">
             <h2 className="feedback-card__title">{item.title}</h2>
             <p className="feedback-card__company">{item.company}</p>
           </div>

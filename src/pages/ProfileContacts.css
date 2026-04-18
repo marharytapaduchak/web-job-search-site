@@ -128,31 +128,3 @@
     background-color: #771229;
   }
   
-  @media (max-width: 900px) {
-    .profile-contacts-page {
-      padding: 32px 24px 56px;
-    }
-  
-    .profile-contacts-page__container {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-  
-    .profile-contacts-content {
-      max-width: 100%;
-    }
-  
-    .profile-contacts-field {
-      max-width: 100%;
-    }
-  
-    .profile-contacts-actions {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .profile-contacts-save-button {
-      width: 100%;
-      max-width: 320px;
-    }
-  }
