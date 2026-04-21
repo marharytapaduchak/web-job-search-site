@@ -1,17 +1,75 @@
 import "./ProfileContacts.css";
 import eyeIcon from "../img/eye.svg";
+import { useEffect, useState } from "react";
+import { getProfile, updateProfile } from "../services/profileService";
 
 export default function ProfileContacts() {
+  const [profile, setProfile] = useState({
+    email: "",
+    phone: "",
+    telegram: "",
+    linkedin: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profileData = await getProfile();
+
+        setProfile({
+          email: profileData.email || "",
+          phone: profileData.phone || "",
+          telegram: profileData.telegram || "",
+          linkedin: profileData.linkedin || "",
+        });
+      } catch (error) {
+        console.error("Failed to load profile contacts:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setProfile((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  async function handleSave() {
+    try {
+      await updateProfile({
+        email: profile.email,
+        phone: profile.phone,
+        telegram: profile.telegram,
+        linkedin: profile.linkedin,
+      });
+
+      alert("Зміни збережено");
+    } catch (error) {
+      console.error("Failed to save profile contacts:", error);
+      alert("Не вдалося зберегти зміни");
+    }
+  }
+
+  if (loading) {
+    return <main className="profile-contacts-page">Завантаження...</main>;
+  }
+
   return (
     <main className="profile-contacts-page">
       <div className="profile-contacts-page__container">
         <aside className="profile-contacts-sidebar">
-        <a
-  href="/profile_page"
-  className="profile-contacts-sidebar__title"
->
-  Мій профіль
-</a>
+          <a href="/profile_page" className="profile-contacts-sidebar__title">
+            Мій профіль
+          </a>
 
           <button className="profile-contacts-sidebar__item profile-contacts-sidebar__item--active">
             Контакти
@@ -26,16 +84,21 @@ export default function ProfileContacts() {
         </aside>
 
         <section className="profile-contacts-content">
-          <form className="profile-contacts-form">
+          <form
+            className="profile-contacts-form"
+            onSubmit={(e) => e.preventDefault()}
+          >
             <div className="profile-contacts-field">
               <label className="profile-contacts-field__label" htmlFor="email">
                 Email<span className="profile-contacts-field__required">*</span>
               </label>
               <input
                 id="email"
+                name="email"
                 className="profile-contacts-field__input"
                 type="email"
-                defaultValue="katerynamarchuk@gmail.com"
+                value={profile.email}
+                onChange={handleChange}
               />
             </div>
 
@@ -45,9 +108,11 @@ export default function ProfileContacts() {
               </label>
               <input
                 id="phone"
+                name="phone"
                 className="profile-contacts-field__input"
                 type="text"
-                defaultValue="+380996543789"
+                value={profile.phone}
+                onChange={handleChange}
               />
             </div>
 
@@ -60,9 +125,11 @@ export default function ProfileContacts() {
               </label>
               <input
                 id="telegram"
+                name="telegram"
                 className="profile-contacts-field__input"
                 type="text"
-                defaultValue="@katerynamar"
+                value={profile.telegram}
+                onChange={handleChange}
               />
             </div>
 
@@ -75,9 +142,11 @@ export default function ProfileContacts() {
               </label>
               <input
                 id="linkedin"
+                name="linkedin"
                 className="profile-contacts-field__input"
                 type="text"
-                defaultValue="linkedin.com/in/kateryna-marchuk"
+                value={profile.linkedin}
+                onChange={handleChange}
               />
             </div>
           </form>
@@ -92,7 +161,10 @@ export default function ProfileContacts() {
               <span>Переглянути мій профіль</span>
             </a>
 
-            <button className="profile-contacts-save-button">
+            <button
+              className="profile-contacts-save-button"
+              onClick={handleSave}
+            >
               Зберегти зміни
             </button>
           </div>

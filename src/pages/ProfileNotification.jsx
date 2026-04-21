@@ -1,7 +1,73 @@
 import "./ProfileNotification.css";
 import eyeIcon from "../img/eye.svg";
+import { useEffect, useState } from "react";
+import {
+  getProfile,
+  getProfileNotifications,
+  updateProfileNotifications,
+} from "../services/profileService";
 
 export default function ProfileNotification() {
+  const [profile, setProfile] = useState(null);
+  const [notifications, setNotifications] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [profileData, notificationsData] = await Promise.all([
+          getProfile(),
+          getProfileNotifications(),
+        ]);
+
+        setProfile(profileData);
+        setNotifications(notificationsData);
+      } catch (error) {
+        console.error("Failed to load profile notification data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  function handleCheckboxChange(field) {
+    setNotifications((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  }
+
+  async function handleSave() {
+    try {
+      await updateProfileNotifications({
+        allNewVacancies: notifications.allNewVacancies,
+        recommendedVacancies: notifications.recommendedVacancies,
+        disableNotifications: notifications.disableNotifications,
+        sendToMainEmail: notifications.sendToMainEmail,
+        sendToOtherEmail: notifications.sendToOtherEmail,
+      });
+
+      alert("Зміни збережено");
+    } catch (error) {
+      console.error("Failed to save notifications:", error);
+      alert("Не вдалося зберегти зміни");
+    }
+  }
+
+  if (loading) {
+    return <main className="profile-notification-page">Завантаження...</main>;
+  }
+
+  if (!profile || !notifications) {
+    return (
+      <main className="profile-notification-page">
+        Не вдалося завантажити дані
+      </main>
+    );
+  }
+
   return (
     <main className="profile-notification-page">
       <div className="profile-notification-page__container">
@@ -35,7 +101,8 @@ export default function ProfileNotification() {
               <label className="profile-notification-option">
                 <input
                   type="checkbox"
-                  defaultChecked
+                  checked={notifications.allNewVacancies}
+                  onChange={() => handleCheckboxChange("allNewVacancies")}
                   className="profile-notification-option__input"
                 />
                 <span className="profile-notification-option__custom"></span>
@@ -47,6 +114,8 @@ export default function ProfileNotification() {
               <label className="profile-notification-option">
                 <input
                   type="checkbox"
+                  checked={notifications.recommendedVacancies}
+                  onChange={() => handleCheckboxChange("recommendedVacancies")}
                   className="profile-notification-option__input"
                 />
                 <span className="profile-notification-option__custom"></span>
@@ -58,6 +127,8 @@ export default function ProfileNotification() {
               <label className="profile-notification-option">
                 <input
                   type="checkbox"
+                  checked={notifications.disableNotifications}
+                  onChange={() => handleCheckboxChange("disableNotifications")}
                   className="profile-notification-option__input"
                 />
                 <span className="profile-notification-option__custom"></span>
@@ -77,18 +148,21 @@ export default function ProfileNotification() {
               <label className="profile-notification-option">
                 <input
                   type="checkbox"
-                  defaultChecked
+                  checked={notifications.sendToMainEmail}
+                  onChange={() => handleCheckboxChange("sendToMainEmail")}
                   className="profile-notification-option__input"
                 />
                 <span className="profile-notification-option__custom"></span>
                 <span className="profile-notification-option__text">
-                  На katerynamarchuk@gmail.com
+                  На {profile.email}
                 </span>
               </label>
 
               <label className="profile-notification-option">
                 <input
                   type="checkbox"
+                  checked={notifications.sendToOtherEmail}
+                  onChange={() => handleCheckboxChange("sendToOtherEmail")}
                   className="profile-notification-option__input"
                 />
                 <span className="profile-notification-option__custom"></span>
@@ -109,7 +183,10 @@ export default function ProfileNotification() {
               <span>Переглянути мій профіль</span>
             </a>
 
-            <button className="profile-notification-save-button">
+            <button
+              className="profile-notification-save-button"
+              onClick={handleSave}
+            >
               Зберегти зміни
             </button>
           </div>

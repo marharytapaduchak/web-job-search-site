@@ -7,26 +7,14 @@ import trashIcon from "../img/trash.svg";
 import plusIcon from "../img/plus.svg";
 import infoIcon from "../img/info.svg";
 import uploadWhiteIcon from "../img/whiteUpload.svg";
-
-const skills = [
-  { name: "Figma", level: 4 },
-  { name: "UI/UX", level: 3 },
-  { name: "Prototyping", level: 3 },
-  { name: "Product design", level: 3 },
-  { name: "Wireframing", level: 4 },
-  { name: "Тестування", level: 2 },
-  { name: "Дослідження користувачів", level: 2 },
-  { name: "Responsive design", level: 3 },
-  { name: "Інформаційна архітектура", level: 3 },
-  { name: "Adobe Photoshop", level: 4 },
-  { name: "Adobe Illustrator", level: 4 },
-];
-
-const goals = [
-  "Покращити дослідження користувачів",
-  "Вдосконалювати свої навички у сфері UX",
-  "Розробляти інтуїтивно зрозумілі інтерфейси",
-];
+import { useEffect, useState } from "react";
+import {
+  getProfile,
+  getProfileSkills,
+  getProfileGoals,
+  getProfileProjects,
+  updateProfile,
+} from "../services/profileService";
 
 function SkillTag({ name, level }) {
   return (
@@ -116,6 +104,95 @@ function RecommendationCard() {
 }
 
 export default function ProfileEditInfo() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [skills, setSkills] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [projects, setProjects] = useState([]);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    about: "",
+    position: "",
+    qualificationLevel: "",
+    englishLevel: "",
+    city: "",
+    salary: "",
+    hourlyRate: "",
+    portfolioUrl: "",
+  });
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profile = await getProfile();
+        const skillsData = await getProfileSkills();
+        const goalsData = await getProfileGoals();
+        const projectsData = await getProfileProjects();
+
+        setProfile(profile);
+        setSkills(skillsData);
+        setGoals(goalsData);
+        setProjects(projectsData);
+
+        setFormData({
+          firstName: profile.firstName || "",
+          lastName: profile.lastName || "",
+          about: profile.about || "",
+          position: profile.position || "",
+          qualificationLevel: profile.qualificationLevel || "",
+          englishLevel: profile.englishLevel || "",
+          city: profile.city || "",
+          salary: profile.salary || "",
+          hourlyRate: profile.hourlyRate || "",
+          portfolioUrl: profile.portfolioUrl || "",
+        });
+      } catch (error) {
+        console.error("Failed to load profile edit info:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  async function handleSave() {
+    try {
+      await updateProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        about: formData.about,
+        position: formData.position,
+        qualificationLevel: formData.qualificationLevel,
+        englishLevel: formData.englishLevel,
+        city: formData.city,
+        salary: formData.salary,
+        hourlyRate: formData.hourlyRate,
+        portfolioUrl: formData.portfolioUrl,
+      });
+
+      alert("Зміни збережено");
+    } catch (error) {
+      console.error("Failed to save profile edit info:", error);
+      alert("Не вдалося зберегти зміни");
+    }
+  }
+
+  if (loading) {
+    return <main className="profile-edit-page">Завантаження...</main>;
+  }
+
   return (
     <main className="profile-edit-page">
       <div className="profile-edit-page__container">
@@ -161,7 +238,9 @@ export default function ProfileEditInfo() {
                   <input
                     className="profile-edit-field__input"
                     type="text"
-                    defaultValue="Катерина"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -172,7 +251,9 @@ export default function ProfileEditInfo() {
                   <input
                     className="profile-edit-field__input"
                     type="text"
-                    defaultValue="Марчук"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -188,9 +269,9 @@ export default function ProfileEditInfo() {
 
               <textarea
                 className="profile-edit-field__textarea"
-                defaultValue="Я — junior UI/UX дизайнер із пристрастю до створення зручних, сучасних і естетично привабливих інтерфейсів. Маю досвід роботи з ключовими інструментами, такими як Figma, Adobe XD і Sketch, а також володію навичками UX-досліджень, прототипування й тестування.
-Прагну створювати рішення, що не лише відповідають потребам користувачів, а й перевершують їхні очікування. У процесі роботи я ціную співпрацю з командою, увагу до деталей і готовність до вдосконалення.
-Моєю метою є постійний професійний розвиток у сфері UI/UX дизайну та участь у проєктах, які приносять реальну користь людям."
+                name="about"
+                value={formData.about}
+                onChange={handleChange}
               />
             </div>
           </section>
@@ -208,7 +289,9 @@ export default function ProfileEditInfo() {
                   <input
                     className="profile-edit-field__input"
                     type="text"
-                    defaultValue="UI UX дизайнер"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
                   />
                   <img
                     src={searchIcon}
@@ -222,14 +305,21 @@ export default function ProfileEditInfo() {
                 <label className="profile-edit-field__label">
                   Рівень кваліфікації на цій посаді<span>*</span>
                 </label>
-                <select className="profile-edit-field__input">
+                <select
+                  className="profile-edit-field__input"
+                  name="qualificationLevel"
+                  value={formData.qualificationLevel}
+                  onChange={handleChange}
+                >
                   <option>Junior</option>
+                  <option>Middle</option>
+                  <option>Senior</option>
                 </select>
               </div>
             </div>
 
             <div className="profile-edit-add-row">
-              <button className="profile-edit-link-button">
+              <button className="profile-edit-link-button" type="button">
                 <img
                   src={plusIcon}
                   alt="plus"
@@ -262,12 +352,12 @@ export default function ProfileEditInfo() {
               <div className="profile-edit-tags">
                 {skills.map((skill) => (
                   <SkillTag
-                    key={skill.name}
+                    key={skill.id}
                     name={skill.name}
                     level={skill.level}
                   />
                 ))}
-                <button className="profile-edit-link-button">
+                <button className="profile-edit-link-button" type="button">
                   <img
                     src={plusIcon}
                     alt="plus"
@@ -301,9 +391,9 @@ export default function ProfileEditInfo() {
 
               <div className="profile-edit-tags">
                 {goals.map((goal) => (
-                  <GoalTag key={goal} text={goal} />
+                  <GoalTag key={goal.id} text={goal.text} />
                 ))}
-                <button className="profile-edit-link-button">
+                <button className="profile-edit-link-button" type="button">
                   <img
                     src={plusIcon}
                     alt="plus"
@@ -323,11 +413,20 @@ export default function ProfileEditInfo() {
               </div>
 
               <div className="profile-edit-language-row">
-                <select className="profile-edit-field__input profile-edit-language-row__select">
+                <select
+                  className="profile-edit-field__input profile-edit-language-row__select"
+                  name="englishLevel"
+                  value={formData.englishLevel}
+                  onChange={handleChange}
+                >
+                  <option>A1/Beginner</option>
+                  <option>A2/Elementary</option>
                   <option>B1/Intermediate</option>
+                  <option>B2/Upper-Intermediate</option>
+                  <option>C1/Advanced</option>
                 </select>
 
-                <button className="profile-edit-link-button">
+                <button className="profile-edit-link-button" type="button">
                   <img
                     src={plusIcon}
                     alt="plus"
@@ -353,50 +452,35 @@ export default function ProfileEditInfo() {
               <span className="profile-edit-points">+10%</span>
             </div>
 
-            <div className="profile-edit-field">
-              <label className="profile-edit-field__label">
-                Назва проєкту, в якому ви брали участь
-              </label>
-              <input
-                className="profile-edit-field__input"
-                type="text"
-                defaultValue="Мобільний застосунок для планування особистого бюджету"
-              />
-            </div>
+            {projects.map((project) => (
+              <div key={project.id}>
+                <div className="profile-edit-field">
+                  <label className="profile-edit-field__label">
+                    Назва проєкту, в якому ви брали участь
+                  </label>
+                  <input
+                    className="profile-edit-field__input"
+                    type="text"
+                    value={project.title}
+                    readOnly
+                  />
+                </div>
 
-            <div className="profile-edit-field">
-              <label className="profile-edit-field__label">
-                Ваша роль та короткий опис проєкту
-              </label>
-              <textarea
-                className="profile-edit-field__textarea profile-edit-field__textarea--medium"
-                defaultValue="Я створила інтерактивні прототипи для застосунку, що допомагає користувачам легко контролювати свої доходи і витрати. У мої обов’язки входило розроблення адаптивного дизайну, тестування прототипів на реальних користувачах та вдосконалення UX на основі їхнього фідбеку."
-              />
-            </div>
-
-            <div className="profile-edit-field">
-              <label className="profile-edit-field__label">
-                Назва проєкту, в якому ви брали участь
-              </label>
-              <input
-                className="profile-edit-field__input"
-                type="text"
-                defaultValue="Вебсайт для бронювання подорожей"
-              />
-            </div>
-
-            <div className="profile-edit-field">
-              <label className="profile-edit-field__label">
-                Ваша роль та короткий опис проєкту
-              </label>
-              <textarea
-                className="profile-edit-field__textarea profile-edit-field__textarea--medium"
-                defaultValue="У цьому проєкті я була асистентом у створенні UX-дизайну для користувацького потоку. Брала участь у дизайні зручного користувацького потоку для платформи, що дозволяє бронювати квитки та готелі. Я відповідала за розроблення wireframes для ключових сторінок, а також за тестування та коригування інтерфейсу на основі аналітики поведінки користувачів."
-              />
-            </div>
+                <div className="profile-edit-field">
+                  <label className="profile-edit-field__label">
+                    Ваша роль та короткий опис проєкту
+                  </label>
+                  <textarea
+                    className="profile-edit-field__textarea profile-edit-field__textarea--medium"
+                    value={project.description}
+                    readOnly
+                  />
+                </div>
+              </div>
+            ))}
 
             <div className="profile-edit-add-row">
-              <button className="profile-edit-link-button">
+              <button className="profile-edit-link-button" type="button">
                 <img
                   src={plusIcon}
                   alt="plus"
@@ -421,7 +505,7 @@ export default function ProfileEditInfo() {
                 <span className="profile-edit-points">+10%</span>
               </div>
 
-              <button className="profile-edit-template-button">
+              <button className="profile-edit-template-button" type="button">
                 <span>Шаблон резюме</span>
                 <img src={uploadWhiteIcon} alt="download" />
               </button>
@@ -446,10 +530,12 @@ export default function ProfileEditInfo() {
               <input
                 className="profile-edit-field__input profile-edit-field__input--portfolio"
                 type="text"
-                defaultValue="https://www.behance.net/katerynamarchuk"
+                name="portfolioUrl"
+                value={formData.portfolioUrl}
+                onChange={handleChange}
               />
 
-              <button className="profile-edit-template-button">
+              <button className="profile-edit-template-button" type="button">
                 <span>Шаблон портфоліо</span>
                 <img src={uploadWhiteIcon} alt="download" />
               </button>
@@ -518,7 +604,9 @@ export default function ProfileEditInfo() {
                 <input
                   className="profile-edit-field__input"
                   type="text"
-                  defaultValue="Львів"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
                 />
                 <img
                   src={searchIcon}
@@ -546,7 +634,9 @@ export default function ProfileEditInfo() {
                 <input
                   className="profile-edit-field__input"
                   type="text"
-                  defaultValue="600$"
+                  name="salary"
+                  value={formData.salary}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -560,7 +650,9 @@ export default function ProfileEditInfo() {
                 <input
                   className="profile-edit-field__input"
                   type="text"
-                  defaultValue="10$"
+                  name="hourlyRate"
+                  value={formData.hourlyRate}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -603,7 +695,7 @@ export default function ProfileEditInfo() {
               <div className="profile-edit-recommendations-grid">
                 <RecommendationCard />
 
-                <button className="profile-edit-request-card">
+                <button className="profile-edit-request-card" type="button">
                   <img src={plusIcon} alt="plus" />
                   <span>Запросити рекомендацію</span>
                 </button>
@@ -617,7 +709,9 @@ export default function ProfileEditInfo() {
               <span>Переглянути мій профіль</span>
             </a>
 
-            <button className="profile-edit-save-button">Зберегти зміни</button>
+            <button className="profile-edit-save-button" onClick={handleSave}>
+              Зберегти зміни
+            </button>
           </div>
         </section>
       </div>
