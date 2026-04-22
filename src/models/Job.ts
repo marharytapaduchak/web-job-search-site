@@ -1,6 +1,7 @@
 import { Company } from "./Company";
 
 export class Job {
+    id: number;
     title: string;
     company: Company;
     salary: number;
@@ -17,6 +18,7 @@ export class Job {
     date_added: Date;
 
 constructor(
+    id: number,
     title: string,
     company: Company,
     salary: number,
@@ -32,6 +34,7 @@ constructor(
     num_views: number,
     date_added: Date,
   ) {
+    this.id = id;
     this.title = title;
     this.company = company;
     this.salary = salary;
