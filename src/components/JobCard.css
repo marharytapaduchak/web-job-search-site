@@ -1,0 +1,115 @@
+:root {
+    --primary-burgundy: #80182a;
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --accent-yellow: #fdf1a7;
+}
+
+.job-card {
+    font-family: 'Inter', -apple-system, sans-serif;
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    background-color: #fff;
+    border-radius: 4px;
+    margin: 20px;
+}
+
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.company-info {
+    display: flex;
+    gap: 16px;
+}
+
+.logo-placeholder {
+    width: 64px;
+    height: 64px;
+    background-color: var(--accent-yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.job-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+}
+
+.company-name {
+    font-size: 18px;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.compatibility-score {
+    text-align: center;
+    color: var(--primary-burgundy);
+}
+
+.score-number {
+    display: block;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.job-metadata {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.meta-item.highlight {
+    color: var(--primary-burgundy);
+    font-weight: 600;
+}
+
+.meta-separator {
+    color: #ccc;
+}
+
+.job-description {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.job-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

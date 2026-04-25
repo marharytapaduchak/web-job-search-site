@@ -1,0 +1,146 @@
+.profile-notification-page {
+    background-color: #f3f3f3;
+    min-height: calc(100vh - 72px);
+    padding: 48px 68px 80px;
+  }
+  
+  .profile-notification-page__container {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  
+  .profile-notification-sidebar {
+    padding-top: 12px;
+  }
+  
+  .profile-notification-sidebar__title {
+    text-decoration: none;
+    color: #111;
+    font-size: 18px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 12px;
+  }
+  
+  .profile-notification-sidebar__item {
+    width: 100%;
+    height: 48px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .profile-notification-sidebar__item--active {
+    background-color: #8f1731;
+    color: white;
+  }
+  
+  .profile-notification-content {
+    max-width: 860px;
+  }
+  
+  .profile-notification-section {
+    margin-bottom: 40px;
+  }
+  
+  .profile-notification-section__title {
+    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .profile-notification-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  
+  .profile-notification-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  
+  .profile-notification-option__input {
+    display: none;
+  }
+  
+  .profile-notification-option__custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #1a1a1a;
+    background-color: transparent;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .profile-notification-option__input:checked
+    + .profile-notification-option__custom::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: #8f1731;
+  }
+  
+  .profile-notification-option__text {
+    font-size: 16px;
+    color: #111;
+    line-height: 1.4;
+  }
+  
+  .profile-notification-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 70px;
+  }
+  
+  .profile-notification-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #111;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .profile-notification-preview__icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .profile-notification-save-button {
+    width: 265px;
+    height: 52px;
+    border: none;
+    background-color: #8f1731;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  .profile-notification-save-button:hover {
+    background-color: #771229;
+  }
+  

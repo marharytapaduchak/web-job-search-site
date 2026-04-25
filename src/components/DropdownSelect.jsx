@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './DropdownSelect.css';
 
 const DropdownSelect = ({
@@ -8,6 +8,7 @@ const DropdownSelect = ({
   placeholder = "Вибрати"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [direction, setDirection] = useState('down');
   const dropdownRef = useRef(null);
 
   const selectedOption = options.find(opt => opt.value === value);
@@ -25,6 +26,21 @@ const DropdownSelect = ({
     };
   }, []);
 
+  const toggleDropdown = () => {
+    if (!isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      
+      if (spaceBelow < 260) {
+        setDirection('up');
+      } else {
+        setDirection('down');
+      }
+    }
+    setIsOpen(!isOpen);
+  };
+
   const handleSelect = (optionValue) => {
     onChange(optionValue);
     setIsOpen(false);
@@ -34,7 +50,7 @@ const DropdownSelect = ({
     <div className="dropdown-container" ref={dropdownRef}>
       <div
         className={`dropdown-trigger ${!selectedOption ? 'placeholder' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
       >
         <span>{selectedOption ? selectedOption.label : placeholder}</span>
 
@@ -55,7 +71,7 @@ const DropdownSelect = ({
       </div>
 
       {isOpen && (
-        <ul className="dropdown-menu">
+        <ul className={`dropdown-menu ${direction}`}>
           {options.map((option) => (
             <li
               key={option.value}
