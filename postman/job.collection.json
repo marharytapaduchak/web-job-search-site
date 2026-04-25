@@ -1,0 +1,651 @@
+{
+  "info": {
+    "_postman_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "name": "Job CRUD API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "company_id",
+      "value": ""
+    },
+    {
+      "key": "job_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Happy Path",
+      "item": [
+        {
+          "name": "Create Company (setup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Job Test Corp\",\n  \"logo_url\": \"https://example.com/logo.png\",\n  \"location\": \"San Francisco, CA\",\n  \"description\": \"A company created for job tests.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/company/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company", "create"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has id; stores company_id\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"id\");",
+                  "    pm.collectionVariables.set(\"company_id\", body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Software Engineer\",\n  \"company_id\": {{company_id}},\n  \"salary\": \"$100,000 - $150,000\",\n  \"level\": \"Mid\",\n  \"format\": \"Remote\",\n  \"employment_type\": \"Full-time\",\n  \"location\": \"San Francisco, CA\",\n  \"english_level\": \"Upper-Intermediate\",\n  \"description\": \"We are looking for a skilled software engineer.\",\n  \"work_conditions\": \"Flexible hours, remote work\",\n  \"skills\": [\"Go\", \"PostgreSQL\", \"Docker\"],\n  \"benefits\": [\"Health insurance\", \"401k\", \"Remote work\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "create"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has all 15 fields\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"id\");",
+                  "    pm.expect(body).to.have.property(\"title\");",
+                  "    pm.expect(body).to.have.property(\"company_id\");",
+                  "    pm.expect(body).to.have.property(\"salary\");",
+                  "    pm.expect(body).to.have.property(\"level\");",
+                  "    pm.expect(body).to.have.property(\"format\");",
+                  "    pm.expect(body).to.have.property(\"employment_type\");",
+                  "    pm.expect(body).to.have.property(\"location\");",
+                  "    pm.expect(body).to.have.property(\"english_level\");",
+                  "    pm.expect(body).to.have.property(\"description\");",
+                  "    pm.expect(body).to.have.property(\"work_conditions\");",
+                  "    pm.expect(body).to.have.property(\"skills\");",
+                  "    pm.expect(body).to.have.property(\"benefits\");",
+                  "    pm.expect(body).to.have.property(\"num_views\");",
+                  "    pm.expect(body).to.have.property(\"date_added\");",
+                  "    pm.expect(body.skills).to.be.an(\"array\");",
+                  "    pm.expect(body.benefits).to.be.an(\"array\");",
+                  "    pm.collectionVariables.set(\"job_id\", body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body is array containing created job\", function () {",
+                  "    const body = pm.response.json();",
+                  "    const jobId = pm.collectionVariables.get(\"job_id\");",
+                  "    pm.expect(body).to.be.an(\"array\");",
+                  "    const found = body.some(function (j) {",
+                  "        return String(j.id) === String(jobId);",
+                  "    });",
+                  "    pm.expect(found).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches created job\", function () {",
+                  "    const body = pm.response.json();",
+                  "    const jobId = pm.collectionVariables.get(\"job_id\");",
+                  "    pm.expect(String(body.id)).to.equal(String(jobId));",
+                  "    pm.expect(body).to.have.property(\"title\");",
+                  "    pm.expect(body).to.have.property(\"company_id\");",
+                  "    pm.expect(body).to.have.property(\"salary\");",
+                  "    pm.expect(body).to.have.property(\"level\");",
+                  "    pm.expect(body).to.have.property(\"format\");",
+                  "    pm.expect(body).to.have.property(\"employment_type\");",
+                  "    pm.expect(body).to.have.property(\"location\");",
+                  "    pm.expect(body).to.have.property(\"english_level\");",
+                  "    pm.expect(body).to.have.property(\"description\");",
+                  "    pm.expect(body).to.have.property(\"work_conditions\");",
+                  "    pm.expect(body).to.have.property(\"skills\");",
+                  "    pm.expect(body).to.have.property(\"benefits\");",
+                  "    pm.expect(body).to.have.property(\"num_views\");",
+                  "    pm.expect(body).to.have.property(\"date_added\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"company_id\": {{company_id}},\n  \"salary\": \"$150,000 - $200,000\",\n  \"level\": \"Senior\",\n  \"format\": \"Hybrid\",\n  \"employment_type\": \"Full-time\",\n  \"location\": \"New York, NY\",\n  \"english_level\": \"Advanced\",\n  \"description\": \"Updated job description.\",\n  \"work_conditions\": \"Flexible hours, hybrid work\",\n  \"skills\": [\"Go\", \"PostgreSQL\", \"Kubernetes\"],\n  \"benefits\": [\"Health insurance\", \"401k\", \"Stock options\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches updated values\", function () {",
+                  "    const body = pm.response.json();",
+                  "    const req = JSON.parse(pm.request.body.raw);",
+                  "    pm.expect(body.title).to.equal(req.title);",
+                  "    pm.expect(body.salary).to.equal(req.salary);",
+                  "    pm.expect(body.level).to.equal(req.level);",
+                  "    pm.expect(body.format).to.equal(req.format);",
+                  "    pm.expect(body.employment_type).to.equal(req.employment_type);",
+                  "    pm.expect(body.location).to.equal(req.location);",
+                  "    pm.expect(body.english_level).to.equal(req.english_level);",
+                  "    pm.expect(body.description).to.equal(req.description);",
+                  "    pm.expect(body.work_conditions).to.equal(req.work_conditions);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is empty\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Deleted Job",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "{{job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Company (cleanup)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company/{{company_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company", "{{company_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Create — missing fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "create"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create — invalid company_id (0)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Software Engineer\",\n  \"company_id\": 0,\n  \"salary\": \"$100,000 - $150,000\",\n  \"level\": \"Mid\",\n  \"format\": \"Remote\",\n  \"employment_type\": \"Full-time\",\n  \"location\": \"San Francisco, CA\",\n  \"english_level\": \"Upper-Intermediate\",\n  \"description\": \"Test description.\",\n  \"work_conditions\": \"Flexible hours\",\n  \"skills\": [\"Go\"],\n  \"benefits\": [\"Health insurance\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "create"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get — non-numeric ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/abc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "abc"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get — non-existent ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/999999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "999999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update — non-numeric ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"company_id\": 1,\n  \"salary\": \"$150,000 - $200,000\",\n  \"level\": \"Senior\",\n  \"format\": \"Hybrid\",\n  \"employment_type\": \"Full-time\",\n  \"location\": \"New York, NY\",\n  \"english_level\": \"Advanced\",\n  \"description\": \"Updated job description.\",\n  \"work_conditions\": \"Flexible hours\",\n  \"skills\": [\"Go\"],\n  \"benefits\": [\"Health insurance\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/abc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "abc"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update — missing fields",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update — non-existent ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ghost Engineer\",\n  \"company_id\": 999999,\n  \"salary\": \"$100,000\",\n  \"level\": \"Mid\",\n  \"format\": \"Remote\",\n  \"employment_type\": \"Full-time\",\n  \"location\": \"Nowhere\",\n  \"english_level\": \"Advanced\",\n  \"description\": \"Does not exist.\",\n  \"work_conditions\": \"N/A\",\n  \"skills\": [\"Go\"],\n  \"benefits\": [\"None\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/job/999999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "999999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete — non-numeric ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/abc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "abc"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete — non-existent ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/job/999999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "job", "999999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Body has error field\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
