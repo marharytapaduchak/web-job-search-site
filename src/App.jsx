@@ -13,6 +13,8 @@ import MainVacancies from './pages/MainVacancies';
 import ProfileContacts from './pages/ProfileContacts';
 import ProfileNotification from './pages/ProfileNotification';
 import ProfileEditInfo from './pages/ProfileEditInfo';
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="/profile_contacts" element={<ProfileContacts />} />
         <Route path="/profile_notification" element={<ProfileNotification />} />
         <Route path="/profile_edit_info" element={<ProfileEditInfo />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
   );
