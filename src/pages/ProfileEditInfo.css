@@ -421,17 +421,18 @@
   }
   
   .profile-edit-recommendations-grid {
-    display: grid;
-    grid-template-columns: 1fr 330px;
+    display: flex;
+    flex-wrap: wrap;
     gap: 22px;
     align-items: stretch;
   }
   
   .profile-edit-recommendation-card {
+    width: 420px;
+    min-height: 300px;
     border: 1px solid #d8d8d8;
     background-color: #efefef;
     padding: 16px;
-    max-width: 420px;
   }
   
   .profile-edit-recommendation-card__top {
@@ -490,6 +491,8 @@
   }
   
   .profile-edit-request-card {
+    width: 420px;
+    min-height: 300px;
     border: 1px solid #c88093;
     background-color: #f8f0f2;
     display: flex;
@@ -499,7 +502,6 @@
     gap: 18px;
     color: #111;
     cursor: pointer;
-    min-height: 238px;
   }
   
   .profile-edit-request-card img {
@@ -543,5 +545,131 @@
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
+  }
+
+  .recommendation-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 17, 17, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 40px;
+  }
+  
+  .recommendation-modal {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    background-color: #f3f3f3;
+    padding: 56px 50px 32px;
+  }
+  
+  .recommendation-modal__close {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    border: none;
+    background: transparent;
+    font-size: 42px;
+    line-height: 1;
+    cursor: pointer;
+    color: #111;
+  }
+  
+  .recommendation-modal__title {
+    margin: 0 0 28px;
+    font-size: 30px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .recommendation-modal__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 26px;
+  }
+  
+  .recommendation-modal__field {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .recommendation-modal__field label {
+    margin-bottom: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .recommendation-modal__field input {
+    height: 48px;
+    border: 1px solid #d0d0d0;
+    background-color: #f3f3f3;
+    padding: 0 12px;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .recommendation-modal__field textarea {
+    height: 110px;
+    border: 1px solid #d0d0d0;
+    background-color: #f3f3f3;
+    padding: 12px;
+    font-size: 16px;
+    resize: none;
+    outline: none;
+  }
+  
+  .recommendation-modal__skills {
+    margin-top: 32px;
+  }
+  
+  .recommendation-modal__skills h3 {
+    margin: 0 0 24px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .recommendation-modal__add {
+    border: none;
+    background: transparent;
+    color: #8f1731;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  .recommendation-modal__add img {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .recommendation-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 38px;
+  }
+  
+  .recommendation-modal__submit {
+    width: 300px;
+    height: 48px;
+    border: none;
+    background-color: #8f1731;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  .recommendation-modal__submit:hover {
+    background-color: #771229;
   }
   

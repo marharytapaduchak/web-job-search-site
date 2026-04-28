@@ -109,6 +109,8 @@ export default function ProfileEditInfo() {
   const [skills, setSkills] = useState([]);
   const [goals, setGoals] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [isRecommendationModalOpen, setIsRecommendationModalOpen] =
+    useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -695,7 +697,11 @@ export default function ProfileEditInfo() {
               <div className="profile-edit-recommendations-grid">
                 <RecommendationCard />
 
-                <button className="profile-edit-request-card" type="button">
+                <button
+                  className="profile-edit-request-card"
+                  type="button"
+                  onClick={() => setIsRecommendationModalOpen(true)}
+                >
                   <img src={plusIcon} alt="plus" />
                   <span>Запросити рекомендацію</span>
                 </button>
@@ -715,6 +721,55 @@ export default function ProfileEditInfo() {
           </div>
         </section>
       </div>
+      {isRecommendationModalOpen && (
+        <div className="recommendation-modal-overlay">
+          <div className="recommendation-modal">
+            <button
+              className="recommendation-modal__close"
+              type="button"
+              onClick={() => setIsRecommendationModalOpen(false)}
+            >
+              ×
+            </button>
+
+            <h2 className="recommendation-modal__title">
+              Запросити рекомендацію
+            </h2>
+
+            <div className="recommendation-modal__row">
+              <div className="recommendation-modal__field">
+                <label>Ім’я</label>
+                <input type="text" />
+              </div>
+
+              <div className="recommendation-modal__field">
+                <label>Email</label>
+                <input type="email" />
+              </div>
+            </div>
+
+            <div className="recommendation-modal__field">
+              <label>Супровідний лист</label>
+              <textarea />
+            </div>
+
+            <div className="recommendation-modal__skills">
+              <h3>Навички, які потребують підтвердження</h3>
+
+              <button className="recommendation-modal__add" type="button">
+                <img src={plusIcon} alt="plus" />
+                <span>Додати навичку</span>
+              </button>
+            </div>
+
+            <div className="recommendation-modal__actions">
+              <button className="recommendation-modal__submit" type="button">
+                Надіслати лист
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
