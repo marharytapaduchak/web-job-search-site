@@ -1,50 +1,71 @@
 .profile-page {
     background-color: #f3f3f3;
     min-height: calc(100vh - 72px);
-    padding: 40px 70px 60px;
+    padding: 40px 10px 60px;
   }
   
   .profile-page__container {
-    max-width: 1120px;
+    max-width: 1180px;
     margin: 0 auto;
   }
   
+  .profile-page__layout {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  
   .profile-page__back {
+    justify-self: start;
+    padding-left: 4px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     text-decoration: none;
     color: #111;
     font-size: 16px;
     font-weight: 600;
-    margin-bottom: 20px;
     cursor: pointer;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+  
+  .profile-page__back-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  .profile-section.profile-section--recommendations {
+    border-bottom: none;
   }
   
   .profile-card {
     background-color: #f3f3f3;
   }
   
-  .profile-card__top {
-    display: flex;
-    align-items: flex-start;
+  .profile-card__header {
+    display: grid;
+    grid-template-columns: 150px 1fr;
     gap: 28px;
-    margin-bottom: 28px;
+    align-items: start;
+    margin-bottom: 22px;
   }
   
   .profile-card__photo {
-    width: 118px;
-    height: 118px;
+    width: 135px;
+    height: 135px;
     background: linear-gradient(135deg, #b8b8b8, #8d8d8d);
     flex-shrink: 0;
   }
   
   .profile-card__main-info {
-    flex: 1;
+    min-width: 0;
   }
   
   .profile-card__title {
-    margin: 0 0 20px;
+    margin: 0 0 18px;
     font-size: 28px;
     font-weight: 700;
     color: #111;
@@ -53,9 +74,15 @@
   .profile-card__info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-bottom: 22px;
-    max-width: 760px;
+    gap: 50px;
+    margin-bottom: 0;
+    max-width: 560px;
+  }
+  
+  .profile-card__about {
+    max-width: 900px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #d1d1d1;
   }
   
   .profile-card__info-column {
@@ -80,6 +107,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .profile-card__info-svg {
@@ -106,12 +135,6 @@
   .profile-card__meta span:last-child::after {
     content: "";
     margin: 0;
-  }
-  
-  .profile-card__about {
-    max-width: 900px;
-    padding-bottom: 28px;
-    border-bottom: 1px solid #d1d1d1;
   }
   
   .profile-card__about p {

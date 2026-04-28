@@ -86,13 +86,13 @@
   
   .profile-edit-about-row {
     display: grid;
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: 190px 1fr;
     gap: 24px;
-    align-items: start;
+    align-items: center;
   }
   
   .profile-edit-about-row__photo {
-    width: 150px;
+    width: 180px;
     height: 180px;
     background-color: #b8b8b8;
     flex-shrink: 0;
@@ -186,9 +186,11 @@
   
   .profile-edit-points {
     color: #8f1731;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    white-space: nowrap;
+    background-color: #f3dce3;
+    padding: 4px 8px;
+    border-radius: 4px;
   }
   
   .profile-edit-points--hidden {
