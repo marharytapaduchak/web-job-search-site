@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useParams } from "react-router-dom";
-import "./UsefulMaterials.css";
+import "./MaterialArticle.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
+import eyeIcon from "../img/eye.svg";
 import {
   getAllArticles,
   getArticleById,
@@ -10,7 +11,7 @@ import {
   unsaveArticle,
 } from "../services/articlesService";
 
-function SidebarResultCard({ article, isActive }) {
+function SidebarResultCard({ article, isActive, submittedQuery }) {
   return (
     <Link
       to={`/useful_materials/article/${article.id}`}
@@ -18,17 +19,71 @@ function SidebarResultCard({ article, isActive }) {
         isActive ? "materials-results-card--active" : ""
       }`}
     >
+      <button type="button" className="materials-results-card__bookmark">
+        <img src={bookmarkIcon} alt="" />
+      </button>
+
       <h3 className="materials-results-card__title">{article.title}</h3>
+
+      <div className="materials-results-card__tags">
+        {article.tags?.slice(0, 4).map((tag) => {
+          const isActiveTag =
+            submittedQuery.trim() &&
+            tag.toLowerCase().includes(submittedQuery.toLowerCase());
+
+          return (
+            <span
+              key={tag}
+              style={
+                isActiveTag
+                  ? { color: "#8f1731", fontWeight: 700 }
+                  : undefined
+              }
+            >
+              {tag}
+            </span>
+          );
+        })}
+      </div>
+
       <p className="materials-results-card__text">{article.excerpt}</p>
+
+      <div className="materials-results-card__meta">
+        <span className="views">
+          <img src={eyeIcon} alt="" />
+          {article.views} переглядів
+        </span>
+        <span>{article.date}</span>
+      </div>
     </Link>
   );
+}
+
+function renderArticleContent(content) {
+  return (content || "")
+    .split("\n\n")
+    .filter(Boolean)
+    .map((paragraph, index) => {
+      const match = paragraph.match(/^(\d+\.\s[^.?!\n]+)([\s\S]*)/);
+
+      if (match) {
+        return (
+          <p key={index}>
+            <strong>{match[1]}</strong>
+            {match[2]}
+          </p>
+        );
+      }
+
+      return <p key={index}>{paragraph}</p>;
+    });
 }
 
 export default function MaterialArticlePage() {
   const { id } = useParams();
 
   const [searchValue, setSearchValue] = useState("");
-  const [submittedQuery, setSubmittedQuery] = useState("Портфоліо");
+  const [submittedQuery, setSubmittedQuery] = useState(""); // 🔥 тут було "Портфоліо"
   const [article, setArticle] = useState(null);
   const [allArticles, setAllArticles] = useState([]);
   const [loadingArticle, setLoadingArticle] = useState(true);
@@ -45,18 +100,14 @@ export default function MaterialArticlePage() {
 
         const data = await getArticleById(id);
 
-        if (!ignore) {
-          setArticle(data);
-        }
-      } catch (err) {
+        if (!ignore) setArticle(data);
+      } catch {
         if (!ignore) {
           setError("Не вдалося завантажити статтю.");
           setArticle(null);
         }
       } finally {
-        if (!ignore) {
-          setLoadingArticle(false);
-        }
+        if (!ignore) setLoadingArticle(false);
       }
     }
 
@@ -76,17 +127,11 @@ export default function MaterialArticlePage() {
 
         const data = await getAllArticles();
 
-        if (!ignore) {
-          setAllArticles(Array.isArray(data) ? data : []);
-        }
-      } catch (err) {
-        if (!ignore) {
-          setAllArticles([]);
-        }
+        if (!ignore) setAllArticles(Array.isArray(data) ? data : []);
+      } catch {
+        if (!ignore) setAllArticles([]);
       } finally {
-        if (!ignore) {
-          setLoadingList(false);
-        }
+        if (!ignore) setLoadingList(false);
       }
     }
 
@@ -117,30 +162,21 @@ export default function MaterialArticlePage() {
     const nextSaved = !previousSaved;
 
     setArticle((prev) => ({ ...prev, saved: nextSaved }));
-    setAllArticles((prev) =>
-      prev.map((item) =>
-        item.id === article.id ? { ...item, saved: nextSaved } : item
-      )
-    );
 
     try {
-      if (nextSaved) {
-        await saveArticle(article.id);
-      } else {
-        await unsaveArticle(article.id);
-      }
-    } catch (err) {
+      if (nextSaved) await saveArticle(article.id);
+      else await unsaveArticle(article.id);
+    } catch {
       setArticle((prev) => ({ ...prev, saved: previousSaved }));
-      setAllArticles((prev) =>
-        prev.map((item) =>
-          item.id === article.id ? { ...item, saved: previousSaved } : item
-        )
-      );
     }
   }
 
+  function handleSearch() {
+    setSubmittedQuery(searchValue.trim());
+  }
+
   return (
-    <section className="materials-page materials-page--article">
+    <section className="materials-article-page">
       <div className="materials-page__tabs">
         <NavLink
           to="/useful_materials"
@@ -168,60 +204,46 @@ export default function MaterialArticlePage() {
 
       <div className="materials-article-layout">
         <aside className="materials-results-sidebar">
-          <h1 className="materials-page__title materials-page__title--left">
-            Шукати вакансії
-          </h1>
-
-          <div className="materials-page__search-row materials-page__search-row--stack">
-            <div className="materials-page__search-input-wrapper">
-              <img
-                src={searchIcon}
-                alt=""
-                className="materials-page__search-icon"
-              />
-              <input
-                className="materials-page__search-input"
-                type="text"
-                placeholder="Пошук"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-            </div>
-
-            <button
-              type="button"
-              className="materials-page__search-button materials-page__search-button--full"
-              onClick={() => setSubmittedQuery(searchValue)}
-            >
-              Пошук
-            </button>
+          <div className="materials-page__search-input-wrapper">
+            <img src={searchIcon} alt="" className="materials-page__search-icon" />
+            <input
+              className="materials-page__search-input"
+              type="text"
+              placeholder="Пошук"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
+            />
           </div>
 
           {submittedQuery.trim() && (
             <div className="materials-search-chip">
               <span>{submittedQuery}</span>
-              <button
-                type="button"
-                className="materials-search-chip__close"
-                onClick={() => setSubmittedQuery("")}
-              >
-                ×
-              </button>
+              <button onClick={() => setSubmittedQuery("")}>×</button>
             </div>
           )}
 
           <p className="materials-results-sidebar__count">
-            {relatedArticles.length} результатів за запитом{" "}
-            <strong>«{submittedQuery || "усі статті"}»</strong>
+            {submittedQuery.trim() ? (
+              <>
+                {relatedArticles.length} результати за запитом{" "}
+                <strong>«{submittedQuery}»</strong>
+              </>
+            ) : (
+              <>{relatedArticles.length} результати</>
+            )}
           </p>
 
           <div className="materials-results-list">
             {!loadingList &&
-              relatedArticles.map((item) => (
+              relatedArticles.slice(0, 2).map((item) => (
                 <SidebarResultCard
                   key={item.id}
                   article={item}
                   isActive={String(item.id) === String(id)}
+                  submittedQuery={submittedQuery}
                 />
               ))}
           </div>
@@ -232,44 +254,14 @@ export default function MaterialArticlePage() {
             <h1 className="materials-article__title">Завантаження...</h1>
           )}
 
-          {!loadingArticle && error && (
-            <>
-              <h1 className="materials-article__title">Сталася помилка</h1>
-              <div className="materials-article__content">
-                <p>{error}</p>
-              </div>
-            </>
-          )}
-
-          {!loadingArticle && !error && !article && (
-            <>
-              <h1 className="materials-article__title">Статтю не знайдено</h1>
-              <div className="materials-article__content">
-                <p>Перевір посилання або повернися до списку статей.</p>
-              </div>
-            </>
-          )}
-
           {!loadingArticle && !error && article && (
             <>
               <div className="materials-article__top">
-                <div className="materials-article__tags">
-                  {article.tags?.map((tag) => (
-                    <span key={tag} className="materials-card__tag">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <h1 className="materials-article__title">{article.title}</h1>
 
                 <button
-                  type="button"
                   className="materials-article__bookmark-button"
                   onClick={handleToggleSave}
-                  aria-label={
-                    article.saved
-                      ? "Прибрати із збережених"
-                      : "Зберегти статтю"
-                  }
                 >
                   <img
                     src={bookmarkIcon}
@@ -281,21 +273,37 @@ export default function MaterialArticlePage() {
                 </button>
               </div>
 
-              <h1 className="materials-article__title">{article.title}</h1>
+              <div className="materials-article__tags">
+                {article.tags?.map((tag) => {
+                  const isActiveTag =
+                    submittedQuery.trim() &&
+                    tag.toLowerCase().includes(submittedQuery.toLowerCase());
 
-              <div className="materials-article__meta">
-                <span>{article.date}</span>
-                <span>•</span>
-                <span>{article.views} переглядів</span>
+                  return (
+                    <span
+                      key={tag}
+                      className={
+                        isActiveTag
+                          ? "materials-article__tag materials-article__tag--active"
+                          : "materials-article__tag"
+                      }
+                    >
+                      {tag}
+                    </span>
+                  );
+                })}
               </div>
 
               <div className="materials-article__content">
-                {(article.content || "")
-                  .split("\n\n")
-                  .filter(Boolean)
-                  .map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
+                {renderArticleContent(article.content)}
+              </div>
+
+              <div className="materials-article__meta">
+                <span className="views">
+                  <img src={eyeIcon} alt="" />
+                  {article.views} переглядів
+                </span>
+                <span>{article.date}</span>
               </div>
             </>
           )}

@@ -1,20 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import "./UsefulMaterials.css";
+import "./SavedMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
-import arrowIcon from "../img/arrow.svg";
-import {
-  getSavedArticles,
-  unsaveArticle,
-} from "../services/articlesService";
+import eyeIcon from "../img/eye.svg";
+import { getSavedArticles, unsaveArticle } from "../services/articlesService";
 
-function SavedArticleCard({ article, onRemove }) {
+function SavedArticleCard({ article, onRemove, submittedQuery }) {
   return (
-    <Link
-      to={`/useful_materials/article/${article.id}`}
-      className="materials-card"
-    >
+    <Link to={`/useful_materials/article/${article.id}`} className="materials-card">
       <button
         type="button"
         className="materials-card__bookmark-button"
@@ -35,20 +29,35 @@ function SavedArticleCard({ article, onRemove }) {
       <h3 className="materials-card__title">{article.title}</h3>
 
       <div className="materials-card__tags">
-        {article.tags?.map((tag) => (
-          <span key={tag} className="materials-card__tag">
-            {tag}
-          </span>
-        ))}
+        {article.tags?.map((tag) => {
+          const isActiveTag =
+            submittedQuery.trim() &&
+            tag.toLowerCase().includes(submittedQuery.trim().toLowerCase());
+
+          return (
+            <span
+              key={tag}
+              className={
+                isActiveTag
+                  ? "materials-card__tag materials-card__tag--active"
+                  : "materials-card__tag"
+              }
+            >
+              {tag}
+            </span>
+          );
+        })}
       </div>
 
       <p className="materials-card__text">{article.excerpt}</p>
 
       <div className="materials-card__footer">
+        <span className="views">
+          <img src={eyeIcon} alt="" />
+          {article.views} переглядів
+        </span>
         <span>{article.date}</span>
       </div>
-
-      <img src={arrowIcon} alt="" className="materials-card__arrow" />
     </Link>
   );
 }
@@ -57,6 +66,8 @@ export default function SavedMaterialsPage() {
   const [articles, setArticles] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
+  const [draftSortBy, setDraftSortBy] = useState("saved");
+  const [sortBy, setSortBy] = useState("saved");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -73,7 +84,7 @@ export default function SavedMaterialsPage() {
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
+      } catch {
         if (!ignore) {
           setError("Не вдалося завантажити збережені статті.");
         }
@@ -92,28 +103,48 @@ export default function SavedMaterialsPage() {
   }, []);
 
   const savedArticles = useMemo(() => {
-    if (!submittedQuery.trim()) return articles;
+    const filtered = articles.filter((article) => {
+      if (!submittedQuery.trim()) return true;
 
-    const query = submittedQuery.toLowerCase();
+      const query = submittedQuery.trim().toLowerCase();
 
-    return articles.filter(
-      (article) =>
+      return (
         article.title?.toLowerCase().includes(query) ||
         article.excerpt?.toLowerCase().includes(query) ||
         article.tags?.some((tag) => tag.toLowerCase().includes(query))
-    );
-  }, [articles, submittedQuery]);
+      );
+    });
+
+    if (sortBy === "popular") {
+      return [...filtered].sort((a, b) => (b.views ?? 0) - (a.views ?? 0));
+    }
+
+    return filtered;
+  }, [articles, submittedQuery, sortBy]);
 
   async function handleRemove(article) {
-    const previous = articles;
+    const previousArticles = articles;
 
     setArticles((prev) => prev.filter((item) => item.id !== article.id));
 
     try {
       await unsaveArticle(article.id);
-    } catch (err) {
-      setArticles(previous);
+    } catch {
+      setArticles(previousArticles);
     }
+  }
+
+  function handleSearch() {
+    setSubmittedQuery(searchValue.trim());
+  }
+
+  function handleResetSort() {
+    setDraftSortBy("saved");
+    setSortBy("saved");
+  }
+
+  function handleApplySort() {
+    setSortBy(draftSortBy);
   }
 
   return (
@@ -144,44 +175,83 @@ export default function SavedMaterialsPage() {
       </div>
 
       <div className="materials-page__top">
-        <h1 className="materials-page__title">Шукати серед збережених статей</h1>
+        <h1 className="materials-page__title">
+          Шукати серед збережених статей
+        </h1>
 
         <div className="materials-page__search-row">
           <div className="materials-page__search-input-wrapper">
-            <img
-              src={searchIcon}
-              alt=""
-              className="materials-page__search-icon"
-            />
+            <img src={searchIcon} alt="" className="materials-page__search-icon" />
+
             <input
               className="materials-page__search-input"
               type="text"
               placeholder="Пошук"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
             />
           </div>
 
           <button
-            className="materials-page__search-button"
             type="button"
-            onClick={() => setSubmittedQuery(searchValue)}
+            className="materials-page__search-button"
+            onClick={handleSearch}
           >
             Пошук
           </button>
         </div>
+
+        {submittedQuery && (
+          <div className="materials-search-chip">
+            <span>{submittedQuery}</span>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSubmittedQuery("");
+                setSearchValue("");
+              }}
+              aria-label="Очистити пошук"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="materials-content">
         <aside className="materials-sidebar">
           <h2 className="materials-sidebar__title">Сортувати за</h2>
 
-          <div className="materials-sidebar__options">
+          <div className="materials-sidebar__select-wrapper">
+            <select
+              className="materials-sidebar__select"
+              value={draftSortBy}
+              onChange={(e) => setDraftSortBy(e.target.value)}
+            >
+              <option value="saved">Збережені</option>
+              <option value="popular">Найбільше переглядів</option>
+            </select>
+          </div>
+
+          <div className="materials-sidebar__actions">
             <button
               type="button"
-              className="materials-sidebar__option materials-sidebar__option--active"
+              className="materials-sidebar__reset"
+              onClick={handleResetSort}
             >
-              Збережені
+              Скинути
+            </button>
+
+            <button
+              type="button"
+              className="materials-sidebar__apply"
+              onClick={handleApplySort}
+            >
+              Застосувати
             </button>
           </div>
         </aside>
@@ -216,6 +286,7 @@ export default function SavedMaterialsPage() {
                 key={article.id}
                 article={article}
                 onRemove={handleRemove}
+                submittedQuery={submittedQuery}
               />
             ))}
         </div>

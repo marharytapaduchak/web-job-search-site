@@ -3,14 +3,14 @@ import { Link, NavLink } from "react-router-dom";
 import "./UsefulMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
-import arrowIcon from "../img/arrow.svg";
+import eyeIcon from "../img/eye.svg";
 import {
   getAllArticles,
   saveArticle,
   unsaveArticle,
 } from "../services/articlesService";
 
-function ArticleCard({ article, onToggleSave }) {
+function ArticleCard({ article, onToggleSave, submittedQuery }) {
   return (
     <Link
       to={`/useful_materials/article/${article.id}`}
@@ -40,20 +40,35 @@ function ArticleCard({ article, onToggleSave }) {
       <h3 className="materials-card__title">{article.title}</h3>
 
       <div className="materials-card__tags">
-        {article.tags?.map((tag) => (
-          <span key={tag} className="materials-card__tag">
-            {tag}
-          </span>
-        ))}
+        {article.tags?.map((tag) => {
+          const isActiveTag =
+            submittedQuery.trim() &&
+            tag.toLowerCase().includes(submittedQuery.trim().toLowerCase());
+
+          return (
+            <span
+              key={tag}
+              className={
+                isActiveTag
+                  ? "materials-card__tag materials-card__tag--active"
+                  : "materials-card__tag"
+              }
+            >
+              {tag}
+            </span>
+          );
+        })}
       </div>
 
       <p className="materials-card__text">{article.excerpt}</p>
 
       <div className="materials-card__footer">
+        <span className="views">
+          <img src={eyeIcon} alt="" />
+          {article.views} переглядів
+        </span>
         <span>{article.date}</span>
       </div>
-
-      <img src={arrowIcon} alt="" className="materials-card__arrow" />
     </Link>
   );
 }
@@ -63,6 +78,7 @@ export default function UsefulMaterials() {
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
+  const [draftSortBy, setDraftSortBy] = useState("latest");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -79,7 +95,7 @@ export default function UsefulMaterials() {
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
+      } catch {
         if (!ignore) {
           setError("Не вдалося завантажити статті.");
         }
@@ -101,7 +117,7 @@ export default function UsefulMaterials() {
     const base = articles.filter((article) => {
       if (!submittedQuery.trim()) return true;
 
-      const query = submittedQuery.toLowerCase();
+      const query = submittedQuery.trim().toLowerCase();
 
       return (
         article.title?.toLowerCase().includes(query) ||
@@ -134,12 +150,9 @@ export default function UsefulMaterials() {
     );
 
     try {
-      if (nextSaved) {
-        await saveArticle(article.id);
-      } else {
-        await unsaveArticle(article.id);
-      }
-    } catch (err) {
+      if (nextSaved) await saveArticle(article.id);
+      else await unsaveArticle(article.id);
+    } catch {
       setArticles((prev) =>
         prev.map((item) =>
           item.id === article.id ? { ...item, saved: previousSaved } : item
@@ -148,7 +161,18 @@ export default function UsefulMaterials() {
     }
   }
 
-  const title = "Шукати вакансії";
+  function handleSearch() {
+    setSubmittedQuery(searchValue.trim());
+  }
+
+  function handleResetSort() {
+    setDraftSortBy("latest");
+    setSortBy("latest");
+  }
+
+  function handleApplySort() {
+    setSortBy(draftSortBy);
+  }
 
   return (
     <section className="materials-page">
@@ -178,7 +202,7 @@ export default function UsefulMaterials() {
       </div>
 
       <div className="materials-page__top">
-        <h1 className="materials-page__title">{title}</h1>
+        <h1 className="materials-page__title">Шукати вакансії</h1>
 
         <div className="materials-page__search-row">
           <div className="materials-page__search-input-wrapper">
@@ -187,58 +211,77 @@ export default function UsefulMaterials() {
               alt=""
               className="materials-page__search-icon"
             />
+
             <input
               className="materials-page__search-input"
               type="text"
-              placeholder="Введіть запит"
+              placeholder="Пошук"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
             />
           </div>
 
           <button
             className="materials-page__search-button"
             type="button"
-            onClick={() => setSubmittedQuery(searchValue)}
+            onClick={handleSearch}
           >
             Пошук
           </button>
         </div>
+
+        {submittedQuery && (
+          <div className="materials-search-chip">
+            <span>{submittedQuery}</span>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSubmittedQuery("");
+                setSearchValue("");
+              }}
+              aria-label="Очистити пошук"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="materials-content">
         <aside className="materials-sidebar">
           <h2 className="materials-sidebar__title">Сортувати за</h2>
 
-          <div className="materials-sidebar__options">
+          <div className="materials-sidebar__select-wrapper">
+            <select
+              className="materials-sidebar__select"
+              value={draftSortBy}
+              onChange={(e) => setDraftSortBy(e.target.value)}
+            >
+              <option value="latest">Останні</option>
+              <option value="saved">Найбільше збережень</option>
+              <option value="popular">Найбільше переглядів</option>
+            </select>
+          </div>
+
+          <div className="materials-sidebar__actions">
             <button
               type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "latest" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("latest")}
+              className="materials-sidebar__reset"
+              onClick={handleResetSort}
             >
-              Останні
+              Скинути
             </button>
 
             <button
               type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "saved" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("saved")}
+              className="materials-sidebar__apply"
+              onClick={handleApplySort}
             >
-              Найбільше збережень
-            </button>
-
-            <button
-              type="button"
-              className={`materials-sidebar__option ${
-                sortBy === "popular" ? "materials-sidebar__option--active" : ""
-              }`}
-              onClick={() => setSortBy("popular")}
-            >
-              Найбільше переглядів
+              Застосувати
             </button>
           </div>
         </aside>
@@ -273,6 +316,7 @@ export default function UsefulMaterials() {
                 key={article.id}
                 article={article}
                 onToggleSave={handleToggleSave}
+                submittedQuery={submittedQuery}
               />
             ))}
         </div>
