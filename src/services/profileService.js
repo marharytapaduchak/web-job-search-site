@@ -53,3 +53,42 @@ export function createProfileGoal(text) {
 export function deleteProfileGoal(id) {
   return backend.delete(`/userGoals/${id}`);
 }
+
+export function createProfileSkill(name, level = 1) {
+  return backend.post("/userSkills", {
+    userId: CURRENT_USER_ID,
+    name,
+    level,
+  });
+}
+
+export function deleteProfileSkill(id) {
+  return backend.delete(`/userSkills/${id}`);
+}
+
+export function createProfileProject(title, description) {
+  return backend.post("/userProjects", {
+    userId: CURRENT_USER_ID,
+    title,
+    description,
+  });
+}
+
+export function updateProfileProject(id, updates) {
+  return backend.patch(`/userProjects/${id}`, updates);
+}
+
+export function deleteProfileProject(id) {
+  return backend.delete(`/userProjects/${id}`);
+}
+
+export function getProfileRecommendations() {
+  return backend.get(`/userRecommendations?userId=${CURRENT_USER_ID}`);
+}
+
+export function createProfileRecommendation(recommendation) {
+  return backend.post("/userRecommendations", {
+    userId: CURRENT_USER_ID,
+    ...recommendation,
+  });
+}

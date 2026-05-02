@@ -16,14 +16,27 @@ import {
   updateProfile,
   createProfileGoal,
   deleteProfileGoal,
+  createProfileSkill,
+  deleteProfileSkill,
+  createProfileProject,
+  updateProfileProject,
+  deleteProfileProject,
+  getProfileRecommendations,
+  createProfileRecommendation,
 } from "../services/profileService";
 
-function SkillTag({ name, level }) {
+function SkillTag({ name, level, onDelete }) {
   return (
     <div className="profile-edit-skill-tag">
       <span className="profile-edit-skill-tag__name">{name}</span>
       <span className="profile-edit-skill-tag__level">{level}</span>
-      <span className="profile-edit-skill-tag__close">×</span>
+      <button
+        type="button"
+        className="profile-edit-skill-tag__close"
+        onClick={onDelete}
+      >
+        ×
+      </button>
     </div>
   );
 }
@@ -75,17 +88,17 @@ function UploadBox({ fileName, fileDate }) {
   );
 }
 
-function RecommendationCard() {
+function RecommendationCard({ recommendation }) {
   return (
     <div className="profile-edit-recommendation-card">
       <div className="profile-edit-recommendation-card__top">
         <div className="profile-edit-recommendation-card__photo"></div>
         <div>
           <h3 className="profile-edit-recommendation-card__name">
-            Роман Петренко
+            {recommendation.name}
           </h3>
           <p className="profile-edit-recommendation-card__role">
-            UX UI дизайнер, викладач Дизайну взаємодії у ЛНАМ
+            {recommendation.email}
           </p>
         </div>
       </div>
@@ -95,17 +108,13 @@ function RecommendationCard() {
       </p>
 
       <div className="profile-edit-recommendation-card__skills">
-        <span>UI/UX</span>
-        <span>Wireframing</span>
-        <span>Prototyping</span>
+        {recommendation.skills?.map((skill, index) => (
+          <span key={index}>{skill}</span>
+        ))}
       </div>
 
       <p className="profile-edit-recommendation-card__text">
-        Я рекомендую Катерину як талановиту і перспективну дизайнерку. Вона
-        успішно опанувала ключові інструменти, такі як Figma та Adobe XD, і
-        продемонструвала глибоке розуміння UX-досліджень. Її проєкти
-        вирізняються функціональністю та естетикою, а її командна робота й увага
-        до деталей заслуговують на високу оцінку.
+        {recommendation.message}
       </p>
     </div>
   );
@@ -122,14 +131,32 @@ export default function ProfileEditInfo() {
   const [projects, setProjects] = useState([]);
   const [isRecommendationModalOpen, setIsRecommendationModalOpen] =
     useState(false);
+  const [newSkillName, setNewSkillName] = useState("");
+  const [newSkillLevel, setNewSkillLevel] = useState(1);
+  const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [deletedSkillIds, setDeletedSkillIds] = useState([]);
+  const [newSkills, setNewSkills] = useState([]);
+  const [deletedProjectIds, setDeletedProjectIds] = useState([]);
+  const [newProject, setNewProject] = useState({
+    title: "",
+    description: "",
+  });
+  const [isAddingProject, setIsAddingProject] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [newRecommendations, setNewRecommendations] = useState([]);
 
+  const [recommendationForm, setRecommendationForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+    skills: [],
+  });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     about: "",
-    position: "",
-    qualificationLevel: "",
-    englishLevel: "",
+    position: [],
+    languages: [],
     city: "",
     salary: "",
     hourlyRate: "",
@@ -139,6 +166,35 @@ export default function ProfileEditInfo() {
     canRelocate: false,
   });
 
+  const isAboutFilled = formData.about.trim().length > 0;
+  const isSkillsFilled = skills.length > 0;
+  const isGoalsFilled = goals.length > 0;
+  const isLanguagesFilled = formData.languages.some(
+    (l) => l.name.trim() && l.level
+  );
+  const isProjectsFilled = projects.length > 0;
+  const isSalaryFilled = formData.salary.trim().length > 0;
+  const isHourlyFilled = formData.hourlyRate.trim().length > 0;
+  const isCityFilled = formData.city.trim().length > 0;
+  const isWorkFormatsFilled = formData.workFormats.length > 0;
+  const isEmploymentTypesFilled = formData.employmentTypes.length > 0;
+  const isRecommendationsFilled = recommendations.length > 0;
+
+  const progress =
+    (isAboutFilled ? 10 : 0) +
+    (isSkillsFilled ? 15 : 0) +
+    (isGoalsFilled ? 10 : 0) +
+    (isLanguagesFilled ? 5 : 0) +
+    (isProjectsFilled ? 10 : 0) +
+    (isSalaryFilled ? 5 : 0) +
+    (isHourlyFilled ? 5 : 0) +
+    (isCityFilled ? 5 : 0) +
+    (isWorkFormatsFilled ? 5 : 0) +
+    (isEmploymentTypesFilled ? 5 : 0) +
+    (isRecommendationsFilled ? 10 : 0);
+
+  const progressPercent = Math.min(progress, 100);
+
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -146,19 +202,33 @@ export default function ProfileEditInfo() {
         const skillsData = await getProfileSkills();
         const goalsData = await getProfileGoals();
         const projectsData = await getProfileProjects();
+        const recommendationsData = await getProfileRecommendations();
 
         setProfile(profile);
         setSkills(skillsData);
         setGoals(goalsData);
         setProjects(projectsData);
+        setRecommendations(recommendationsData);
 
         setFormData({
           firstName: profile.firstName || "",
           lastName: profile.lastName || "",
           about: profile.about || "",
-          position: profile.position || "",
+          positions: profile.positions || [
+            {
+              id: "main-position",
+              title: profile.position || "",
+              qualificationLevel: profile.qualificationLevel || "Junior",
+            },
+          ],
           qualificationLevel: profile.qualificationLevel || "",
-          englishLevel: profile.englishLevel || "",
+          languages: profile.languages || [
+            {
+              id: "main-language",
+              name: "Англійська",
+              level: profile.englishLevel || "B1/Intermediate",
+            },
+          ],
           city: profile.city || "",
           salary: profile.salary || "",
           hourlyRate: profile.hourlyRate || "",
@@ -245,15 +315,141 @@ export default function ProfileEditInfo() {
     setGoals((prev) => prev.filter((goal) => goal.id !== goalId));
   }
 
+  function handleLanguageChange(languageId, field, value) {
+    setFormData((prev) => ({
+      ...prev,
+      languages: prev.languages.map((language) =>
+        language.id === languageId ? { ...language, [field]: value } : language
+      ),
+    }));
+  }
+
+  function handleAddLanguage() {
+    setFormData((prev) => ({
+      ...prev,
+      languages: [
+        ...prev.languages,
+        {
+          id: `temp-language-${Date.now()}`,
+          name: "",
+          level: "A1/Beginner",
+        },
+      ],
+    }));
+  }
+
+  function handleDeleteLanguage(languageId) {
+    setFormData((prev) => ({
+      ...prev,
+      languages: prev.languages.filter(
+        (language) => language.id !== languageId
+      ),
+    }));
+  }
+
+  function handlePositionChange(positionId, field, value) {
+    setFormData((prev) => ({
+      ...prev,
+      positions: prev.positions.map((position) =>
+        position.id === positionId ? { ...position, [field]: value } : position
+      ),
+    }));
+  }
+
+  function handleAddPosition() {
+    setFormData((prev) => ({
+      ...prev,
+      positions: [
+        ...prev.positions,
+        {
+          id: `temp-position-${Date.now()}`,
+          title: "",
+          qualificationLevel: "Junior",
+        },
+      ],
+    }));
+  }
+
+  function handleDeletePosition(positionId) {
+    if (formData.positions.length === 1) {
+      alert("Має бути хоча б одна посада");
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      positions: prev.positions.filter(
+        (position) => position.id !== positionId
+      ),
+    }));
+  }
+
+  function handleAddRecommendation() {
+    const name = recommendationForm.name.trim();
+    const email = recommendationForm.email.trim();
+    const message = recommendationForm.message.trim();
+
+    if (!name || !email || !message) {
+      alert("Заповніть ім’я, email і супровідний лист");
+      return;
+    }
+
+    if (recommendationForm.skills.length === 0) {
+      alert("Оберіть хоча б одну навичку для підтвердження");
+      return;
+    }
+
+    const temporaryRecommendation = {
+      id: `temp-${Date.now()}`,
+      name,
+      email,
+      message,
+      skills: recommendationForm.skills,
+      isNew: true,
+    };
+
+    setRecommendations((prev) => [...prev, temporaryRecommendation]);
+    setNewRecommendations((prev) => [...prev, temporaryRecommendation]);
+
+    setRecommendationForm({
+      name: "",
+      email: "",
+      message: "",
+      skills: [],
+    });
+
+    setIsRecommendationModalOpen(false);
+  }
+
   async function handleSave() {
+    const hasEmptyPosition = formData.positions.some(
+      (position) => !position.title.trim() || !position.qualificationLevel
+    );
+
+    if (hasEmptyPosition) {
+      alert("Для кожної посади потрібно вказати назву і рівень");
+      return;
+    }
+
+    const hasEmptyLanguage = formData.languages.some(
+      (language) => !language.name.trim() || !language.level
+    );
+
+    if (hasEmptyLanguage) {
+      alert("Для кожної мови потрібно вказати назву і рівень");
+      return;
+    }
+
+    const firstPosition = formData.positions[0];
     try {
       await updateProfile({
         firstName: formData.firstName,
         lastName: formData.lastName,
         about: formData.about,
-        position: formData.position,
-        qualificationLevel: formData.qualificationLevel,
-        englishLevel: formData.englishLevel,
+        position: firstPosition.title,
+        qualificationLevel: firstPosition.qualificationLevel,
+        positions: formData.positions,
+        languages: formData.languages,
         city: formData.city,
         salary: formData.salary,
         hourlyRate: formData.hourlyRate,
@@ -262,6 +458,55 @@ export default function ProfileEditInfo() {
         workFormats: formData.workFormats,
         canRelocate: formData.canRelocate,
       });
+
+      await Promise.all(
+        deletedSkillIds.map((skillId) => deleteProfileSkill(skillId))
+      );
+
+      await Promise.all(
+        newSkills.map((skill) => createProfileSkill(skill.name, skill.level))
+      );
+
+      setDeletedSkillIds([]);
+      setNewSkills([]);
+
+      await Promise.all(
+        newRecommendations.map((recommendation) =>
+          createProfileRecommendation({
+            name: recommendation.name,
+            email: recommendation.email,
+            message: recommendation.message,
+            skills: recommendation.skills,
+          })
+        )
+      );
+
+      setNewRecommendations([]);
+
+      await Promise.all(
+        deletedProjectIds.map((projectId) => deleteProfileProject(projectId))
+      );
+
+      await Promise.all(
+        projects
+          .filter((project) => project.isNew)
+          .map((project) =>
+            createProfileProject(project.title, project.description)
+          )
+      );
+
+      await Promise.all(
+        projects
+          .filter((project) => !project.isNew)
+          .map((project) =>
+            updateProfileProject(project.id, {
+              title: project.title,
+              description: project.description,
+            })
+          )
+      );
+
+      setDeletedProjectIds([]);
 
       await Promise.all(
         deletedGoalIds.map((goalId) => deleteProfileGoal(goalId))
@@ -274,6 +519,75 @@ export default function ProfileEditInfo() {
       console.error("Failed to save profile edit info:", error);
       alert("Не вдалося зберегти зміни");
     }
+  }
+
+  function handleDeleteSkill(skillId) {
+    setDeletedSkillIds((prev) => [...prev, skillId]);
+    setSkills((prev) => prev.filter((skill) => skill.id !== skillId));
+  }
+
+  function handleAddSkill() {
+    const trimmedName = newSkillName.trim();
+
+    if (!trimmedName) {
+      alert("Введіть назву навички");
+      return;
+    }
+
+    const wordsCount = trimmedName.split(/\s+/).length;
+
+    if (wordsCount > 4) {
+      alert("Назва навички має містити не більше 4 слів");
+      return;
+    }
+
+    const temporarySkill = {
+      id: `temp-${Date.now()}`,
+      name: trimmedName,
+      level: Number(newSkillLevel),
+      isNew: true,
+    };
+
+    setNewSkills((prev) => [...prev, temporarySkill]);
+    setSkills((prev) => [...prev, temporarySkill]);
+
+    setNewSkillName("");
+    setNewSkillLevel(1);
+    setIsAddingSkill(false);
+  }
+
+  function handleProjectChange(projectId, field, value) {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === projectId ? { ...project, [field]: value } : project
+      )
+    );
+  }
+
+  function handleDeleteProject(projectId) {
+    setDeletedProjectIds((prev) => [...prev, projectId]);
+    setProjects((prev) => prev.filter((project) => project.id !== projectId));
+  }
+
+  function handleAddProject() {
+    const title = newProject.title.trim();
+    const description = newProject.description.trim();
+
+    if (!title || !description) {
+      alert("Заповніть назву проєкту і вашу роль");
+      return;
+    }
+
+    const temporaryProject = {
+      id: `temp-${Date.now()}`,
+      title,
+      description,
+      isNew: true,
+    };
+
+    setProjects((prev) => [...prev, temporaryProject]);
+    setNewProject({ title: "", description: "" });
+    setIsAddingProject(false);
   }
 
   if (loading) {
@@ -305,10 +619,14 @@ export default function ProfileEditInfo() {
           <div className="profile-edit-progress">
             <div className="profile-edit-progress__top">
               <span>Профіль заповнено на</span>
-              <span className="profile-edit-progress__value">120%</span>
+              <span className="profile-edit-progress__value">{progress}%</span>
             </div>
+
             <div className="profile-edit-progress__bar">
-              <div className="profile-edit-progress__fill"></div>
+              <div
+                className="profile-edit-progress__fill"
+                style={{ width: `${progressPercent}%` }}
+              ></div>
             </div>
           </div>
 
@@ -351,7 +669,13 @@ export default function ProfileEditInfo() {
                 <label className="profile-edit-field__label">
                   Розширена розповідь про вас
                 </label>
-                <span className="profile-edit-points">+10%</span>
+                <span
+                  className={`profile-edit-points ${
+                    isAboutFilled ? "active" : ""
+                  }`}
+                >
+                  +10%
+                </span>
               </div>
 
               <textarea
@@ -366,47 +690,74 @@ export default function ProfileEditInfo() {
           <section className="profile-edit-section">
             <h2 className="profile-edit-section__title">Навички</h2>
 
-            <div className="profile-edit-two-cols">
-              <div className="profile-edit-field">
-                <label className="profile-edit-field__label">
-                  Посада<span>*</span>
-                </label>
+            {formData.positions.map((position) => (
+              <div className="profile-edit-position-row" key={position.id}>
+                <div className="profile-edit-two-cols">
+                  <div className="profile-edit-field">
+                    <label className="profile-edit-field__label">
+                      Посада<span>*</span>
+                    </label>
 
-                <div className="profile-edit-input-icon">
-                  <input
-                    className="profile-edit-field__input"
-                    type="text"
-                    name="position"
-                    value={formData.position}
-                    onChange={handleChange}
-                  />
-                  <img
-                    src={searchIcon}
-                    alt="search"
-                    className="profile-edit-input-icon__icon"
-                  />
+                    <div className="profile-edit-input-icon">
+                      <input
+                        className="profile-edit-field__input"
+                        type="text"
+                        value={position.title}
+                        onChange={(e) =>
+                          handlePositionChange(
+                            position.id,
+                            "title",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <img
+                        src={searchIcon}
+                        alt="search"
+                        className="profile-edit-input-icon__icon"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="profile-edit-field">
+                    <label className="profile-edit-field__label">
+                      Рівень кваліфікації на цій посаді<span>*</span>
+                    </label>
+
+                    <select
+                      className="profile-edit-field__input"
+                      value={position.qualificationLevel}
+                      onChange={(e) =>
+                        handlePositionChange(
+                          position.id,
+                          "qualificationLevel",
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option>Junior</option>
+                      <option>Middle</option>
+                      <option>Senior</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="profile-edit-field">
-                <label className="profile-edit-field__label">
-                  Рівень кваліфікації на цій посаді<span>*</span>
-                </label>
-                <select
-                  className="profile-edit-field__input"
-                  name="qualificationLevel"
-                  value={formData.qualificationLevel}
-                  onChange={handleChange}
+                <button
+                  className="profile-edit-link-button"
+                  type="button"
+                  onClick={() => handleDeletePosition(position.id)}
                 >
-                  <option>Junior</option>
-                  <option>Middle</option>
-                  <option>Senior</option>
-                </select>
+                  Видалити посаду
+                </button>
               </div>
-            </div>
+            ))}
 
             <div className="profile-edit-add-row">
-              <button className="profile-edit-link-button" type="button">
+              <button
+                className="profile-edit-link-button"
+                type="button"
+                onClick={handleAddPosition}
+              >
                 <img
                   src={plusIcon}
                   alt="plus"
@@ -433,7 +784,13 @@ export default function ProfileEditInfo() {
                     Ключові слова допоможуть рекрутерам показати ваші вміння
                   </p>
                 </div>
-                <span className="profile-edit-points">+15%</span>
+                <span
+                  className={`profile-edit-points ${
+                    isSkillsFilled ? "active" : ""
+                  }`}
+                >
+                  +15%
+                </span>
               </div>
 
               <div className="profile-edit-tags">
@@ -442,17 +799,66 @@ export default function ProfileEditInfo() {
                     key={skill.id}
                     name={skill.name}
                     level={skill.level}
+                    onDelete={() => handleDeleteSkill(skill.id)}
                   />
                 ))}
 
-                <button className="profile-edit-link-button" type="button">
-                  <img
-                    src={plusIcon}
-                    alt="plus"
-                    className="profile-edit-link-button__icon"
-                  />
-                  <span>Додати навичку</span>
-                </button>
+                {isAddingSkill ? (
+                  <div className="profile-edit-skill-add">
+                    <input
+                      className="profile-edit-skill-add__input"
+                      type="text"
+                      value={newSkillName}
+                      placeholder="Назва навички"
+                      onChange={(e) => setNewSkillName(e.target.value)}
+                    />
+
+                    <select
+                      className="profile-edit-skill-add__level"
+                      value={newSkillLevel}
+                      onChange={(e) => setNewSkillLevel(e.target.value)}
+                    >
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+
+                    <button
+                      className="profile-edit-link-button"
+                      type="button"
+                      onClick={handleAddSkill}
+                    >
+                      Зберегти
+                    </button>
+
+                    <button
+                      className="profile-edit-skill-add__close"
+                      type="button"
+                      onClick={() => {
+                        setNewSkillName("");
+                        setNewSkillLevel(1);
+                        setIsAddingSkill(false);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="profile-edit-link-button"
+                    type="button"
+                    onClick={() => setIsAddingSkill(true)}
+                  >
+                    <img
+                      src={plusIcon}
+                      alt="plus"
+                      className="profile-edit-link-button__icon"
+                    />
+                    <span>Додати навичку</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -474,7 +880,13 @@ export default function ProfileEditInfo() {
                     професійні прагнення
                   </p>
                 </div>
-                <span className="profile-edit-points">+10%</span>
+                <span
+                  className={`profile-edit-points ${
+                    isGoalsFilled ? "active" : ""
+                  }`}
+                >
+                  +10%
+                </span>
               </div>
 
               <div className="profile-edit-tags">
@@ -539,35 +951,64 @@ export default function ProfileEditInfo() {
 
             <div className="profile-edit-subsection">
               <div className="profile-edit-subsection__top">
-                <div className="profile-edit-field__label">
-                  Рівень англійської
-                </div>
-                <span className="profile-edit-points">+5%</span>
-              </div>
-
-              <div className="profile-edit-language-row">
-                <select
-                  className="profile-edit-field__input profile-edit-language-row__select"
-                  name="englishLevel"
-                  value={formData.englishLevel}
-                  onChange={handleChange}
+                <div className="profile-edit-field__label">Рівень мови</div>
+                <span
+                  className={`profile-edit-points ${
+                    isLanguagesFilled ? "active" : ""
+                  }`}
                 >
-                  <option>A1/Beginner</option>
-                  <option>A2/Elementary</option>
-                  <option>B1/Intermediate</option>
-                  <option>B2/Upper-Intermediate</option>
-                  <option>C1/Advanced</option>
-                </select>
-
-                <button className="profile-edit-link-button" type="button">
-                  <img
-                    src={plusIcon}
-                    alt="plus"
-                    className="profile-edit-link-button__icon"
-                  />
-                  <span>Додати мову</span>
-                </button>
+                  +5%
+                </span>
               </div>
+
+              {formData.languages.map((language) => (
+                <div className="profile-edit-language-row" key={language.id}>
+                  <input
+                    className="profile-edit-field__input profile-edit-language-row__select"
+                    type="text"
+                    placeholder="Мова"
+                    value={language.name}
+                    onChange={(e) =>
+                      handleLanguageChange(language.id, "name", e.target.value)
+                    }
+                  />
+
+                  <select
+                    className="profile-edit-field__input profile-edit-language-row__select"
+                    value={language.level}
+                    onChange={(e) =>
+                      handleLanguageChange(language.id, "level", e.target.value)
+                    }
+                  >
+                    <option>A1/Beginner</option>
+                    <option>A2/Elementary</option>
+                    <option>B1/Intermediate</option>
+                    <option>B2/Upper-Intermediate</option>
+                    <option>C1/Advanced</option>
+                  </select>
+
+                  <button
+                    className="profile-edit-link-button"
+                    type="button"
+                    onClick={() => handleDeleteLanguage(language.id)}
+                  >
+                    Видалити мову
+                  </button>
+                </div>
+              ))}
+
+              <button
+                className="profile-edit-link-button"
+                type="button"
+                onClick={handleAddLanguage}
+              >
+                <img
+                  src={plusIcon}
+                  alt="plus"
+                  className="profile-edit-link-button__icon"
+                />
+                <span>Додати мову</span>
+              </button>
             </div>
           </section>
 
@@ -582,11 +1023,17 @@ export default function ProfileEditInfo() {
                   участь
                 </p>
               </div>
-              <span className="profile-edit-points">+10%</span>
+              <span
+                className={`profile-edit-points ${
+                  isProjectsFilled ? "active" : ""
+                }`}
+              >
+                +10%
+              </span>
             </div>
 
             {projects.map((project) => (
-              <div key={project.id}>
+              <div key={project.id} className="profile-edit-project">
                 <div className="profile-edit-field">
                   <label className="profile-edit-field__label">
                     Назва проєкту, в якому ви брали участь
@@ -595,7 +1042,9 @@ export default function ProfileEditInfo() {
                     className="profile-edit-field__input"
                     type="text"
                     value={project.title}
-                    readOnly
+                    onChange={(e) =>
+                      handleProjectChange(project.id, "title", e.target.value)
+                    }
                   />
                 </div>
 
@@ -606,21 +1055,87 @@ export default function ProfileEditInfo() {
                   <textarea
                     className="profile-edit-field__textarea profile-edit-field__textarea--medium"
                     value={project.description}
-                    readOnly
+                    onChange={(e) =>
+                      handleProjectChange(
+                        project.id,
+                        "description",
+                        e.target.value
+                      )
+                    }
                   />
                 </div>
+
+                <button
+                  className="profile-edit-link-button"
+                  type="button"
+                  onClick={() => handleDeleteProject(project.id)}
+                >
+                  Видалити досвід
+                </button>
               </div>
             ))}
 
             <div className="profile-edit-add-row">
-              <button className="profile-edit-link-button" type="button">
-                <img
-                  src={plusIcon}
-                  alt="plus"
-                  className="profile-edit-link-button__icon"
-                />
-                <span>Додати досвід</span>
-              </button>
+              {isAddingProject ? (
+                <div className="profile-edit-project-add">
+                  <input
+                    className="profile-edit-field__input"
+                    type="text"
+                    placeholder="Назва проєкту"
+                    value={newProject.title}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                  />
+
+                  <textarea
+                    className="profile-edit-field__textarea profile-edit-field__textarea--medium"
+                    placeholder="Ваша роль та короткий опис проєкту"
+                    value={newProject.description}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  />
+
+                  <button
+                    className="profile-edit-link-button"
+                    type="button"
+                    onClick={handleAddProject}
+                  >
+                    Зберегти досвід
+                  </button>
+
+                  <button
+                    className="profile-edit-project-add__close"
+                    type="button"
+                    onClick={() => {
+                      setNewProject({ title: "", description: "" });
+                      setIsAddingProject(false);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="profile-edit-link-button"
+                  type="button"
+                  onClick={() => setIsAddingProject(true)}
+                >
+                  <img
+                    src={plusIcon}
+                    alt="plus"
+                    className="profile-edit-link-button__icon"
+                  />
+                  <span>Додати досвід</span>
+                </button>
+              )}
             </div>
           </section>
 
@@ -686,7 +1201,13 @@ export default function ProfileEditInfo() {
                   <div className="profile-edit-field__label">
                     Тип зайнятості
                   </div>
-                  <span className="profile-edit-points">+5%</span>
+                  <span
+                    className={`profile-edit-points ${
+                      isEmploymentTypesFilled ? "active" : ""
+                    }`}
+                  >
+                    +5%
+                  </span>
                 </div>
 
                 <div className="profile-edit-checkboxes">
@@ -713,7 +1234,13 @@ export default function ProfileEditInfo() {
               <div className="profile-edit-subsection">
                 <div className="profile-edit-subsection__top">
                   <div className="profile-edit-field__label">Формат роботи</div>
-                  <span className="profile-edit-points">+5%</span>
+                  <span
+                    className={`profile-edit-points ${
+                      isWorkFormatsFilled ? "active" : ""
+                    }`}
+                  >
+                    +5%
+                  </span>
                 </div>
 
                 <div className="profile-edit-checkboxes">
@@ -738,7 +1265,13 @@ export default function ProfileEditInfo() {
                 <div className="profile-edit-field__label">
                   Місто та країна перебування
                 </div>
-                <span className="profile-edit-points">+5%</span>
+                <span
+                  className={`profile-edit-points ${
+                    isCityFilled ? "active" : ""
+                  }`}
+                >
+                  +5%
+                </span>
               </div>
 
               <div className="profile-edit-input-icon">
@@ -773,7 +1306,11 @@ export default function ProfileEditInfo() {
                   <div className="profile-edit-field__label">
                     Зарплатні очікування
                   </div>
-                  <span className="profile-edit-points profile-edit-points--hidden">
+                  <span
+                    className={`profile-edit-points ${
+                      isSalaryFilled ? "active" : ""
+                    }`}
+                  >
                     +5%
                   </span>
                 </div>
@@ -791,7 +1328,13 @@ export default function ProfileEditInfo() {
                   <div className="profile-edit-field__label">
                     Погодинна ставка
                   </div>
-                  <span className="profile-edit-points">+5%</span>
+                  <span
+                    className={`profile-edit-points ${
+                      isHourlyFilled ? "active" : ""
+                    }`}
+                  >
+                    +5%
+                  </span>
                 </div>
                 <input
                   className="profile-edit-field__input"
@@ -835,11 +1378,22 @@ export default function ProfileEditInfo() {
                     ваших навичок
                   </p>
                 </div>
-                <span className="profile-edit-points">+10%</span>
+                <span
+                  className={`profile-edit-points ${
+                    isRecommendationsFilled ? "active" : ""
+                  }`}
+                >
+                  +10%
+                </span>
               </div>
 
               <div className="profile-edit-recommendations-grid">
-                <RecommendationCard />
+                {recommendations.map((recommendation) => (
+                  <RecommendationCard
+                    key={recommendation.id}
+                    recommendation={recommendation}
+                  />
+                ))}
 
                 <button
                   className="profile-edit-request-card"
@@ -883,31 +1437,83 @@ export default function ProfileEditInfo() {
             <div className="recommendation-modal__row">
               <div className="recommendation-modal__field">
                 <label>Ім’я</label>
-                <input type="text" />
+                <input
+                  type="text"
+                  value={recommendationForm.name}
+                  onChange={(e) =>
+                    setRecommendationForm((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
+                />
               </div>
 
               <div className="recommendation-modal__field">
                 <label>Email</label>
-                <input type="email" />
+                <input
+                  type="email"
+                  value={recommendationForm.email}
+                  onChange={(e) =>
+                    setRecommendationForm((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
+                />
               </div>
             </div>
 
             <div className="recommendation-modal__field">
               <label>Супровідний лист</label>
-              <textarea />
+              <textarea
+                value={recommendationForm.message}
+                onChange={(e) =>
+                  setRecommendationForm((prev) => ({
+                    ...prev,
+                    message: e.target.value,
+                  }))
+                }
+              />
             </div>
 
             <div className="recommendation-modal__skills">
               <h3>Навички, які потребують підтвердження</h3>
 
-              <button className="recommendation-modal__add" type="button">
-                <img src={plusIcon} alt="plus" />
-                <span>Додати навичку</span>
-              </button>
+              <div className="recommendation-modal__skills-list">
+                {skills.map((skill) => (
+                  <label
+                    key={skill.id}
+                    className="recommendation-modal__skill-option"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={recommendationForm.skills.includes(skill.name)}
+                      onChange={() => {
+                        setRecommendationForm((prev) => {
+                          const exists = prev.skills.includes(skill.name);
+
+                          return {
+                            ...prev,
+                            skills: exists
+                              ? prev.skills.filter((s) => s !== skill.name)
+                              : [...prev.skills, skill.name],
+                          };
+                        });
+                      }}
+                    />
+                    <span>{skill.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="recommendation-modal__actions">
-              <button className="recommendation-modal__submit" type="button">
+              <button
+                className="recommendation-modal__submit"
+                type="button"
+                onClick={handleAddRecommendation}
+              >
                 Надіслати лист
               </button>
             </div>
