@@ -14,6 +14,8 @@ import {
   getProfileGoals,
   getProfileProjects,
   updateProfile,
+  createProfileGoal,
+  deleteProfileGoal,
 } from "../services/profileService";
 
 function SkillTag({ name, level }) {
@@ -26,11 +28,17 @@ function SkillTag({ name, level }) {
   );
 }
 
-function GoalTag({ text }) {
+function GoalTag({ text, onDelete }) {
   return (
     <div className="profile-edit-goal-tag">
       <span>{text}</span>
-      <span className="profile-edit-goal-tag__close">×</span>
+      <button
+        type="button"
+        className="profile-edit-goal-tag__close"
+        onClick={onDelete}
+      >
+        ×
+      </button>
     </div>
   );
 }
@@ -104,6 +112,9 @@ function RecommendationCard() {
 }
 
 export default function ProfileEditInfo() {
+  const [newGoalText, setNewGoalText] = useState("");
+  const [isAddingGoal, setIsAddingGoal] = useState(false);
+  const [deletedGoalIds, setDeletedGoalIds] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [skills, setSkills] = useState([]);
@@ -123,6 +134,9 @@ export default function ProfileEditInfo() {
     salary: "",
     hourlyRate: "",
     portfolioUrl: "",
+    employmentTypes: [],
+    workFormats: [],
+    canRelocate: false,
   });
 
   useEffect(() => {
@@ -149,6 +163,13 @@ export default function ProfileEditInfo() {
           salary: profile.salary || "",
           hourlyRate: profile.hourlyRate || "",
           portfolioUrl: profile.portfolioUrl || "",
+          employmentTypes: profile.employmentTypes || [
+            "Часткова зайнятість",
+            "Проєктна робота",
+            "Стажування",
+          ],
+          workFormats: profile.workFormats || ["Віддалена", "Віддалена/офіс"],
+          canRelocate: profile.canRelocate || false,
         });
       } catch (error) {
         console.error("Failed to load profile edit info:", error);
@@ -169,6 +190,61 @@ export default function ProfileEditInfo() {
     }));
   }
 
+  function handleCheckboxArrayChange(field, value) {
+    setFormData((prev) => {
+      const currentValues = prev[field];
+
+      return {
+        ...prev,
+        [field]: currentValues.includes(value)
+          ? currentValues.filter((item) => item !== value)
+          : [...currentValues, value],
+      };
+    });
+  }
+
+  function handleCheckboxChange(event) {
+    const { name, checked } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  }
+
+  const GOAL_MAX_LENGTH = 70;
+
+  async function handleAddGoal() {
+    const trimmedGoal = newGoalText.trim();
+
+    if (!trimmedGoal) {
+      alert("Введіть текст цілі");
+      return;
+    }
+
+    if (trimmedGoal.length > GOAL_MAX_LENGTH) {
+      alert(`Ціль має містити не більше ${GOAL_MAX_LENGTH} символів`);
+      return;
+    }
+
+    try {
+      const createdGoal = await createProfileGoal(trimmedGoal);
+
+      setGoals((prev) => [...prev, createdGoal]);
+      setNewGoalText("");
+      setIsAddingGoal(false);
+    } catch (error) {
+      console.error("Failed to add goal:", error);
+      alert("Не вдалося додати ціль");
+    }
+  }
+
+  function handleDeleteGoal(goalId) {
+    setDeletedGoalIds((prev) => [...prev, goalId]);
+
+    setGoals((prev) => prev.filter((goal) => goal.id !== goalId));
+  }
+
   async function handleSave() {
     try {
       await updateProfile({
@@ -182,7 +258,16 @@ export default function ProfileEditInfo() {
         salary: formData.salary,
         hourlyRate: formData.hourlyRate,
         portfolioUrl: formData.portfolioUrl,
+        employmentTypes: formData.employmentTypes,
+        workFormats: formData.workFormats,
+        canRelocate: formData.canRelocate,
       });
+
+      await Promise.all(
+        deletedGoalIds.map((goalId) => deleteProfileGoal(goalId))
+      );
+
+      setDeletedGoalIds([]);
 
       alert("Зміни збережено");
     } catch (error) {
@@ -359,6 +444,7 @@ export default function ProfileEditInfo() {
                     level={skill.level}
                   />
                 ))}
+
                 <button className="profile-edit-link-button" type="button">
                   <img
                     src={plusIcon}
@@ -393,16 +479,61 @@ export default function ProfileEditInfo() {
 
               <div className="profile-edit-tags">
                 {goals.map((goal) => (
-                  <GoalTag key={goal.id} text={goal.text} />
-                ))}
-                <button className="profile-edit-link-button" type="button">
-                  <img
-                    src={plusIcon}
-                    alt="plus"
-                    className="profile-edit-link-button__icon"
+                  <GoalTag
+                    key={goal.id}
+                    text={goal.text}
+                    onDelete={() => handleDeleteGoal(goal.id)}
                   />
-                  <span>Додати ціль</span>
-                </button>
+                ))}
+
+                {isAddingGoal ? (
+                  <div className="profile-edit-goal-add">
+                    <input
+                      className="profile-edit-goal-add__input"
+                      type="text"
+                      value={newGoalText}
+                      maxLength={GOAL_MAX_LENGTH}
+                      placeholder="Введіть нову ціль"
+                      onChange={(e) => setNewGoalText(e.target.value)}
+                    />
+
+                    <span className="profile-edit-goal-add__counter">
+                      {newGoalText.length}/{GOAL_MAX_LENGTH}
+                    </span>
+
+                    <button
+                      className="profile-edit-link-button"
+                      type="button"
+                      onClick={handleAddGoal}
+                    >
+                      Зберегти
+                    </button>
+
+                    <button
+                      className="profile-edit-goal-add__close"
+                      type="button"
+                      onClick={() => {
+                        setNewGoalText("");
+                        setIsAddingGoal(false);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="profile-edit-link-button"
+                    type="button"
+                    onClick={() => setIsAddingGoal(true)}
+                  >
+                    <img
+                      src={plusIcon}
+                      alt="plus"
+                      className="profile-edit-link-button__icon"
+                    />
+                    <span>Додати ціль</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -559,18 +690,23 @@ export default function ProfileEditInfo() {
                 </div>
 
                 <div className="profile-edit-checkboxes">
-                  <label>
-                    <input type="checkbox" /> Повна зайнятість
-                  </label>
-                  <label>
-                    <input type="checkbox" defaultChecked /> Часткова зайнятість
-                  </label>
-                  <label>
-                    <input type="checkbox" defaultChecked /> Проєктна робота
-                  </label>
-                  <label>
-                    <input type="checkbox" defaultChecked /> Стажування
-                  </label>
+                  {[
+                    "Повна зайнятість",
+                    "Часткова зайнятість",
+                    "Проєктна робота",
+                    "Стажування",
+                  ].map((type) => (
+                    <label key={type}>
+                      <input
+                        type="checkbox"
+                        checked={formData.employmentTypes.includes(type)}
+                        onChange={() =>
+                          handleCheckboxArrayChange("employmentTypes", type)
+                        }
+                      />
+                      {type}
+                    </label>
+                  ))}
                 </div>
               </div>
 
@@ -581,15 +717,18 @@ export default function ProfileEditInfo() {
                 </div>
 
                 <div className="profile-edit-checkboxes">
-                  <label>
-                    <input type="checkbox" defaultChecked /> Віддалена
-                  </label>
-                  <label>
-                    <input type="checkbox" defaultChecked /> Віддалена/офіс
-                  </label>
-                  <label>
-                    <input type="checkbox" /> Офіс
-                  </label>
+                  {["Віддалена", "Віддалена/офіс", "Офіс"].map((format) => (
+                    <label key={format}>
+                      <input
+                        type="checkbox"
+                        checked={formData.workFormats.includes(format)}
+                        onChange={() =>
+                          handleCheckboxArrayChange("workFormats", format)
+                        }
+                      />
+                      {format}
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
@@ -618,7 +757,12 @@ export default function ProfileEditInfo() {
               </div>
 
               <label className="profile-edit-checkbox-single">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  name="canRelocate"
+                  checked={formData.canRelocate}
+                  onChange={handleCheckboxChange}
+                />
                 <span>Можу переїхати за потреби</span>
               </label>
             </div>

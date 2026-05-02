@@ -42,3 +42,14 @@ export function getProfileGoals() {
 export function getProfileProjects() {
   return backend.get(`/userProjects?userId=${CURRENT_USER_ID}`);
 }
+
+export function createProfileGoal(text) {
+  return backend.post("/userGoals", {
+    userId: CURRENT_USER_ID,
+    text,
+  });
+}
+
+export function deleteProfileGoal(id) {
+  return backend.delete(`/userGoals/${id}`);
+}

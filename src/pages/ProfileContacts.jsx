@@ -43,8 +43,17 @@ export default function ProfileContacts() {
     }));
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
+    if (!profile.email.trim()) {
+      alert("Email є обовʼязковим");
+      return;
+    }
+
     try {
+      setSaving(true);
+
       await updateProfile({
         email: profile.email,
         phone: profile.phone,
@@ -56,6 +65,8 @@ export default function ProfileContacts() {
     } catch (error) {
       console.error("Failed to save profile contacts:", error);
       alert("Не вдалося зберегти зміни");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -164,8 +175,9 @@ export default function ProfileContacts() {
             <button
               className="profile-contacts-save-button"
               onClick={handleSave}
+              disabled={saving}
             >
-              Зберегти зміни
+              {saving ? "Збереження..." : "Зберегти зміни"}
             </button>
           </div>
         </section>
