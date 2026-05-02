@@ -25,6 +25,10 @@ npm install react-router-dom
 5. Start the project!
 
 ```shell
+npx json-server --watch data/db.json --port 3001
+```
+
+```shell
 npm run dev
 ```
 
