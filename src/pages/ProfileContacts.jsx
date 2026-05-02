@@ -78,7 +78,7 @@ export default function ProfileContacts() {
     <main className="profile-contacts-page">
       <div className="profile-contacts-page__container">
         <aside className="profile-contacts-sidebar">
-          <a href="/profile_page" className="profile-contacts-sidebar__title">
+          <a href="/profile_edit_info" className="profile-contacts-sidebar__title">
             Мій профіль
           </a>
 

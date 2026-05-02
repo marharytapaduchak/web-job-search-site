@@ -13,6 +13,7 @@ import {
   getProfileSkills,
   getProfileGoals,
   getProfileProjects,
+  getProfileRecommendations,
 } from "../services/profileService";
 
 export default function Profile() {
@@ -21,22 +22,30 @@ export default function Profile() {
   const [skills, setSkills] = useState([]);
   const [goals, setGoals] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     async function loadProfile() {
       try {
-        const [profileData, skillsData, goalsData, projectsData] =
-          await Promise.all([
-            getProfile(),
-            getProfileSkills(),
-            getProfileGoals(),
-            getProfileProjects(),
-          ]);
+        const [
+          profileData,
+          skillsData,
+          goalsData,
+          projectsData,
+          recommendationsData,
+        ] = await Promise.all([
+          getProfile(),
+          getProfileSkills(),
+          getProfileGoals(),
+          getProfileProjects(),
+          getProfileRecommendations(),
+        ]);
 
         setProfile(profileData);
         setSkills(skillsData);
         setGoals(goalsData);
         setProjects(projectsData);
+        setRecommendations(recommendationsData);
       } catch (error) {
         console.error("Failed to load profile:", error);
       } finally {
@@ -147,12 +156,27 @@ export default function Profile() {
             </div>
 
             <div className="profile-card__meta">
-              <span>{profile.salary}</span>
-              <span>{profile.qualificationLevel}</span>
-              <span>{profile.workFormat}</span>
-              <span>{profile.employmentType}</span>
-              <span>{profile.locationScope}</span>
-              <span>{profile.englishLevel}</span>
+              {profile.salary && <span>{profile.salary}</span>}
+
+              {profile.positions?.map((position) => (
+                <span key={position.id}>
+                  {position.title} — {position.qualificationLevel}
+                </span>
+              ))}
+
+              {profile.workFormats?.map((format) => (
+                <span key={format}>{format}</span>
+              ))}
+
+              {profile.employmentTypes?.map((type) => (
+                <span key={type}>{type}</span>
+              ))}
+
+              {profile.languages?.map((language) => (
+                <span key={language.id}>
+                  {language.name} — {language.level}
+                </span>
+              ))}
             </div>
 
             <div className="profile-card__about">
@@ -237,44 +261,38 @@ export default function Profile() {
 
             <section className="profile-section profile-section--recommendations">
               <h2 className="profile-section__title">Рекомендації</h2>
+              {recommendations.map((recommendation) => (
+                <div className="recommendation-card" key={recommendation.id}>
+                  <div className="recommendation-card__top">
+                    <div className="recommendation-card__photo" />
 
-              <div className="recommendation-card">
-                <div className="recommendation-card__top">
-                  <div className="recommendation-card__photo" />
-
-                  <div>
-                    <h3 className="recommendation-card__name">
-                      Роман Петренко
-                    </h3>
-                    <p className="recommendation-card__role">
-                      UX UI дизайнер, викладач Дизайну взаємодії у ЛНАМ
-                    </p>
+                    <div>
+                      <h3 className="recommendation-card__name">
+                        {recommendation.name}
+                      </h3>
+                      <p className="recommendation-card__role">
+                        {recommendation.email}
+                      </p>
+                    </div>
                   </div>
+
+                  <p className="recommendation-card__subtitle">
+                    Підтверджені навички:
+                  </p>
+
+                  <div className="recommendation-card__skills">
+                    {recommendation.skills?.map((skill) => (
+                      <span className="recommendation-card__skill" key={skill}>
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+
+                  <p className="recommendation-card__text">
+                    {recommendation.message}
+                  </p>
                 </div>
-
-                <p className="recommendation-card__subtitle">
-                  Підтверджені навички:
-                </p>
-
-                <div className="recommendation-card__skills">
-                  <span className="recommendation-card__skill">UI/UX</span>
-                  <span className="recommendation-card__skill">
-                    Wireframing
-                  </span>
-                  <span className="recommendation-card__skill">
-                    Prototyping
-                  </span>
-                </div>
-
-                <p className="recommendation-card__text">
-                  Я рекомендую Катерину як талановиту і перспективну дизайнерку.
-                  Вона успішно опанувала ключові інструменти, такі як Figma та
-                  Adobe XD, і продемонструвала глибоке розуміння UX-досліджень.
-                  Її проєкти вирізняються функціональністю та естетикою, а її
-                  командна робота й увага до деталей заслуговують на високу
-                  оцінку.
-                </p>
-              </div>
+              ))}
             </section>
 
             <div className="profile-page__actions">

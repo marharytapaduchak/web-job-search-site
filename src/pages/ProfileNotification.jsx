@@ -78,7 +78,7 @@ export default function ProfileNotification() {
       <div className="profile-notification-page__container">
         <aside className="profile-notification-sidebar">
           <a
-            href="/profile_page"
+            href="/profile_edit_info"
             className="profile-notification-sidebar__title"
           >
             Мій профіль
