@@ -1,0 +1,30 @@
+
+:root {
+    --sidebar-width: 320px;
+    --sidebar-padding-y: 30px;
+    --sidebar-padding-x: 20px;
+    --spacing-md: 24px;
+    
+    --bg-surface: #ffffff;
+    --text-primary: #111827;
+}
+
+.filter-sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0; 
+    background-color: var(--bg-surface);
+    padding: var(--sidebar-padding-y) var(--sidebar-padding-x);
+}
+
+.filters-main-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+}
+
+.filters-scroll-container {
+    display: flex;
+    flex-direction: column;
+}

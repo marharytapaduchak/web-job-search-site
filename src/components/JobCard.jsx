@@ -33,6 +33,10 @@ const JobCard = () => {
                 <span className="meta-item highlight">Світ</span>
                 <span className="meta-separator">•</span>
                 <span className="meta-item highlight">Intermediate</span>
+                <span className="meta-separator">•</span>
+                <span className="meta-item highlight">Hot</span>
+                <span className="meta-separator">•</span>
+                <span className="meta-item highlight">New</span>
             </div>
 
             <div className="job-description">

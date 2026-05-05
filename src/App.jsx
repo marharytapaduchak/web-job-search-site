@@ -12,13 +12,14 @@ import MainVacancies from './pages/MainVacancies';
 import ProfileContacts from './pages/ProfileContacts';
 import ProfileNotification from './pages/ProfileNotification';
 import ProfileEditInfo from './pages/ProfileEditInfo';
+import Vacancy from './pages/Vacancy'
 
 function App() {
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<MainVacancies />} />
+        <Route path="/" element={<Vacancy />} />
 
         <Route path="/feedback_history" element={<FeedbackHistory />} />
 

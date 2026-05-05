@@ -1,0 +1,45 @@
+.recommendations-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    
+    font-size: 14px;
+    color: #4b5563;
+    
+    margin-top: 24px;
+    margin-bottom: 20px;
+}
+
+.results-count {
+    font-weight: 400;
+}
+
+.results-query {
+    font-weight: 700;
+    color: #111827;
+}
+
+.vacancy-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    padding-bottom: 24px; 
+}
+
+.vacancy-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vacancy-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vacancy-list::-webkit-scrollbar-thumb {
+    background-color: #e5e7eb;
+}
+
+.vacancy-list::-webkit-scrollbar-thumb:hover {
+    background-color: #d1d5db;
+}
