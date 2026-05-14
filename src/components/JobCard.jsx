@@ -1,56 +1,48 @@
-import './JobCard.css';
+import "./JobCard.css";
 
-const JobCard = () => {
+const JobCard = ({ job, company }) => {
+    const companyName = company?.name || "Компанія";
+    const salaryText = job.salary ? `${job.salary}₴` : "Зарплата не вказана";
+
     return (
-        <div className="job-card">
-            <div className="job-card-header">
-                <div className="company-info">
-                    <div className="company-logo">
-                        <div className="logo-placeholder">
-                            <span className="logo-text">PixelPath Studios</span>
-                        </div>
-                    </div>
-                    <div className="title-section">
-                        <h1 className="job-title">UI / UX Designer</h1>
-                        <p className="company-name">PixelPath Studios</p>
-                    </div>
+        <article className="job-card">
+            <div className="job-card__top">
+                <div>
+                    <p className="job-card__company">{companyName}</p>
+                    <h3 className="job-card__title">{job.title}</h3>
                 </div>
-                <div className="compatibility-score">
-                    <span className="score-number">89%</span>
-                    <span className="score-label">сумісність</span>
-                </div>
+
+                <span className="job-card__views">
+                    {job.num_views} переглядів
+                </span>
             </div>
 
-            <div className="job-metadata">
-                <span className="meta-item highlight">25 000₴</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Junior</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Віддалено</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item">Повна зайнятість</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Світ</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Intermediate</span>
-            </div>
+            <p className="job-card__meta">
+                {salaryText} • {job.level} • {job.format} •{" "}
+                {job.employment_type} • {job.location} • {job.english_level}
+            </p>
 
-            <div className="job-description">
-                PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати 
-                інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових продуктів. На цій посаді...
-            </div>
+            <p className="job-card__description">{job.description}</p>
 
-            <div className="job-footer">
-                <div className="footer-item">
-                    <i className="icon-eye"></i>
-                    <span>40 переглядів</span>
+            {job.skills?.length > 0 && (
+                <div className="job-card__tags">
+                    {job.skills.map((skill) => (
+                        <span key={skill} className="job-card__tag">
+                            {skill}
+                        </span>
+                    ))}
                 </div>
-                <span className="meta-separator">•</span>
-                <div className="footer-item">
-                    <span>25 жовтня</span>
-                </div>
+            )}
+
+            <div className="job-card__footer">
+                <span>
+                    Додано:{" "}
+                    {job.date_added instanceof Date
+                        ? job.date_added.toLocaleDateString("uk-UA")
+                        : job.date_added}
+                </span>
             </div>
-        </div>
+        </article>
     );
 };
 

@@ -1,0 +1,113 @@
+import { BackendService } from "./BackendService";
+
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost:3001";
+
+const backend = new BackendService(API_BASE_URL);
+
+const CURRENT_USER_ID = 1;
+
+export function getProfile<T = unknown>(): Promise<T> {
+  return backend.get<T>(`/users/${CURRENT_USER_ID}`);
+}
+
+export function updateProfile<T = unknown>(updates: unknown): Promise<T> {
+  return backend.patch<T>(`/users/${CURRENT_USER_ID}`, updates);
+}
+
+export async function getProfileNotifications<T extends { id: unknown } = { id: unknown }>(): Promise<T | null> {
+  const data = await backend.get<T[]>(`/userNotifications?userId=${CURRENT_USER_ID}`);
+  return data[0] ?? null;
+}
+
+export async function updateProfileNotifications<T = unknown>(updates: unknown): Promise<T> {
+  const data = await backend.get<Array<{ id: unknown }>>(`/userNotifications?userId=${CURRENT_USER_ID}`);
+  const notification = data[0];
+
+  if (!notification) {
+    throw new Error("Notifications not found");
+  }
+
+  return backend.patch<T>(`/userNotifications/${notification.id}`, updates);
+}
+
+export function getProfileSkills<T = unknown>(): Promise<T> {
+  return backend.get<T>(`/userSkills?userId=${CURRENT_USER_ID}`);
+}
+
+export function getProfileGoals<T = unknown>(): Promise<T> {
+  return backend.get<T>(`/userGoals?userId=${CURRENT_USER_ID}`);
+}
+
+export function getProfileProjects<T = unknown>(): Promise<T> {
+  return backend.get<T>(`/userProjects?userId=${CURRENT_USER_ID}`);
+}
+
+export function createProfileGoal<T = unknown>(
+  goal: unknown,
+): Promise<T> {
+  return backend.post<T>("/userGoals", goal);
+}
+
+export function deleteProfileGoal(
+  id: number,
+): Promise<void> {
+  return backend.delete(`/userGoals/${id}`);
+}
+
+export function createProfileSkill<T = unknown>(
+  skill: unknown,
+): Promise<T> {
+  return backend.post<T>("/userSkills", skill);
+}
+
+export function deleteProfileSkill(
+  id: number,
+): Promise<void> {
+  return backend.delete(`/userSkills/${id}`);
+}
+
+export function createProfileProject<T = unknown>(
+  project: unknown,
+): Promise<T> {
+  return backend.post<T>(
+    "/userProjects",
+    project,
+  );
+}
+
+export function updateProfileProject<T = unknown>(
+  id: number,
+  updates: unknown,
+): Promise<T> {
+  return backend.patch<T>(
+    `/userProjects/${id}`,
+    updates,
+  );
+}
+
+export function deleteProfileProject(
+  id: number,
+): Promise<void> {
+  return backend.delete(
+    `/userProjects/${id}`,
+  );
+}
+
+export function getProfileRecommendations<
+  T = unknown,
+>(): Promise<T> {
+  return backend.get<T>(
+    `/userRecommendations?userId=${CURRENT_USER_ID}`,
+  );
+}
+
+export function createProfileRecommendation<
+  T = unknown,
+>(recommendation: unknown): Promise<T> {
+  return backend.post<T>(
+    "/userRecommendations",
+    recommendation,
+  );
+}
