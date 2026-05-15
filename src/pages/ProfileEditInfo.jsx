@@ -8,6 +8,7 @@ import plusIcon from "../img/plus.svg";
 import infoIcon from "../img/info.svg";
 import uploadWhiteIcon from "../img/whiteUpload.svg";
 import linkIcon from "../img/link_white.svg";
+import defaultAvatarIcon from "../img/person-circle.svg";
 import { useEffect, useState } from "react";
 import {
   getProfile,
@@ -820,10 +821,7 @@ export default function ProfileEditInfo() {
             <h2 className="profile-edit-section__title">Про мене</h2>
 
             <div className="profile-edit-about-row">
-              <div
-                className="profile-edit-avatar"
-                onClick={() => setIsAvatarPickerOpen(true)}
-              >
+              <div className="profile-edit-avatar">
                 {formData.avatarStyle && formData.avatarSeed ? (
                   <img
                     src={getAvatarUrl(
@@ -834,10 +832,38 @@ export default function ProfileEditInfo() {
                     className="profile-edit-avatar__image"
                   />
                 ) : (
-                  <div className="profile-edit-avatar__placeholder"></div>
+                  <img
+                    src={defaultAvatarIcon}
+                    alt="default avatar"
+                    className="profile-edit-avatar__image profile-edit-avatar__image--default"
+                  />
                 )}
 
-                <div className="profile-edit-avatar__overlay">Обрати</div>
+                <div className="profile-edit-avatar__overlay">
+                  <button
+                    type="button"
+                    className="profile-edit-avatar__overlay-button"
+                    onClick={() => setIsAvatarPickerOpen(true)}
+                  >
+                    Обрати
+                  </button>
+
+                  {formData.avatarStyle && formData.avatarSeed && (
+                    <button
+                      type="button"
+                      className="profile-edit-avatar__delete-button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          avatarStyle: "",
+                          avatarSeed: "",
+                        }))
+                      }
+                    >
+                      <img src={trashIcon} alt="delete avatar" />
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="profile-edit-about-row__fields">
                 <div className="profile-edit-field">

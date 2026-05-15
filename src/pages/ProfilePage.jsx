@@ -6,6 +6,7 @@ import ProfileIcon from "../img/profile.svg";
 import Location from "../img/location.svg";
 import LinkImg from "../img/link.svg";
 import Phone from "../img/phone.svg";
+import defaultAvatarIcon from "../img/person-circle.svg";
 
 import { useEffect, useState } from "react";
 import {
@@ -15,6 +16,12 @@ import {
   getProfileProjects,
   getProfileRecommendations,
 } from "../services/profileService";
+
+function getAvatarUrl(style, seed) {
+  if (!style || !seed) return "";
+
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
+}
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -85,7 +92,17 @@ export default function Profile() {
 
           <section className="profile-card">
             <div className="profile-card__header">
-              <div className="profile-card__photo" />
+              <div className="profile-card__photo">
+                <img
+                  src={
+                    profile.avatarStyle && profile.avatarSeed
+                      ? getAvatarUrl(profile.avatarStyle, profile.avatarSeed)
+                      : defaultAvatarIcon
+                  }
+                  alt="avatar"
+                  className="profile-card__photo-img"
+                />
+              </div>
 
               <div className="profile-card__main-info">
                 <h1 className="profile-card__title">{profile.position}</h1>
