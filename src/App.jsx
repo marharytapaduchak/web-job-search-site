@@ -19,7 +19,8 @@ function App() {
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<Vacancy />} />
+        <Route path="/" element={<MainVacancies />} />
+        <Route path="/vacancy/:id" element={<Vacancy />} />
 
         <Route path="/feedback_history" element={<FeedbackHistory />} />
 

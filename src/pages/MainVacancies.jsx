@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SearchSection from '../components/search_section/SearchSection';
 import FilterSidebar from '../components/filter_sidebar/FilterSidebar';
 import JobCard from '../components/JobCard';
+import { MOCK_RECOMMENDATIONS } from '../components/vacancy_details/mockJobs';
 import './MainVacancies.css';
 
 const MainVacancies = () => {
@@ -33,7 +34,13 @@ const MainVacancies = () => {
                 <FilterSidebar onApplyFilters={handleApplyFilters} />
 
                 <div className="job-list-area">
-                    <JobCard />
+                    {MOCK_RECOMMENDATIONS.map((wrapper) => (
+                        <JobCard 
+                            key={wrapper.job.id} 
+                            job={wrapper.job} 
+                            matchScore={wrapper.matchScore} 
+                        />
+                    ))}
                 </div>
             </div>
         </div>

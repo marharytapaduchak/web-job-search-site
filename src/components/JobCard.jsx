@@ -1,57 +1,80 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './JobCard.css';
 
-const JobCard = () => {
+const JobCard = ({ job, matchScore }) => {
+    const navigate = useNavigate();
+
+    if (!job) return null;
+
+    const handleCardClick = () => {
+        navigate(`/vacancy/${job.id}`);
+    };
+
+    const dateAdded = job.date_added instanceof Date ? job.date_added : new Date(job.date_added);
+    const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
+        day: 'numeric', 
+        month: 'long' 
+    }).format(dateAdded);
+
     return (
-        <div className="job-card">
+        <div className="job-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
             <div className="job-card-header">
                 <div className="company-info">
                     <div className="company-logo">
-                        <div className="logo-placeholder">
-                            <span className="logo-text">PixelPath Studios</span>
-                        </div>
+                        {job.company.logoURL ? (
+                            <img src={job.company.logoURL} alt={job.company.name} className="logo-image" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        ) : (
+                            <div className="logo-placeholder">
+                                <span className="logo-text">{job.company.name}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="title-section">
-                        <h1 className="job-title">UI / UX Designer</h1>
-                        <p className="company-name">PixelPath Studios</p>
+                        <h1 className="job-title">{job.title}</h1>
+                        <p className="company-name">{job.company.name}</p>
                     </div>
                 </div>
-                <div className="compatibility-score">
-                    <span className="score-number">89%</span>
-                    <span className="score-label">сумісність</span>
-                </div>
+                {matchScore && (
+                    <div className="compatibility-score">
+                        <span className="score-number">{matchScore}%</span>
+                        <span className="score-label">сумісність</span>
+                    </div>
+                )}
             </div>
 
             <div className="job-metadata">
-                <span className="meta-item highlight">25 000₴</span>
+                <span className="meta-item highlight">{job.salary}₴</span>
                 <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Junior</span>
+                <span className="meta-item highlight">{job.level}</span>
                 <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Віддалено</span>
+                <span className="meta-item highlight">{job.format}</span>
                 <span className="meta-separator">•</span>
-                <span className="meta-item">Повна зайнятість</span>
+                <span className="meta-item">{job.employment_type}</span>
                 <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Світ</span>
+                <span className="meta-item highlight">{job.location}</span>
                 <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Intermediate</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">Hot</span>
-                <span className="meta-separator">•</span>
-                <span className="meta-item highlight">New</span>
+                <span className="meta-item highlight">{job.english_level}</span>
+                {job.tags && job.tags.map((tag, index) => (
+                    <React.Fragment key={index}>
+                        <span className="meta-separator">•</span>
+                        <span className="meta-item highlight">{tag}</span>
+                    </React.Fragment>
+                ))}
             </div>
 
             <div className="job-description">
-                PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати 
-                інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових продуктів. На цій посаді...
+                {job.description}
             </div>
 
             <div className="job-footer">
                 <div className="footer-item">
                     <i className="icon-eye"></i>
-                    <span>40 переглядів</span>
+                    <span>{job.num_views} переглядів</span>
                 </div>
                 <span className="meta-separator">•</span>
                 <div className="footer-item">
-                    <span>25 жовтня</span>
+                    <span>{formattedDate}</span>
                 </div>
             </div>
         </div>
