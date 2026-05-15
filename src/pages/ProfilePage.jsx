@@ -130,17 +130,21 @@ export default function Profile() {
                       {profile.phone}
                     </p>
 
-                    <a
-                      href={profile.portfolioUrl}
-                      className="profile-card__link"
-                    >
-                      <img
-                        src={LinkImg}
-                        alt="link"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.portfolioUrl}
-                    </a>
+                    {profile.portfolioUrl && (
+                      <a
+                        href={profile.portfolioUrl}
+                        className="profile-card__link"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={LinkImg}
+                          alt="link"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.portfolioUrl}
+                      </a>
+                    )}
 
                     <a href={profile.linkedin} className="profile-card__link">
                       <img

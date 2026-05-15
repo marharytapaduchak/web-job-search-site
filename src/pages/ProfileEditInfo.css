@@ -325,8 +325,9 @@
   .profile-edit-language-row__select {
     max-width: 220px;
   }
-  
+
   .profile-edit-template-button {
+    text-decoration: none;
     height: 42px;
     min-width: 210px;
     border: none;
@@ -342,6 +343,25 @@
     cursor: pointer;
     font-size: 15px;
     font-weight: 700;
+  }
+
+  .profile-edit-resume-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  
+  .profile-edit-upload__file-link {
+    color: inherit;
+    text-decoration: none;
+    flex: 1;
+  }
+  
+  .profile-edit-upload__delete-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
   }
   
   .profile-edit-template-button img {
@@ -373,6 +393,7 @@
   }
   
   .profile-edit-upload__file {
+    margin-top: 16px;
     max-width: 390px;
     min-height: 48px;
     border: 1px solid #d8d8d8;
@@ -795,4 +816,31 @@
 
   .profile-edit-language-row {
     margin-bottom: 12px;
+  }
+
+  .profile-edit-certificate-form {
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+  
+  .profile-edit-certificate-form__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .profile-edit-certificate-form__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .profile-edit-certificate-form__cancel {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: #111;
   }

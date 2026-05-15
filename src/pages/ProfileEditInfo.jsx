@@ -7,6 +7,7 @@ import trashIcon from "../img/trash.svg";
 import plusIcon from "../img/plus.svg";
 import infoIcon from "../img/info.svg";
 import uploadWhiteIcon from "../img/whiteUpload.svg";
+import linkIcon from "../img/link_white.svg";
 import { useEffect, useState } from "react";
 import {
   getProfile,
@@ -155,7 +156,7 @@ export default function ProfileEditInfo() {
     firstName: "",
     lastName: "",
     about: "",
-    position: [],
+    positions: [],
     languages: [],
     city: "",
     salary: "",
@@ -164,8 +165,16 @@ export default function ProfileEditInfo() {
     employmentTypes: [],
     workFormats: [],
     canRelocate: false,
+    resumeTitle: "",
+    resumeUrl: "",
+    resumeAddedAt: "",
+    certificates: [],
   });
-
+  const [newCertificate, setNewCertificate] = useState({
+    title: "",
+    url: "",
+  });
+  const [isAddingCertificate, setIsAddingCertificate] = useState(false);
   const isAboutFilled = formData.about.trim().length > 0;
   const isSkillsFilled = skills.length > 0;
   const isGoalsFilled = goals.length > 0;
@@ -179,6 +188,11 @@ export default function ProfileEditInfo() {
   const isWorkFormatsFilled = formData.workFormats.length > 0;
   const isEmploymentTypesFilled = formData.employmentTypes.length > 0;
   const isRecommendationsFilled = recommendations.length > 0;
+  const isResumeFilled =
+    formData.resumeTitle.trim().length > 0 &&
+    formData.resumeUrl.trim().length > 0;
+  const isPortfolioFilled = formData.portfolioUrl.trim().length > 0;
+  const isCertificatesFilled = formData.certificates.length > 0;
 
   const progress =
     (isAboutFilled ? 10 : 0) +
@@ -191,6 +205,9 @@ export default function ProfileEditInfo() {
     (isCityFilled ? 5 : 0) +
     (isWorkFormatsFilled ? 5 : 0) +
     (isEmploymentTypesFilled ? 5 : 0) +
+    (isResumeFilled ? 10 : 0) +
+    (isPortfolioFilled ? 20 : 0) +
+    (isCertificatesFilled ? 10 : 0) +
     (isRecommendationsFilled ? 10 : 0);
 
   const progressPercent = Math.min(progress, 100);
@@ -240,6 +257,10 @@ export default function ProfileEditInfo() {
           ],
           workFormats: profile.workFormats || ["Віддалена", "Віддалена/офіс"],
           canRelocate: profile.canRelocate || false,
+          resumeTitle: profile.resumeTitle || "",
+          resumeUrl: profile.resumeUrl || "",
+          resumeAddedAt: profile.resumeAddedAt || "",
+          certificates: profile.certificates || [],
         });
       } catch (error) {
         console.error("Failed to load profile edit info:", error);
@@ -258,6 +279,15 @@ export default function ProfileEditInfo() {
       ...prev,
       [name]: value,
     }));
+  }
+
+  function handleCancelCertificateAdding() {
+    setNewCertificate({
+      title: "",
+      url: "",
+    });
+  
+    setIsAddingCertificate(false);
   }
 
   function handleCheckboxArrayChange(field, value) {
@@ -279,6 +309,47 @@ export default function ProfileEditInfo() {
     setFormData((prev) => ({
       ...prev,
       [name]: checked,
+    }));
+  }
+
+  function handleAddCertificate() {
+    const title = newCertificate.title.trim();
+    const url = newCertificate.url.trim();
+  
+    if (!title || !url) {
+      alert("Вкажіть назву сертифіката і посилання");
+      return;
+    }
+  
+    const certificate = {
+      id: `temp-certificate-${Date.now()}`,
+      title,
+      url,
+      addedAt: new Date().toLocaleDateString("uk-UA", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+    };
+  
+    setFormData((prev) => ({
+      ...prev,
+      certificates: [...prev.certificates, certificate],
+    }));
+  
+    setNewCertificate({
+      title: "",
+      url: "",
+    });
+  
+    setIsAddingCertificate(false);
+  }
+
+  function handleDeleteCertificate(certificateId) {
+    setFormData((prev) => ({
+      ...prev,
+      certificates: prev.certificates.filter(
+        (certificate) => certificate.id !== certificateId
+      ),
     }));
   }
 
@@ -421,8 +492,38 @@ export default function ProfileEditInfo() {
     setIsRecommendationModalOpen(false);
   }
 
+  function handleResumeChange(event) {
+    const { name, value } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      resumeAddedAt:
+        name === "resumeUrl" && value.trim() && !prev.resumeAddedAt
+          ? new Date().toLocaleDateString("uk-UA", {
+              day: "2-digit",
+              month: "2-digit",
+            })
+          : prev.resumeAddedAt,
+    }));
+  }
+
+  function handleDeleteResume() {
+    setFormData((prev) => ({
+      ...prev,
+      resumeTitle: "",
+      resumeUrl: "",
+      resumeAddedAt: "",
+    }));
+  }
+
   async function handleSave() {
-    const hasEmptyPosition = formData.positions.some(
+    console.log("SAVE CLICKED", formData);
+
+    const positions = formData.positions || [];
+    const languages = formData.languages || [];
+
+    const hasEmptyPosition = positions.some(
       (position) => !position.title.trim() || !position.qualificationLevel
     );
 
@@ -431,7 +532,7 @@ export default function ProfileEditInfo() {
       return;
     }
 
-    const hasEmptyLanguage = formData.languages.some(
+    const hasEmptyLanguage = languages.some(
       (language) => !language.name.trim() || !language.level
     );
 
@@ -440,35 +541,37 @@ export default function ProfileEditInfo() {
       return;
     }
 
-    const firstPosition = formData.positions[0];
     try {
       await updateProfile({
         firstName: formData.firstName,
         lastName: formData.lastName,
         about: formData.about,
-        position: firstPosition.title,
-        qualificationLevel: firstPosition.qualificationLevel,
-        positions: formData.positions,
-        languages: formData.languages,
+        position: positions?.[0]?.title || "",
+        qualificationLevel: positions?.[0]?.qualificationLevel || "Junior",
+        positions,
+        languages,
         city: formData.city,
         salary: formData.salary,
         hourlyRate: formData.hourlyRate,
         portfolioUrl: formData.portfolioUrl,
-        employmentTypes: formData.employmentTypes,
-        workFormats: formData.workFormats,
+        employmentTypes: formData.employmentTypes || [],
+        workFormats: formData.workFormats || [],
         canRelocate: formData.canRelocate,
+        resumeTitle: formData.resumeTitle,
+        resumeUrl: formData.resumeUrl,
+        resumeAddedAt: formData.resumeAddedAt,
+        certificates: formData.certificates || [],
       });
 
       await Promise.all(
-        deletedSkillIds.map((skillId) => deleteProfileSkill(skillId))
+        deletedSkillIds
+          .filter((skillId) => !String(skillId).startsWith("temp-"))
+          .map((skillId) => deleteProfileSkill(skillId))
       );
 
       await Promise.all(
         newSkills.map((skill) => createProfileSkill(skill.name, skill.level))
       );
-
-      setDeletedSkillIds([]);
-      setNewSkills([]);
 
       await Promise.all(
         newRecommendations.map((recommendation) =>
@@ -481,10 +584,10 @@ export default function ProfileEditInfo() {
         )
       );
 
-      setNewRecommendations([]);
-
       await Promise.all(
-        deletedProjectIds.map((projectId) => deleteProfileProject(projectId))
+        deletedProjectIds
+          .filter((projectId) => !String(projectId).startsWith("temp-"))
+          .map((projectId) => deleteProfileProject(projectId))
       );
 
       await Promise.all(
@@ -497,7 +600,10 @@ export default function ProfileEditInfo() {
 
       await Promise.all(
         projects
-          .filter((project) => !project.isNew)
+          .filter(
+            (project) =>
+              !project.isNew && !String(project.id).startsWith("temp-")
+          )
           .map((project) =>
             updateProfileProject(project.id, {
               title: project.title,
@@ -506,12 +612,16 @@ export default function ProfileEditInfo() {
           )
       );
 
-      setDeletedProjectIds([]);
-
       await Promise.all(
-        deletedGoalIds.map((goalId) => deleteProfileGoal(goalId))
+        deletedGoalIds
+          .filter((goalId) => !String(goalId).startsWith("temp-"))
+          .map((goalId) => deleteProfileGoal(goalId))
       );
 
+      setDeletedSkillIds([]);
+      setNewSkills([]);
+      setNewRecommendations([]);
+      setDeletedProjectIds([]);
       setDeletedGoalIds([]);
 
       alert("Зміни збережено");
@@ -1147,18 +1257,80 @@ export default function ProfileEditInfo() {
                 <div>
                   <div className="profile-edit-field__label">Ваше резюме</div>
                   <p className="profile-edit-helper">
-                    Зекономте час на оформленні резюме з нашим готовим шаблоном.
+                    Додайте посилання на резюме. Можна додати лише одне резюме.
                   </p>
                 </div>
-                <span className="profile-edit-points">+10%</span>
+
+                <span
+                  className={`profile-edit-points ${
+                    isResumeFilled ? "active" : ""
+                  }`}
+                >
+                  +10%
+                </span>
               </div>
 
-              <button className="profile-edit-template-button" type="button">
+              <a
+                className="profile-edit-template-button"
+                href="https://www.canva.com/templates/EAGk_gh8u5g-white-and-grey-clean-professional-a4-resume/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <span>Шаблон резюме</span>
-                <img src={uploadWhiteIcon} alt="download" />
-              </button>
+                <img src={linkIcon} alt="link" />
+              </a>
 
-              <UploadBox fileName="CV Kateryna Marchuk.pdf" fileDate="25.10" />
+              {!isResumeFilled && (
+                <div className="profile-edit-resume-form">
+                  <input
+                    className="profile-edit-field__input"
+                    type="text"
+                    name="resumeTitle"
+                    placeholder="Назва резюме"
+                    value={formData.resumeTitle}
+                    onChange={handleResumeChange}
+                  />
+
+                  <input
+                    className="profile-edit-field__input"
+                    type="url"
+                    name="resumeUrl"
+                    placeholder="Посилання на резюме"
+                    value={formData.resumeUrl}
+                    onChange={handleResumeChange}
+                  />
+                </div>
+              )}
+
+              {isResumeFilled && (
+                <div className="profile-edit-upload__file">
+                  <a
+                    href={formData.resumeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="profile-edit-upload__file-link"
+                  >
+                    <div className="profile-edit-upload__file-name">
+                      {formData.resumeTitle}
+                    </div>
+                    <div className="profile-edit-upload__file-date">
+                      Додано {formData.resumeAddedAt}
+                    </div>
+                  </a>
+
+                  <button
+                    type="button"
+                    className="profile-edit-upload__delete-button"
+                    onClick={handleDeleteResume}
+                  >
+                    <img
+                      src={trashIcon}
+                      alt="delete"
+                      className="profile-edit-upload__trash"
+                    />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="profile-edit-subsection">
@@ -1168,27 +1340,38 @@ export default function ProfileEditInfo() {
                     Ваше портфоліо
                   </div>
                   <p className="profile-edit-helper">
-                    Зекономте час на оформленні портфоліо з нашим готовим
-                    шаблоном.
+                    Додайте посилання на портфоліо. Це поле можна залишити
+                    порожнім.
                   </p>
                 </div>
-                <span className="profile-edit-points">+20%</span>
+
+                <span
+                  className={`profile-edit-points ${
+                    formData.portfolioUrl.trim() ? "active" : ""
+                  }`}
+                >
+                  +20%
+                </span>
               </div>
 
               <input
                 className="profile-edit-field__input profile-edit-field__input--portfolio"
-                type="text"
+                type="url"
                 name="portfolioUrl"
+                placeholder="Посилання на портфоліо"
                 value={formData.portfolioUrl}
                 onChange={handleChange}
               />
 
-              <button className="profile-edit-template-button" type="button">
+              <a
+                className="profile-edit-template-button"
+                href="https://www.canva.com/templates/EAG8Ybfi_ck-beige-black-white-grayscale-minimalist-portfolio-presentation/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <span>Шаблон портфоліо</span>
-                <img src={uploadWhiteIcon} alt="download" />
-              </button>
-
-              <UploadBox fileName="Kateryna Marchuk.pdf" fileDate="25.10" />
+                <img src={linkIcon} alt="link" />
+              </a>
             </div>
           </section>
 
@@ -1363,10 +1546,108 @@ export default function ProfileEditInfo() {
                     іншого навчання
                   </p>
                 </div>
-                <span className="profile-edit-points">+10%</span>
+
+                <span
+                  className={`profile-edit-points ${
+                    isCertificatesFilled ? "active" : ""
+                  }`}
+                >
+                  +10%
+                </span>
               </div>
 
-              <UploadBox fileName="Сертифікат.pdf" fileDate="04.09" />
+              {isAddingCertificate ? (
+                <div className="profile-edit-certificate-form">
+                  <div className="profile-edit-certificate-form__fields">
+                    <input
+                      className="profile-edit-field__input"
+                      type="text"
+                      placeholder="Назва сертифіката"
+                      value={newCertificate.title}
+                      onChange={(e) =>
+                        setNewCertificate((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                    />
+
+                    <input
+                      className="profile-edit-field__input"
+                      type="url"
+                      placeholder="Посилання на сертифікат"
+                      value={newCertificate.url}
+                      onChange={(e) =>
+                        setNewCertificate((prev) => ({
+                          ...prev,
+                          url: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="profile-edit-certificate-form__actions">
+                    <button
+                      className="profile-edit-link-button"
+                      type="button"
+                      onClick={handleAddCertificate}
+                    >
+                      Зберегти сертифікат
+                    </button>
+
+                    <button
+                      className="profile-edit-certificate-form__cancel"
+                      type="button"
+                      onClick={handleCancelCertificateAdding}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="profile-edit-link-button"
+                  type="button"
+                  onClick={() => setIsAddingCertificate(true)}
+                >
+                  <img
+                    src={plusIcon}
+                    alt="plus"
+                    className="profile-edit-link-button__icon"
+                  />
+                  <span>Додати сертифікат</span>
+                </button>
+              )}
+
+              {formData.certificates.map((certificate) => (
+                <div className="profile-edit-upload__file" key={certificate.id}>
+                  <a
+                    href={certificate.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="profile-edit-upload__file-link"
+                  >
+                    <div className="profile-edit-upload__file-name">
+                      {certificate.title}
+                    </div>
+                    <div className="profile-edit-upload__file-date">
+                      Додано {certificate.addedAt}
+                    </div>
+                  </a>
+
+                  <button
+                    type="button"
+                    className="profile-edit-upload__delete-button"
+                    onClick={() => handleDeleteCertificate(certificate.id)}
+                  >
+                    <img
+                      src={trashIcon}
+                      alt="delete"
+                      className="profile-edit-upload__trash"
+                    />
+                  </button>
+                </div>
+              ))}
             </div>
 
             <div className="profile-edit-subsection">
