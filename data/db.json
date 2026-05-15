@@ -208,7 +208,9 @@
       "resumeTitle": "",
       "resumeUrl": "",
       "resumeAddedAt": "",
-      "certificates": []
+      "certificates": [],
+      "avatarStyle": "micah",
+      "avatarSeed": "avatar-2"
     }
   ],
   "userNotifications": [

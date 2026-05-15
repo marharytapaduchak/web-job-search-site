@@ -844,3 +844,147 @@
     cursor: pointer;
     color: #111;
   }
+
+  .profile-edit-avatar {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    background-color: #b8b8b8;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
+  .profile-edit-avatar__image,
+  .profile-edit-avatar__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .profile-edit-avatar__image {
+    object-fit: cover;
+    display: block;
+  }
+  
+  .profile-edit-avatar__placeholder {
+    background-color: #b8b8b8;
+  }
+  
+  .profile-edit-avatar__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .profile-edit-avatar:hover .profile-edit-avatar__overlay {
+    opacity: 1;
+  }
+  
+  .avatar-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 17, 17, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 40px;
+  }
+  
+  .avatar-picker {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: #f3f3f3;
+    padding: 42px;
+  }
+  
+  .avatar-picker__close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: none;
+    background: transparent;
+    font-size: 36px;
+    cursor: pointer;
+  }
+  
+  .avatar-picker__title {
+    margin: 0 0 24px;
+    font-size: 28px;
+  }
+  
+  .avatar-picker__section {
+    margin-bottom: 28px;
+  }
+  
+  .avatar-picker__subtitle {
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+  
+  .avatar-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  
+  .avatar-picker__option {
+    border: 2px solid transparent;
+    background: white;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .avatar-picker__option--selected {
+    border-color: #8f1731;
+  }
+  
+  .avatar-picker__image {
+    width: 100%;
+    aspect-ratio: 1;
+    display: block;
+  }
+  
+  .avatar-picker__remove {
+    border: none;
+    background: transparent;
+    color: #8f1731;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .profile-edit-field__input--error {
+    border-color: #8f1731;
+  }
+  
+  .profile-edit-field__error {
+    margin: -8px 0 0;
+    color: #8f1731;
+    font-size: 14px;
+  }
+  
+  .profile-edit-upload__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .profile-edit-upload__edit-button {
+    border: none;
+    background: transparent;
+    color: #8f1731;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }

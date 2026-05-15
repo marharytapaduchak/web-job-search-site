@@ -46,5 +46,7 @@ export class User {
     public resumeUrl: string = "",
     public resumeAddedAt: string = "",
     public certificates: UserCertificate[] = [],
+    public avatarStyle: string = "",
+    public avatarSeed: string = ""
   ) {}
 }

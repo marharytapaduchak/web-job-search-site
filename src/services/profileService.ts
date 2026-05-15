@@ -41,6 +41,8 @@ function mapToUser(item: any): User {
     item.resumeUrl ?? "",
     item.resumeAddedAt ?? "",
     item.certificates ?? [],
+    item.avatarStyle ?? "",
+    item.avatarSeed ?? ""
   );
 }
 

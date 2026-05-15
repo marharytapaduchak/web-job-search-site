@@ -26,6 +26,28 @@ import {
   createProfileRecommendation,
 } from "../services/profileService";
 
+const AVATAR_STYLES = [
+  { id: "micah", label: "Micah" },
+  { id: "open-peeps", label: "Open Peeps" },
+];
+
+const AVATAR_SEEDS = [
+  "avatar-1",
+  "avatar-2",
+  "avatar-3",
+  "avatar-4",
+  "avatar-5",
+  "avatar-6",
+  "avatar-7",
+  "avatar-8",
+];
+
+function getAvatarUrl(style, seed) {
+  if (!style || !seed) return "";
+
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
+}
+
 function SkillTag({ name, level, onDelete }) {
   return (
     <div className="profile-edit-skill-tag">
@@ -145,6 +167,8 @@ export default function ProfileEditInfo() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [newRecommendations, setNewRecommendations] = useState([]);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
+  const [isEditingResume, setIsEditingResume] = useState(false);
 
   const [recommendationForm, setRecommendationForm] = useState({
     name: "",
@@ -169,6 +193,8 @@ export default function ProfileEditInfo() {
     resumeUrl: "",
     resumeAddedAt: "",
     certificates: [],
+    avatarStyle: "",
+    avatarSeed: "",
   });
   const [newCertificate, setNewCertificate] = useState({
     title: "",
@@ -190,7 +216,8 @@ export default function ProfileEditInfo() {
   const isRecommendationsFilled = recommendations.length > 0;
   const isResumeFilled =
     formData.resumeTitle.trim().length > 0 &&
-    formData.resumeUrl.trim().length > 0;
+    formData.resumeUrl.trim().length > 0 &&
+    isValidUrl(formData.resumeUrl);
   const isPortfolioFilled = formData.portfolioUrl.trim().length > 0;
   const isCertificatesFilled = formData.certificates.length > 0;
 
@@ -261,6 +288,8 @@ export default function ProfileEditInfo() {
           resumeUrl: profile.resumeUrl || "",
           resumeAddedAt: profile.resumeAddedAt || "",
           certificates: profile.certificates || [],
+          avatarStyle: profile.avatarStyle || "",
+          avatarSeed: profile.avatarSeed || "",
         });
       } catch (error) {
         console.error("Failed to load profile edit info:", error);
@@ -286,7 +315,7 @@ export default function ProfileEditInfo() {
       title: "",
       url: "",
     });
-  
+
     setIsAddingCertificate(false);
   }
 
@@ -315,12 +344,17 @@ export default function ProfileEditInfo() {
   function handleAddCertificate() {
     const title = newCertificate.title.trim();
     const url = newCertificate.url.trim();
-  
+
     if (!title || !url) {
       alert("Вкажіть назву сертифіката і посилання");
       return;
     }
-  
+
+    if (!isValidUrl(url)) {
+      alert("Вкажіть коректне посилання на сертифікат");
+      return;
+    }
+
     const certificate = {
       id: `temp-certificate-${Date.now()}`,
       title,
@@ -330,17 +364,17 @@ export default function ProfileEditInfo() {
         month: "2-digit",
       }),
     };
-  
+
     setFormData((prev) => ({
       ...prev,
       certificates: [...prev.certificates, certificate],
     }));
-  
+
     setNewCertificate({
       title: "",
       url: "",
     });
-  
+
     setIsAddingCertificate(false);
   }
 
@@ -517,6 +551,27 @@ export default function ProfileEditInfo() {
     }));
   }
 
+  function handleEditResume() {
+    setIsEditingResume(true);
+  }
+
+  function handleCancelResumeEditing() {
+    if (formData.resumeTitle.trim() && isValidUrl(formData.resumeUrl)) {
+      setIsEditingResume(false);
+    }
+  }
+
+  function isValidUrl(value) {
+    if (!value.trim()) return true;
+
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+
   async function handleSave() {
     console.log("SAVE CLICKED", formData);
 
@@ -541,6 +596,25 @@ export default function ProfileEditInfo() {
       return;
     }
 
+    if (formData.resumeUrl && !isValidUrl(formData.resumeUrl)) {
+      alert("Вкажіть коректне посилання на резюме");
+      return;
+    }
+
+    if (formData.portfolioUrl && !isValidUrl(formData.portfolioUrl)) {
+      alert("Вкажіть коректне посилання на портфоліо");
+      return;
+    }
+
+    const hasInvalidCertificateUrl = formData.certificates.some(
+      (certificate) => certificate.url && !isValidUrl(certificate.url)
+    );
+
+    if (hasInvalidCertificateUrl) {
+      alert("Один або кілька сертифікатів мають некоректне посилання");
+      return;
+    }
+
     try {
       await updateProfile({
         firstName: formData.firstName,
@@ -561,6 +635,8 @@ export default function ProfileEditInfo() {
         resumeUrl: formData.resumeUrl,
         resumeAddedAt: formData.resumeAddedAt,
         certificates: formData.certificates || [],
+        avatarStyle: formData.avatarStyle,
+        avatarSeed: formData.avatarSeed,
       });
 
       await Promise.all(
@@ -744,7 +820,25 @@ export default function ProfileEditInfo() {
             <h2 className="profile-edit-section__title">Про мене</h2>
 
             <div className="profile-edit-about-row">
-              <div className="profile-edit-about-row__photo"></div>
+              <div
+                className="profile-edit-avatar"
+                onClick={() => setIsAvatarPickerOpen(true)}
+              >
+                {formData.avatarStyle && formData.avatarSeed ? (
+                  <img
+                    src={getAvatarUrl(
+                      formData.avatarStyle,
+                      formData.avatarSeed
+                    )}
+                    alt="avatar"
+                    className="profile-edit-avatar__image"
+                  />
+                ) : (
+                  <div className="profile-edit-avatar__placeholder"></div>
+                )}
+
+                <div className="profile-edit-avatar__overlay">Обрати</div>
+              </div>
               <div className="profile-edit-about-row__fields">
                 <div className="profile-edit-field">
                   <label className="profile-edit-field__label">
@@ -1280,7 +1374,7 @@ export default function ProfileEditInfo() {
                 <img src={linkIcon} alt="link" />
               </a>
 
-              {!isResumeFilled && (
+              {(!isResumeFilled || isEditingResume) && (
                 <div className="profile-edit-resume-form">
                   <input
                     className="profile-edit-field__input"
@@ -1292,17 +1386,40 @@ export default function ProfileEditInfo() {
                   />
 
                   <input
-                    className="profile-edit-field__input"
+                    className={`profile-edit-field__input ${
+                      formData.resumeUrl.trim() &&
+                      !isValidUrl(formData.resumeUrl)
+                        ? "profile-edit-field__input--error"
+                        : ""
+                    }`}
                     type="url"
                     name="resumeUrl"
                     placeholder="Посилання на резюме"
                     value={formData.resumeUrl}
                     onChange={handleResumeChange}
                   />
+
+                  {formData.resumeUrl.trim() &&
+                    !isValidUrl(formData.resumeUrl) && (
+                      <p className="profile-edit-field__error">
+                        Вкажіть коректне посилання, наприклад
+                        https://example.com
+                      </p>
+                    )}
+
+                  {isEditingResume && isResumeFilled && (
+                    <button
+                      className="profile-edit-link-button"
+                      type="button"
+                      onClick={() => setIsEditingResume(false)}
+                    >
+                      Завершити редагування
+                    </button>
+                  )}
                 </div>
               )}
 
-              {isResumeFilled && (
+              {isResumeFilled && !isEditingResume && (
                 <div className="profile-edit-upload__file">
                   <a
                     href={formData.resumeUrl}
@@ -1318,17 +1435,27 @@ export default function ProfileEditInfo() {
                     </div>
                   </a>
 
-                  <button
-                    type="button"
-                    className="profile-edit-upload__delete-button"
-                    onClick={handleDeleteResume}
-                  >
-                    <img
-                      src={trashIcon}
-                      alt="delete"
-                      className="profile-edit-upload__trash"
-                    />
-                  </button>
+                  <div className="profile-edit-upload__actions">
+                    <button
+                      type="button"
+                      className="profile-edit-upload__edit-button"
+                      onClick={handleEditResume}
+                    >
+                      Редагувати
+                    </button>
+
+                    <button
+                      type="button"
+                      className="profile-edit-upload__delete-button"
+                      onClick={handleDeleteResume}
+                    >
+                      <img
+                        src={trashIcon}
+                        alt="delete"
+                        className="profile-edit-upload__trash"
+                      />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1798,6 +1925,78 @@ export default function ProfileEditInfo() {
                 Надіслати лист
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {isAvatarPickerOpen && (
+        <div className="avatar-picker-overlay">
+          <div className="avatar-picker">
+            <button
+              className="avatar-picker__close"
+              type="button"
+              onClick={() => setIsAvatarPickerOpen(false)}
+            >
+              ×
+            </button>
+
+            <h2 className="avatar-picker__title">Оберіть аватарку</h2>
+
+            {AVATAR_STYLES.map((style) => (
+              <div className="avatar-picker__section" key={style.id}>
+                <h3 className="avatar-picker__subtitle">{style.label}</h3>
+
+                <div className="avatar-picker__grid">
+                  {AVATAR_SEEDS.map((seed) => {
+                    const isSelected =
+                      formData.avatarStyle === style.id &&
+                      formData.avatarSeed === seed;
+
+                    return (
+                      <button
+                        key={`${style.id}-${seed}`}
+                        type="button"
+                        className={`avatar-picker__option ${
+                          isSelected ? "avatar-picker__option--selected" : ""
+                        }`}
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            avatarStyle: style.id,
+                            avatarSeed: seed,
+                          }));
+
+                          setIsAvatarPickerOpen(false);
+                        }}
+                      >
+                        <img
+                          src={getAvatarUrl(style.id, seed)}
+                          alt=""
+                          className="avatar-picker__image"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {(formData.avatarStyle || formData.avatarSeed) && (
+              <button
+                className="avatar-picker__remove"
+                type="button"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    avatarStyle: "",
+                    avatarSeed: "",
+                  }));
+
+                  setIsAvatarPickerOpen(false);
+                }}
+              >
+                Прибрати аватарку
+              </button>
+            )}
           </div>
         </div>
       )}
