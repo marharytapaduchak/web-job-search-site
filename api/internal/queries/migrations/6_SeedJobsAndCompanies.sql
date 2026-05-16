@@ -1,0 +1,58 @@
+-- Seed companies
+insert into company (id, name, logo_url, location, description)
+overriding system value
+values
+(101, 'AppFlow', 'https://via.placeholder.com/48', 'Kyiv, Ukraine', 'Innovative app development company.'),
+(102, 'Shop Sphere', 'https://via.placeholder.com/48', 'Lviv, Ukraine', 'E-commerce solutions provider.'),
+(103, 'BrandCraft', 'https://via.placeholder.com/48', 'Kyiv, Ukraine', 'Creative branding agency.'),
+(104, 'GameCloud', 'https://via.placeholder.com/48', 'Dnipro, Ukraine', 'Cloud gaming platform.'),
+(105, 'MedTech Innovations', 'https://via.placeholder.com/48', 'Odesa, Ukraine', 'Medical technology startup.');
+
+select setval('company_id_seq', (select max(id) from company));
+
+-- Seed jobs
+insert into job (id, company_id, title, salary, level, format, employment_type, location, english_level, description, work_conditions, skills, benefits, num_views, date_added)
+overriding system value
+values
+(
+    1, 101, 'UI / UX Designer', '15000', 'Junior', 'Офіс', 'Неповна зайнятість', 'Київ', 'Intermediate',
+    'Ми шукаємо талановитого Junior UI/UX дизайнера, який допоможе нам створювати інтуїтивно зрозумілі інтерфейси для наших мобільних застосунків. Ви працюватимете в команді досвідчених дизайнерів та розробників.',
+    'Гнучкий графік роботи, можливість частково віддаленої роботи, регулярні фідбек-сесії.',
+    array['Figma', 'UI Design', 'UX Design', 'Prototyping'],
+    array['Медичне страхування', 'Курси англійської мови', 'Безкоштовні обіди'],
+    35, '2023-09-12 10:00:00'
+),
+(
+    2, 102, 'UI / UX Designer', '20000', 'Middle', 'Офіс', 'Неповна зайнятість', 'Львів', 'Upper-Intermediate',
+    'Shop Sphere шукає Middle UI/UX дизайнера для покращення досвіду користувачів нашої e-commerce платформи. Якщо ви маєте око на деталі та любите вирішувати складні завдання - ми чекаємо на вас.',
+    'Робота в сучасному офісі у Львові, професійна техніка, оплачувані конференції.',
+    array['Figma', 'E-commerce', 'Responsive Design'],
+    array['Спортивний зал', 'Корпоративні заходи', 'Бонуси за результати'],
+    35, '2023-09-12 10:00:00'
+),
+(
+    3, 103, 'UI / UX Designer (Senior/Middle)', '40000', 'Middle', 'Віддалено/офіс', 'Повна зайнятість', 'Київ', 'Advanced',
+    'Приєднуйтесь до BrandCraft як UI/UX дизайнер. Ми створюємо унікальні бренди та цифрові продукти. Ваша роль буде ключовою у розробці дизайну для великих міжнародних проектів.',
+    'Можливість працювати як в офісі, так і віддалено, робота з міжнародними клієнтами.',
+    array['Branding', 'UI/UX', 'Interaction Design'],
+    array['Висока зарплата', 'Міжнародні проекти', 'Професійний розвиток'],
+    40, '2023-11-12 10:00:00'
+),
+(
+    4, 104, 'UI / UX Designer (Games)', '20000', 'Junior', 'Віддалено/офіс', 'Повна зайнятість', 'Дніпро', 'Intermediate',
+    'GameCloud шукає дизайнера, який любить ігри так само як і дизайн. Ви будете створювати інтерфейси для нашої ігрової хмарної платформи.',
+    'Гнучкий початок робочого дня, доступ до новітніх ігор, творча атмосфера.',
+    array['Game UI', 'UX Research', 'Figma'],
+    array['Ігрова зона в офісі', 'Безкоштовні напої та снеки', 'Тімбілдінги'],
+    44, '2023-09-01 10:00:00'
+),
+(
+    5, 105, 'Product Designer', '20000', 'Middle', 'Віддалено', 'Неповна зайнятість', 'Одеса', 'Upper-Intermediate',
+    'MedTech Innovations розробляє майбутнє медицини. Нам потрібен Middle Product Designer, який допоможе зробити медичні сервіси простішими та доступнішими.',
+    'Повністю віддалена робота, соціально важливий проект, гнучкі години.',
+    array['Product Design', 'UI/UX', 'HealthTech'],
+    array['Медичне страхування', 'Відпустка 24 дні', 'Курси підвищення кваліфікації'],
+    23, '2023-09-23 10:00:00'
+);
+
+select setval('job_id_seq', (select max(id) from job));

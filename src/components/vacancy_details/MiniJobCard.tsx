@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { JobWrapper } from '../../models/JobWrapper';
 import './MiniJobCard.css';
 
 const MiniJobCard = ({ job, matchScore }: JobWrapper) => {
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState<boolean>(false);
 
   const dateAdded = job.date_added instanceof Date ? job.date_added : new Date(job.date_added);
@@ -14,8 +16,12 @@ const MiniJobCard = ({ job, matchScore }: JobWrapper) => {
   
   const showImage = Boolean(job.company.logoURL && !imageError);
 
+  const handleCardClick = () => {
+    navigate(`/vacancy/${job.id}`);
+  };
+
   return (
-    <div className="vacancy-card">
+    <div className="vacancy-card" onClick={handleCardClick}>
       <div className="card-top-row">
         <div className="company-logo">
           {showImage ? (

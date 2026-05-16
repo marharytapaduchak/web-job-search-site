@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,7 +19,7 @@ func OpenDB(attempts uint16, logger *slog.Logger) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	pass := string(bin)
+	pass := strings.TrimSpace(string(bin))
 
 	user := os.Getenv("POSTGRES_USER")
 	if user == "" {

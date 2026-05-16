@@ -1,16 +1,19 @@
-.main-vacancies-page {
+.main-vacancies {
     width: 100%;
     min-height: 100vh;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
 }
 
-.content-container {
+.main-vacancies__content {
     display: flex;
     align-items: flex-start;
+    padding: 20px;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 
-.content-container > aside, 
 .filter-sidebar { 
     width: 300px;
     flex-shrink: 0;
@@ -19,8 +22,12 @@
 }
 
 
-.job-list-area {
+.main-vacancies__list {
     flex-grow: 1;
+}
+
+.job-list-area {
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
