@@ -14,6 +14,8 @@ import ProfileContacts from './pages/ProfileContacts';
 import ProfileNotification from './pages/ProfileNotification';
 import ProfileEditInfo from './pages/ProfileEditInfo';
 import Vacancy from './pages/Vacancy'
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (

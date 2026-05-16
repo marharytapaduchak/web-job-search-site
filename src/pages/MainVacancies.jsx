@@ -143,13 +143,14 @@ const MainVacancies = () => {
 
                 <div className="job-list-area">
                     {MOCK_RECOMMENDATIONS.map((wrapper) => (
-                        <JobCard 
-                            key={wrapper.job.id} 
-                            job={wrapper.job} 
-                            matchScore={wrapper.matchScore} 
+                        <JobCard
+                            key={wrapper.job.id}
+                            job={wrapper.job}
+                            matchScore={wrapper.matchScore}
                         />
                     ))}
                 </div>
+                </section>
             </div>
         </main>
     );
