@@ -1,18 +1,32 @@
+import { Article } from "../models/Article";
 import { BackendService } from "./BackendService";
 
-export interface Article {
-  id: number;
-  title: string;
-  content: string;
-  saved: boolean;
+interface ArticleApiResponse {
+    id: number;
+    title: string;
+    content: string;
+    saved: boolean;
 }
 
-export type ArticleUpdates = Partial<Omit<Article, "id">>;
+export type ArticleUpdates =
+    Partial<Omit<ArticleApiResponse, "id">>;
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost:3001";
 
 const backend = new BackendService(API_BASE_URL);
+
+function mapToArticle(
+    item: ArticleApiResponse,
+): Article {
+    return new Article(
+        item.id,
+        item.title,
+        item.content,
+        item.saved,
+    );
+}
 
 export function getAllArticles(): Promise<Article[]> {
   return backend.get<Article[]>("/articles");

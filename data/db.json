@@ -189,7 +189,7 @@
       "phone": "+380996543789",
       "telegram": "@katerynamar",
       "linkedin": "linkedin.com/in/kateryna-marchuk",
-      "position": "UI UX дизайнер",
+      "position": "",
       "qualificationLevel": "Junior",
       "englishLevel": "B1/Intermediate",
       "city": "Львів",
@@ -199,7 +199,18 @@
       "workFormat": "Віддалено",
       "employmentType": "Неповна зайнятість",
       "locationScope": "Світ",
-      "about": "Я — junior UI/UX дизайнер із пристрастю до створення зручних, сучасних і естетично привабливих інтерфейсів. Маю досвід роботи з ключовими інструментами, такими як Figma, Adobe XD і Sketch, а також володію навичками UX-досліджень, прототипування й тестування.\nПрагну створювати рішення, що не лише відповідають потребам користувачів, а й перевершують їхні очікування.\nУ процесі роботи я ціную співпрацю з командою, увагу до деталей і готовність до вдосконалення.\nМоєю метою є постійний професійний розвиток у сфері UI/UX дизайну та участь у проєктах, які приносять реальну користь людям."
+      "about": "Я — junior UI/UX дизайнер із пристрастю до створення зручних, сучасних і естетично привабливих інтерфейсів. Маю досвід роботи з ключовими інструментами, такими як Figma, Adobe XD і Sketch, а також володію навичками UX-досліджень, прототипування й тестування.\nПрагну створювати рішення, що не лише відповідають потребам користувачів, а й перевершують їхні очікування.\nУ процесі роботи я ціную співпрацю з командою, увагу до деталей і готовність до вдосконалення.\nМоєю метою є постійний професійний розвиток у сфері UI/UX дизайну та участь у проєктах, які приносять реальну користь людям.",
+      "positions": [],
+      "languages": [],
+      "employmentTypes": [],
+      "workFormats": [],
+      "canRelocate": false,
+      "resumeTitle": "",
+      "resumeUrl": "",
+      "resumeAddedAt": "",
+      "certificates": [],
+      "avatarStyle": "",
+      "avatarSeed": ""
     }
   ],
   "userNotifications": [
@@ -312,5 +323,41 @@
       "description": "У цьому проєкті я була асистентом у створенні UX-дизайну для користувацького потоку. Брала участь у дизайні зручного користувацького потоку для платформи, що дозволяє бронювати квитки та готелі. Я відповідала за розроблення wireframes для ключових сторінок, а також за тестування та коригування інтерфейсу на основі аналітики поведінки користувачів."
     }
   ],
+  "companies": [
+    {
+      "id": 1,
+      "name": "PixelPath Studios",
+      "logo_url": "",
+      "location": "Львів",
+      "description": "Креативна студія цифрових продуктів."
+    }
+  ],
+  "jobs": [
+    {
+      "id": 1,
+      "title": "Frontend Developer",
+      "company_id": 1,
+      "salary": "25000",
+      "level": "Junior",
+      "format": "Remote",
+      "employment_type": "Full-time",
+      "location": "Львів",
+      "english_level": "Intermediate",
+      "description": "Позиція для frontend developer.",
+      "work_conditions": "Remote, Flexible schedule",
+      "skills": [
+        "React",
+        "JavaScript",
+        "CSS"
+      ],
+      "benefits": [
+        "Mentorship",
+        "Flexible hours"
+      ],
+      "num_views": 40,
+      "date_added": "2026-05-14"
+    }
+  ],
+  "userRecommendations": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

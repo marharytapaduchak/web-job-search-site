@@ -76,6 +76,15 @@ const JobCard = ({ job, matchScore }) => {
                 <div className="footer-item">
                     <span>{formattedDate}</span>
                 </div>
+
+                <div className="job-card__footer">
+                    <span>
+                        Додано:{" "}
+                        {job.date_added instanceof Date
+                            ? job.date_added.toLocaleDateString("uk-UA")
+                            : job.date_added}
+                    </span>
+                </div>
             </div>
         </div>
     );

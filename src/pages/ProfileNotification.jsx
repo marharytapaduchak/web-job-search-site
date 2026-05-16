@@ -39,8 +39,12 @@ export default function ProfileNotification() {
     }));
   }
 
+  const [saving, setSaving] = useState(false);
+
   async function handleSave() {
     try {
+      setSaving(true);
+
       await updateProfileNotifications({
         allNewVacancies: notifications.allNewVacancies,
         recommendedVacancies: notifications.recommendedVacancies,
@@ -51,8 +55,9 @@ export default function ProfileNotification() {
 
       alert("Зміни збережено");
     } catch (error) {
-      console.error("Failed to save notifications:", error);
       alert("Не вдалося зберегти зміни");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -73,7 +78,7 @@ export default function ProfileNotification() {
       <div className="profile-notification-page__container">
         <aside className="profile-notification-sidebar">
           <a
-            href="/profile_page"
+            href="/profile_edit_info"
             className="profile-notification-sidebar__title"
           >
             Мій профіль
@@ -186,8 +191,9 @@ export default function ProfileNotification() {
             <button
               className="profile-notification-save-button"
               onClick={handleSave}
+              disabled={saving}
             >
-              Зберегти зміни
+              {saving ? "Збереження..." : "Зберегти зміни"}
             </button>
           </div>
         </section>

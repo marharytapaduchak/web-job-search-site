@@ -57,28 +57,89 @@ const MainVacancies = () => {
     }, [jobService, companyService]);
 
     const handleSearchSubmit = () => {
-        console.log('Ready to fetch jobs with:', {
-            query: searchQuery,
-            spec: specialization
+        console.log({
+            searchQuery,
+            specialization,
+            filters,
         });
     };
 
-    const handleApplyFilters = (filters) => {
-        console.log('Applied filters:', filters);
+    const handleApplyFilters = (newFilters) => {
+        setFilters(newFilters);
     };
 
+    const filteredJobs = jobs.filter((job) => {
+        const matchesSearch =
+            searchQuery === "" ||
+            job.title
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            job.description
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase());
+
+        const matchesSpecialization =
+            specialization === "" ||
+            job.title
+                .toLowerCase()
+                .includes(specialization.toLowerCase());
+
+        const matchesLocation =
+            !filters?.location ||
+            job.location
+                .toLowerCase()
+                .includes(filters.location.toLowerCase());
+
+        const matchesQualification =
+            !filters?.qualification ||
+            job.level === filters.qualification;
+
+        const matchesSalary =
+            !filters?.salary ||
+            job.salary >= Number(filters.salary);
+
+        return (
+            matchesSearch &&
+            matchesSpecialization &&
+            matchesLocation &&
+            matchesQualification &&
+            matchesSalary
+        );
+    });
+
     return (
-        <div className="main-vacancies-page">
+        <main className="main-vacancies">
             <SearchSection
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 specialization={specialization}
-                onSpecializationChange={setSpecialization}
+                onSpecializationChange={
+                    setSpecialization
+                }
                 onSearchSubmit={handleSearchSubmit}
             />
 
-            <div className="content-container">
-                <FilterSidebar onApplyFilters={handleApplyFilters} />
+            <div className="main-vacancies__content">
+                <FilterSidebar
+                    onApplyFilters={handleApplyFilters}
+                />
+
+                <section className="main-vacancies__list">
+                    {loading && (
+                        <p>
+                            Завантаження вакансій...
+                        </p>
+                    )}
+
+                    {error && <p>{error}</p>}
+
+                    {!loading &&
+                        !error &&
+                        filteredJobs.length === 0 && (
+                            <p>
+                                Вакансій не знайдено
+                            </p>
+                        )}
 
                 <div className="job-list-area">
                     {MOCK_RECOMMENDATIONS.map((wrapper) => (
@@ -90,7 +151,7 @@ const MainVacancies = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </main>
     );
 };
 

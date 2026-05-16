@@ -18,7 +18,7 @@ export default function Header() {
                 <Link to="/useful_materials" className="header__link">
                     Корисні матеріали
                 </Link>
-                <Link to="/profile_page" className="header__link">
+                <Link to="/profile_edit_info" className="header__link">
                     Мій профіль
                 </Link>
             </nav>

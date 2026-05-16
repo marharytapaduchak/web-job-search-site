@@ -1,0 +1,124 @@
+.feedback-details-page {
+  min-height: calc(100vh - 72px);
+  background: #fff;
+  padding: 42px 0 56px;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.feedback-details__back {
+  display: block;
+  width: 864px;
+  margin: 0 auto 24px;
+  color: #8f1731;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.feedback-details-card {
+  width: 864px;
+  min-height: 260px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  border: 1px solid #d6d6d6;
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  box-sizing: border-box;
+}
+
+.feedback-details-card h1 {
+  margin: 0 0 6px;
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #1b1d22;
+}
+
+.feedback-details-card h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #111;
+}
+
+.feedback-details-card__tags {
+  display: flex;
+  gap: 0;
+  margin-bottom: 18px;
+  color: #777;
+  font-size: 16px;
+}
+
+.feedback-details-card__tags span:not(:last-child)::after {
+  content: "•";
+  margin: 0 10px;
+  color: #c7c7c7;
+}
+
+.feedback-details-card p {
+  max-width: 640px;
+  margin: 0 0 22px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #111;
+}
+
+.feedback-details-card__meta {
+  display: flex;
+  gap: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.feedback-details-card__meta span:not(:last-child)::after {
+  content: "•";
+  margin-left: 10px;
+  color: #999;
+}
+
+.views {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.views img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  opacity: 0.75;
+}
+
+.feedback-details-card__match {
+  text-align: right;
+  color: #8f1731;
+}
+
+.feedback-details-card__match strong {
+  display: block;
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.feedback-details-card__match span {
+  font-size: 14px;
+  color: #666;
+}
+
+@media (max-width: 950px) {
+  .feedback-details__back,
+  .feedback-details-card {
+    width: calc(100% - 40px);
+  }
+
+  .feedback-details-card {
+    flex-direction: column;
+  }
+
+  .feedback-details-card__match {
+    text-align: left;
+  }
+}

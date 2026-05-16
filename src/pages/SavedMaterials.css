@@ -1,0 +1,19 @@
+@import "./UsefulMaterials.css";
+
+.materials-page__title {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.materials-sidebar__title {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.materials-sidebar__select {
+  height: 39px;
+}
+
+.materials-sidebar__apply {
+  height: 35px;
+}
