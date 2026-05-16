@@ -17,7 +17,7 @@ export class CompanyService {
     }
 
     async getById(id: number): Promise<Company> {
-        const data = await this.backend.get<CompanyApiResponse>(`/api/company/${id}`);
+        const data = await this.backend.get<CompanyApiResponse>(`/company/${id}`);
         return {
             id,
             name: data.name,

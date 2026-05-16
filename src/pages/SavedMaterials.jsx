@@ -4,7 +4,7 @@ import "./SavedMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import { getSavedArticles, unsaveArticle } from "../services/articlesService";
+import { articleService } from "../services/apiClient";
 
 function SavedArticleCard({ article, onRemove, submittedQuery }) {
   return (
@@ -79,7 +79,7 @@ export default function SavedMaterialsPage() {
         setLoading(true);
         setError("");
 
-        const data = await getSavedArticles();
+        const data = await articleService.getSaved();
 
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
@@ -128,7 +128,7 @@ export default function SavedMaterialsPage() {
     setArticles((prev) => prev.filter((item) => item.id !== article.id));
 
     try {
-      await unsaveArticle(article.id);
+      await articleService.unsave(article.id);
     } catch {
       setArticles(previousArticles);
     }

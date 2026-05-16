@@ -10,22 +10,7 @@ import uploadWhiteIcon from "../img/whiteUpload.svg";
 import linkIcon from "../img/link_white.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
 import { useEffect, useState } from "react";
-import {
-  getProfile,
-  getProfileSkills,
-  getProfileGoals,
-  getProfileProjects,
-  updateProfile,
-  createProfileGoal,
-  deleteProfileGoal,
-  createProfileSkill,
-  deleteProfileSkill,
-  createProfileProject,
-  updateProfileProject,
-  deleteProfileProject,
-  getProfileRecommendations,
-  createProfileRecommendation,
-} from "../services/profileService";
+import { profileService } from "../services/apiClient";
 
 const AVATAR_STYLES = [
   { id: "micah", label: "Micah" },
@@ -243,11 +228,11 @@ export default function ProfileEditInfo() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const profile = await getProfile();
-        const skillsData = await getProfileSkills();
-        const goalsData = await getProfileGoals();
-        const projectsData = await getProfileProjects();
-        const recommendationsData = await getProfileRecommendations();
+        const profile = await profileService.getUser();
+        const skillsData = await profileService.getSkills();
+        const goalsData = await profileService.getGoals();
+        const projectsData = await profileService.getProjects();
+        const recommendationsData = await profileService.getRecommendations();
 
         setProfile(profile);
         setSkills(skillsData);
@@ -404,7 +389,7 @@ export default function ProfileEditInfo() {
     }
 
     try {
-      const createdGoal = await createProfileGoal(trimmedGoal);
+      const createdGoal = await profileService.createGoal(trimmedGoal);
 
       setGoals((prev) => [...prev, createdGoal]);
       setNewGoalText("");
@@ -617,7 +602,7 @@ export default function ProfileEditInfo() {
     }
 
     try {
-      await updateProfile({
+      await profileService.updateUser({
         firstName: formData.firstName,
         lastName: formData.lastName,
         about: formData.about,
@@ -643,16 +628,16 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedSkillIds
           .filter((skillId) => !String(skillId).startsWith("temp-"))
-          .map((skillId) => deleteProfileSkill(skillId))
+          .map((skillId) => profileService.deleteSkill(skillId))
       );
 
       await Promise.all(
-        newSkills.map((skill) => createProfileSkill(skill.name, skill.level))
+        newSkills.map((skill) => profileService.createSkill(skill.name, skill.level))
       );
 
       await Promise.all(
         newRecommendations.map((recommendation) =>
-          createProfileRecommendation({
+          profileService.createRecommendation({
             name: recommendation.name,
             email: recommendation.email,
             message: recommendation.message,
@@ -664,14 +649,14 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedProjectIds
           .filter((projectId) => !String(projectId).startsWith("temp-"))
-          .map((projectId) => deleteProfileProject(projectId))
+          .map((projectId) => profileService.deleteProject(projectId))
       );
 
       await Promise.all(
         projects
           .filter((project) => project.isNew)
           .map((project) =>
-            createProfileProject(project.title, project.description)
+            profileService.createProject(project.title, project.description)
           )
       );
 
@@ -682,7 +667,7 @@ export default function ProfileEditInfo() {
               !project.isNew && !String(project.id).startsWith("temp-")
           )
           .map((project) =>
-            updateProfileProject(project.id, {
+            profileService.updateProject(project.id, {
               title: project.title,
               description: project.description,
             })
@@ -692,7 +677,7 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedGoalIds
           .filter((goalId) => !String(goalId).startsWith("temp-"))
-          .map((goalId) => deleteProfileGoal(goalId))
+          .map((goalId) => profileService.deleteGoal(goalId))
       );
 
       setDeletedSkillIds([]);

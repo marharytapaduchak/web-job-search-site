@@ -4,11 +4,7 @@ import "./UsefulMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import {
-  getAllArticles,
-  saveArticle,
-  unsaveArticle,
-} from "../services/articlesService";
+import { articleService } from "../services/apiClient";
 
 function ArticleCard({ article, onToggleSave, submittedQuery }) {
   return (
@@ -90,7 +86,7 @@ export default function UsefulMaterials() {
         setLoading(true);
         setError("");
 
-        const data = await getAllArticles();
+        const data = await articleService.getAll();
 
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
@@ -150,8 +146,8 @@ export default function UsefulMaterials() {
     );
 
     try {
-      if (nextSaved) await saveArticle(article.id);
-      else await unsaveArticle(article.id);
+      if (nextSaved) await articleService.save(article.id);
+      else await articleService.unsave(article.id);
     } catch {
       setArticles((prev) =>
         prev.map((item) =>

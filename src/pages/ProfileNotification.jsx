@@ -1,11 +1,7 @@
 import "./ProfileNotification.css";
 import eyeIcon from "../img/eye.svg";
 import { useEffect, useState } from "react";
-import {
-  getProfile,
-  getProfileNotifications,
-  updateProfileNotifications,
-} from "../services/profileService";
+import { profileService } from "../services/apiClient";
 
 export default function ProfileNotification() {
   const [profile, setProfile] = useState(null);
@@ -16,8 +12,8 @@ export default function ProfileNotification() {
     async function loadData() {
       try {
         const [profileData, notificationsData] = await Promise.all([
-          getProfile(),
-          getProfileNotifications(),
+          profileService.getUser(),
+          profileService.getNotifications(),
         ]);
 
         setProfile(profileData);
@@ -45,7 +41,7 @@ export default function ProfileNotification() {
     try {
       setSaving(true);
 
-      await updateProfileNotifications({
+      await profileService.updateNotifications({
         allNewVacancies: notifications.allNewVacancies,
         recommendedVacancies: notifications.recommendedVacancies,
         disableNotifications: notifications.disableNotifications,

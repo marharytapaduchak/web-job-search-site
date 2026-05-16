@@ -1,7 +1,7 @@
 import "./ProfileContacts.css";
 import eyeIcon from "../img/eye.svg";
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile } from "../services/profileService";
+import { profileService } from "../services/apiClient";
 
 export default function ProfileContacts() {
   const [profile, setProfile] = useState({
@@ -16,7 +16,7 @@ export default function ProfileContacts() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const profileData = await getProfile();
+        const profileData = await profileService.getUser();
 
         setProfile({
           email: profileData.email || "",
@@ -54,7 +54,7 @@ export default function ProfileContacts() {
     try {
       setSaving(true);
 
-      await updateProfile({
+      await profileService.updateUser({
         email: profile.email,
         phone: profile.phone,
         telegram: profile.telegram,

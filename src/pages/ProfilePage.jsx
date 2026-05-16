@@ -9,13 +9,7 @@ import Phone from "../img/phone.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
 
 import { useEffect, useState } from "react";
-import {
-  getProfile,
-  getProfileSkills,
-  getProfileGoals,
-  getProfileProjects,
-  getProfileRecommendations,
-} from "../services/profileService";
+import { profileService } from "../services/apiClient";
 
 function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
@@ -41,11 +35,11 @@ export default function Profile() {
           projectsData,
           recommendationsData,
         ] = await Promise.all([
-          getProfile(),
-          getProfileSkills(),
-          getProfileGoals(),
-          getProfileProjects(),
-          getProfileRecommendations(),
+          profileService.getUser(),
+          profileService.getSkills(),
+          profileService.getGoals(),
+          profileService.getProjects(),
+          profileService.getRecommendations(),
         ]);
 
         setProfile(profileData);

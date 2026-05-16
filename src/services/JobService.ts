@@ -27,7 +27,7 @@ export class JobService {
     }
 
     async getAll(): Promise<Job[]> {
-        const data = await this.backend.get<JobApiResponse[]>(`/api/job`);
+        const data = await this.backend.get<JobApiResponse[]>(`/job`);
         return data.map(item => ({
             id: item.id,
             title: item.title,
@@ -49,7 +49,7 @@ export class JobService {
     }
 
     async getById(id: number): Promise<Job> {
-        const data = await this.backend.get<JobApiResponse>(`/api/job/${id}`);
+        const data = await this.backend.get<JobApiResponse>(`/job/${id}`);
         return {
             id: data.id,
             title: data.title,

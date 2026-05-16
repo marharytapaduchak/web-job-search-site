@@ -50,3 +50,60 @@ var UpdateJobSQL string
 
 //go:embed sql/delete_job.sql
 var DeleteJobSQL string
+
+//go:embed sql/get_all_articles.sql
+var GetAllArticlesSQL string
+
+//go:embed sql/get_article_by_id.sql
+var GetArticleByIDSQL string
+
+//go:embed sql/update_article.sql
+var UpdateArticleSQL string
+
+//go:embed sql/get_user_by_id.sql
+var GetUserByIDSQL string
+
+//go:embed sql/update_user.sql
+var UpdateUserSQL string
+
+//go:embed sql/get_user_notification_by_user_id.sql
+var GetUserNotificationByUserIDSQL string
+
+//go:embed sql/update_user_notification.sql
+var UpdateUserNotificationSQL string
+
+//go:embed sql/get_user_skills_by_user_id.sql
+var GetUserSkillsByUserIDSQL string
+
+//go:embed sql/insert_user_skill.sql
+var InsertUserSkillSQL string
+
+//go:embed sql/delete_user_skill.sql
+var DeleteUserSkillSQL string
+
+//go:embed sql/get_user_goals_by_user_id.sql
+var GetUserGoalsByUserIDSQL string
+
+//go:embed sql/insert_user_goal.sql
+var InsertUserGoalSQL string
+
+//go:embed sql/delete_user_goal.sql
+var DeleteUserGoalSQL string
+
+//go:embed sql/get_user_projects_by_user_id.sql
+var GetUserProjectsByUserIDSQL string
+
+//go:embed sql/insert_user_project.sql
+var InsertUserProjectSQL string
+
+//go:embed sql/update_user_project.sql
+var UpdateUserProjectSQL string
+
+//go:embed sql/delete_user_project.sql
+var DeleteUserProjectSQL string
+
+//go:embed sql/get_user_recommendations_by_user_id.sql
+var GetUserRecommendationsByUserIDSQL string
+
+//go:embed sql/insert_user_recommendation.sql
+var InsertUserRecommendationSQL string
