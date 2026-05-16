@@ -1,9 +1,7 @@
-import {Company} from './Company'; 
-
 export interface Job {
     id: number;
     title: string;
-    company: Company;
+    company_id: number;
     salary: number;
     level: string;
     format: string;
