@@ -1,9 +1,10 @@
 import "./ProfileContacts.css";
 import eyeIcon from "../img/eye.svg";
 import { useEffect, useState } from "react";
-import { profileService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 export default function ProfileContacts() {
+  const { profileService } = useServices();
   const [profile, setProfile] = useState({
     email: "",
     phone: "",

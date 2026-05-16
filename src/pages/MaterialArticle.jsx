@@ -4,7 +4,7 @@ import "./MaterialArticle.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import { articleService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 function SidebarResultCard({ article, isActive, submittedQuery }) {
   return (
@@ -75,6 +75,7 @@ function renderArticleContent(content) {
 }
 
 export default function MaterialArticlePage() {
+  const { articleService } = useServices();
   const { id } = useParams();
 
   const [searchValue, setSearchValue] = useState("");

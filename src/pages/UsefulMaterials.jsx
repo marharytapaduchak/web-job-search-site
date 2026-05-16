@@ -4,7 +4,7 @@ import "./UsefulMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import { articleService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 function ArticleCard({ article, onToggleSave, submittedQuery }) {
   return (
@@ -70,6 +70,7 @@ function ArticleCard({ article, onToggleSave, submittedQuery }) {
 }
 
 export default function UsefulMaterials() {
+  const { articleService } = useServices();
   const [articles, setArticles] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");

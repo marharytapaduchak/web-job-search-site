@@ -1,9 +1,10 @@
 import "./ProfileNotification.css";
 import eyeIcon from "../img/eye.svg";
 import { useEffect, useState } from "react";
-import { profileService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 export default function ProfileNotification() {
+  const { profileService } = useServices();
   const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState(null);
   const [loading, setLoading] = useState(true);

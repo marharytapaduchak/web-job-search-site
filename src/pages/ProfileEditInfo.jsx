@@ -10,7 +10,7 @@ import uploadWhiteIcon from "../img/whiteUpload.svg";
 import linkIcon from "../img/link_white.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
 import { useEffect, useState } from "react";
-import { profileService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 const AVATAR_STYLES = [
   { id: "micah", label: "Micah" },
@@ -130,6 +130,7 @@ function RecommendationCard({ recommendation }) {
 }
 
 export default function ProfileEditInfo() {
+  const { profileService } = useServices();
   const [newGoalText, setNewGoalText] = useState("");
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [deletedGoalIds, setDeletedGoalIds] = useState([]);

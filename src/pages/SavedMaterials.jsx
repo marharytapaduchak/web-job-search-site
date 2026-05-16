@@ -4,7 +4,7 @@ import "./SavedMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import { articleService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 function SavedArticleCard({ article, onRemove, submittedQuery }) {
   return (
@@ -63,6 +63,7 @@ function SavedArticleCard({ article, onRemove, submittedQuery }) {
 }
 
 export default function SavedMaterialsPage() {
+  const { articleService } = useServices();
   const [articles, setArticles] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");

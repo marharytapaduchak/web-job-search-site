@@ -1,30 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import SearchSection from '../components/search_section/SearchSection';
 import FilterSidebar from '../components/filter_sidebar/FilterSidebar';
 import JobCard from '../components/JobCard';
 import { MOCK_RECOMMENDATIONS } from '../components/vacancy_details/mockJobs';
-import { BackendService } from '../services/BackendService.ts';
-import { JobService } from '../services/JobService.ts';
-import { CompanyService } from '../services/CompanyService.ts';
+import { useServices } from '../services/ServicesContext';
 import './MainVacancies.css';
 
 const MainVacancies = () => {
+    const { jobService, companyService } = useServices();
     const [searchQuery, setSearchQuery] = useState('');
     const [specialization, setSpecialization] = useState('');
     const [jobs, setJobs] = useState([]);
     const [companies, setCompanies] = useState(new Map());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const jobService = useMemo(() => {
-        const backend = new BackendService(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-        return new JobService(backend);
-    }, []);
-
-    const companyService = useMemo(() => {
-        const backend = new BackendService(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-        return new CompanyService(backend);
-    }, []);
 
     useEffect(() => {
         let cancelled = false;

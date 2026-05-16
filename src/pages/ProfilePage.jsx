@@ -9,7 +9,7 @@ import Phone from "../img/phone.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
 
 import { useEffect, useState } from "react";
-import { profileService } from "../services/apiClient";
+import { useServices } from "../services/ServicesContext";
 
 function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
@@ -18,6 +18,7 @@ function getAvatarUrl(style, seed) {
 }
 
 export default function Profile() {
+  const { profileService } = useServices();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [skills, setSkills] = useState([]);
