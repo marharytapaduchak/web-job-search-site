@@ -6,14 +6,17 @@ services:
         condition: service_healthy
     build:
       context: ./api
+    secrets:
+      - db-password
     environment:
       - POSTGRES_DB=jobs
       - POSTGRES_USER=jobs-web
-      - POSTGRES_PASSWORD=changeme
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
     expose:
       - 8080
+    networks:
+      - backend-net
 
   db:
     image: postgres:16-alpine
@@ -21,17 +24,21 @@ services:
     user: postgres
     volumes:
       - db-data:/var/lib/postgresql/data
+    secrets:
+      - db-password
     environment:
       - POSTGRES_DB=jobs
       - POSTGRES_USER=jobs-web
-      - POSTGRES_PASSWORD=changeme
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     expose:
       - 5432
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "jobs-web", "-d", "jobs"]
+      test: ["CMD-SHELL", "pg_isready -U jobs-web -d jobs"]
       interval: 3s
       timeout: 1s
       retries: 5
+    networks:
+      - backend-net
 
   frontend:
     build:
@@ -39,9 +46,22 @@ services:
       args:
         VITE_API_BASE_URL: /api
     ports:
-      - "8088:80"
+      - "8088:8080"
     depends_on:
       - api
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+    driver: bridge
 
 volumes:
   db-data:
+
+
+secrets:
+  db-password:
+    file: db/password.txt

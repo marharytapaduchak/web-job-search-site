@@ -1,7 +1,6 @@
 import { BackendService } from "./BackendService";
 import { Job } from "../models/Job";
 
-/** Raw JSON shape returned by GET /api/job/:id. Internal — not exported. */
 interface JobApiResponse {
     id: number;
     title: string;
