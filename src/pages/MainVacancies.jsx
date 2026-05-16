@@ -3,6 +3,9 @@ import SearchSection from '../components/search_section/SearchSection';
 import FilterSidebar from '../components/filter_sidebar/FilterSidebar';
 import JobCard from '../components/JobCard';
 import { MOCK_RECOMMENDATIONS } from '../components/vacancy_details/mockJobs';
+import { BackendService } from '../services/BackendService.ts';
+import { JobService } from '../services/JobService.ts';
+import { CompanyService } from '../services/CompanyService.ts';
 import './MainVacancies.css';
 
 const MainVacancies = () => {
