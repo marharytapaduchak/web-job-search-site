@@ -81,7 +81,7 @@ const RecommendationSidebar = () => {
                         key={job.id} 
                         job={{
                             ...job,
-                            company: companies.get(job.company_id) || { name: 'Завантаження...', logoURL: '' }
+                            company: companies.get(job.company_id) || { name: 'Завантаження...', logo_url: '' }
                         }} 
                         matchScore={calculateMatchScore(job, user, userSkills)} 
                     />

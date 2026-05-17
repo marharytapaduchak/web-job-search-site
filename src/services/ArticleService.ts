@@ -1,18 +1,7 @@
 import { BackendService } from "./BackendService";
 import { Article } from "../models/Article";
 
-interface ArticleApiResponse {
-    id: number;
-    title: string;
-    tags: string[];
-    excerpt: string;
-    content: string;
-    views: number;
-    date: string;
-    saved: boolean;
-}
-
-export type ArticleUpdates = Partial<Omit<ArticleApiResponse, "id">>;
+export type ArticleUpdates = Partial<Omit<Article, "id">>;
 
 export class ArticleService {
     private readonly backend: BackendService;
@@ -22,23 +11,23 @@ export class ArticleService {
     }
 
     async getAll(): Promise<Article[]> {
-        const data = await this.backend.get<ArticleApiResponse[]>("/articles");
-        return data.map(item => this.mapToArticle(item));
+        const data = await this.backend.get<Article[]>("/articles");
+        return data as Article[];
     }
 
     async getSaved(): Promise<Article[]> {
-        const data = await this.backend.get<ArticleApiResponse[]>("/articles?saved=true");
-        return data.map(item => this.mapToArticle(item));
+        const data = await this.backend.get<Article[]>("/articles?saved=true");
+        return data as Article[];
     }
 
     async getById(id: number): Promise<Article> {
-        const data = await this.backend.get<ArticleApiResponse>(`/articles/${id}`);
-        return this.mapToArticle(data);
+        const data = await this.backend.get<Article>(`/articles/${id}`);
+        return data as Article;
     }
 
     async update(id: number, updates: ArticleUpdates): Promise<Article> {
-        const data = await this.backend.patch<ArticleApiResponse>(`/articles/${id}`, updates);
-        return this.mapToArticle(data);
+        const data = await this.backend.patch<Article>(`/articles/${id}`, updates);
+        return data as Article;
     }
 
     async save(id: number): Promise<Article> {
@@ -47,18 +36,5 @@ export class ArticleService {
 
     async unsave(id: number): Promise<Article> {
         return this.update(id, { saved: false });
-    }
-
-    private mapToArticle(item: ArticleApiResponse): Article {
-        return new Article(
-            item.id,
-            item.title,
-            item.tags ?? [],
-            item.excerpt ?? "",
-            item.content,
-            item.views ?? 0,
-            item.date ?? "",
-            item.saved,
-        );
     }
 }

@@ -1,7 +1,7 @@
 export interface Company {
     id: number;
     name: string;
-    logoURL: string;
+    logo_url: string;
     location: string;
     description: string;
 }
