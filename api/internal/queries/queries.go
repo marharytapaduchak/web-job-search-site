@@ -113,3 +113,6 @@ var InsertUserRecommendationSQL string
 
 //go:embed sql/insert_image.sql
 var InsertImageSQL string
+
+//go:embed sql/insert_job_application.sql
+var InsertJobApplicationSQL string

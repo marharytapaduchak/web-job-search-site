@@ -3,10 +3,12 @@ package routers
 
 import (
 	"context"
+	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -111,6 +113,11 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 	imagesAPI := r.Group("/api/images")
 	{
 		imagesAPI.POST("", h.imageUpload)
+	}
+
+	applications := r.Group("/api/applications")
+	{
+		applications.POST("", h.applicationCreate)
 	}
 
 	return r
@@ -739,6 +746,73 @@ func (h *Handler) userRecommendationCreate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, recommendation)
+}
+
+// ── Application ───────────────────────────────────────────────────────────────
+
+func (h *Handler) applicationCreate(c *gin.Context) {
+	jobIDStr := c.PostForm("job_id")
+	jobID, err := strconv.Atoi(jobIDStr)
+	if err != nil || jobID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "valid job_id required"})
+		return
+	}
+
+	motivation := c.PostForm("motivation")
+
+	resumeName, err := savePDF(c, "resume")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "resume: " + err.Error()})
+		return
+	}
+
+	portfolioName, err := savePDF(c, "portfolio")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "portfolio: " + err.Error()})
+		return
+	}
+
+	record, err := models.InsertJobApplication(h.ctx, h.conn, jobID, 1, motivation, resumeName, portfolioName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, record)
+}
+
+func savePDF(c *gin.Context, field string) (string, error) {
+	fh, err := c.FormFile(field)
+	if err != nil {
+		return "", fmt.Errorf("file required")
+	}
+
+	src, err := fh.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
+	// Validate PDF magic bytes
+	magic := make([]byte, 4)
+	if _, err := io.ReadFull(src, magic); err != nil || string(magic) != "%PDF" {
+		return "", fmt.Errorf("must be a PDF file")
+	}
+	if _, err := src.Seek(0, io.SeekStart); err != nil {
+		return "", err
+	}
+
+	name := uuid.New().String() + ".pdf"
+	dst, err := os.Create("/uploads/" + name)
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, src); err != nil {
+		return "", err
+	}
+	return name, nil
 }
 
 // ── Image ─────────────────────────────────────────────────────────────────────

@@ -105,7 +105,7 @@ const Vacancy = () => {
                     {!loading && !error && jobData && (
                         <>
                             <VacancyDetails jobData={jobData} />
-                            <VacancyApplyForm /> 
+                            <VacancyApplyForm jobId={parseInt(id)} />
                         </>
                     )}
                     {!loading && !error && !jobData && (
