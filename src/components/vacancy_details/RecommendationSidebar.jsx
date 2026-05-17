@@ -27,14 +27,19 @@ const RecommendationSidebar = () => {
                 ]);
 
                 if (cancelled) return;
-                
-                const topJobs = fetchedJobs.slice(0, 5);
+
+                const sortedJobs = [...fetchedJobs].sort((a, b) => {
+                    const scoreA = calculateMatchScore(a, userData, skillsData);
+                    const scoreB = calculateMatchScore(b, userData, skillsData);
+                    return scoreB - scoreA;
+                });
+
+                const topJobs = sortedJobs.slice(0, 5);
                 setJobs(topJobs);
                 setUser(userData);
                 setUserSkills(skillsData);
                 setLoading(false);
 
-                // Fetch companies for these jobs
                 const uniqueIds = [...new Set(topJobs.map(j => j.company_id))];
                 uniqueIds.forEach(id => {
                     companyService.getById(id)
