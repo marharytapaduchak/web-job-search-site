@@ -5,14 +5,14 @@ import RecommendationSidebar from '../components/vacancy_details/RecommendationS
 import VacancyDetails from '../components/vacancy_details/VacancyDetails';
 import VacancyApplyForm from '../components/vacancy_details/VacancyApplyForm'; // Added import
 import { useServices } from '../services/ServicesContext';
+import { useSearch } from '../contexts/SearchContext';
 import { calculateMatchScore } from '../utils/matchScore';
 import './MainVacancies.css';
 
 const Vacancy = () => {
     const { id } = useParams();
     const { jobService, companyService, profileService } = useServices();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [specialization, setSpecialization] = useState('');
+    const { searchQuery, setSearchQuery, specialization, setSpecialization } = useSearch();
     const [jobData, setJobData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

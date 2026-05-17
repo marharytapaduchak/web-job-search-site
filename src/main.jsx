@@ -9,6 +9,7 @@ import { ArticleService } from './services/ArticleService';
 import { ProfileService } from './services/ProfileService';
 import { JobService } from './services/JobService';
 import { CompanyService } from './services/CompanyService';
+import { SearchProvider } from './contexts/SearchContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 const CURRENT_USER_ID = 1;
@@ -25,7 +26,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <ServicesContext.Provider value={services}>
-        <App />
+        <SearchProvider>
+          <App />
+        </SearchProvider>
       </ServicesContext.Provider>
     </BrowserRouter>
   </React.StrictMode>

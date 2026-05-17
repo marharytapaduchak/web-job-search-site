@@ -8,15 +8,14 @@ import {
     WORK_FORMATS 
 } from '../components/filter_sidebar/filterConstants';
 import { useServices } from '../services/ServicesContext';
+import { useSearch } from '../contexts/SearchContext';
 import { calculateMatchScore } from '../utils/matchScore';
 import './MainVacancies.css';
 
 const MainVacancies = () => {
     const { jobService, companyService, profileService } = useServices();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [specialization, setSpecialization] = useState('');
+    const { searchQuery, setSearchQuery, specialization, setSpecialization } = useSearch();
     const [jobs, setJobs] = useState([]);
-    const [companies, setCompanies] = useState(new Map());
     const [user, setUser] = useState(null);
     const [userSkills, setUserSkills] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,16 +41,6 @@ const MainVacancies = () => {
                 setUser(userData);
                 setUserSkills(skillsData);
                 setLoading(false);
-
-                const uniqueIds = [...new Set(fetchedJobs.map(j => j.company_id))];
-                uniqueIds.forEach(id => {
-                    companyService.getById(id)
-                        .then(company => {
-                            if (cancelled) return;
-                            setCompanies(prev => new Map(prev).set(id, company));
-                        })
-                        .catch(() => {});
-                });
             } catch {
                 if (cancelled) return;
                 setError(true);
@@ -191,10 +180,7 @@ const MainVacancies = () => {
                     {filteredJobs.map((job) => (
                         <JobCard
                             key={job.id}
-                            job={{
-                                ...job,
-                                company: companies.get(job.company_id) || { name: 'Завантаження...' }
-                            }}
+                            job={job}
                             matchScore={calculateMatchScore(job, user, userSkills)}
                         />
                     ))}

@@ -1,6 +1,6 @@
 import './SearchInput.css';
 
-const SearchInput = ({ value, onChange, placeholder = "Пошук" }) => {
+const SearchInput = ({ value, onChange, onKeyDown, placeholder = "Пошук" }) => {
   return (
     <div className="search-input-container">
       {}
@@ -26,6 +26,7 @@ const SearchInput = ({ value, onChange, placeholder = "Пошук" }) => {
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
     </div>
   );

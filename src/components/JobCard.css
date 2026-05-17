@@ -12,6 +12,36 @@
     padding: 24px;
     background-color: #fff;
     margin: 10px;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 16px;
+}
+
+.company-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.logo-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: var(--accent-yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .job-card-header {
@@ -21,22 +51,9 @@
     margin-bottom: 12px;
 }
 
-.company-info {
+.title-section {
     display: flex;
-    gap: 16px;
-}
-
-.logo-placeholder {
-    width: 64px;
-    height: 64px;
-    background-color: var(--accent-yellow);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 4px;
-    font-size: 10px;
-    font-weight: bold;
+    flex-direction: column;
 }
 
 .job-title {
@@ -55,6 +72,7 @@
 .compatibility-score {
     text-align: center;
     color: var(--primary-burgundy);
+    flex-shrink: 0;
 }
 
 .score-number {

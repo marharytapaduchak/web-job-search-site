@@ -16,6 +16,29 @@ import SidebarActions from './SidebarActions';
 import SidebarLayout from '../SidebarLayout';
 import './FilterSidebar.css';
 
+const MIN_SALARY = 1000;
+const MAX_SALARY = 100000;
+const SLIDER_STEPS = 1000;
+
+const sliderToSalary = (val) => {
+    const n = Number(val);
+    if (n === 0) return 0;
+    
+    // Logarithmic scale formula: min * (max/min) ^ (val/steps)
+    const salary = MIN_SALARY * Math.pow(MAX_SALARY / MIN_SALARY, (n - 1) / (SLIDER_STEPS - 1));
+    return Math.round(salary / 100) * 100;
+};
+
+const salaryToSlider = (salary) => {
+    const s = Number(salary);
+    if (s <= 0) return 0;
+    if (s <= MIN_SALARY) return 1;
+    
+    // Inverse formula: 1 + (steps-1) * log(salary/min) / log(max/min)
+    const val = 1 + (SLIDER_STEPS - 1) * Math.log(s / MIN_SALARY) / Math.log(MAX_SALARY / MIN_SALARY);
+    return Math.round(val);
+};
+
 const FilterSidebar = ({ onApplyFilters }) => {
     const [filters, setFilters] = useState(INITIAL_FILTER_STATE);
 
@@ -88,12 +111,12 @@ const FilterSidebar = ({ onApplyFilters }) => {
             <FilterGroup title="Зарплатні очікування">
                 <input 
                     type="range" 
-                    min="0" max="1000000" step="1000"
+                    min="0" max={SLIDER_STEPS} step="1"
                     className="salary-slider" 
-                    value={filters.salary} 
-                    onChange={(e) => updateFilter('salary', e.target.value)} 
+                    value={salaryToSlider(filters.salary)} 
+                    onChange={(e) => updateFilter('salary', sliderToSalary(e.target.value))} 
                 />
-                <div className="salary-label">від {filters.salary}₴</div>
+                <div className="salary-label">від {filters.salary.toLocaleString()}₴</div>
             </FilterGroup>
 
             <FilterGroup title="Рівень англійської">

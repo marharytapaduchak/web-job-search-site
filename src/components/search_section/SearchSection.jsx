@@ -30,6 +30,11 @@ const SearchSection = ({
             <SearchInput 
               value={searchQuery} 
               onChange={(e) => onSearchChange(e.target.value)} 
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && onSearchSubmit) {
+                  onSearchSubmit();
+                }
+              }}
               placeholder="Пошук" 
             />
           </div>

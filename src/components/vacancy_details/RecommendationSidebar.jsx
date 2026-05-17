@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import SidebarLayout from '../SidebarLayout';
 import SearchInput from '../search_section/SearchInput';
 import MiniJobCard from './MiniJobCard';
 import { useServices } from '../../services/ServicesContext';
+import { useSearch } from '../../contexts/SearchContext';
 import { calculateMatchScore } from '../../utils/matchScore';
 import './RecommendationSidebar.css';
 
 const RecommendationSidebar = () => {
     const { jobService, companyService, profileService } = useServices();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [jobs, setJobs] = useState([]);
-    const [companies, setCompanies] = useState(new Map());
+    const { searchQuery, setSearchQuery } = useSearch();
+    const [allJobs, setAllJobs] = useState([]);
     const [user, setUser] = useState(null);
     const [userSkills, setUserSkills] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,27 +28,10 @@ const RecommendationSidebar = () => {
 
                 if (cancelled) return;
 
-                const sortedJobs = [...fetchedJobs].sort((a, b) => {
-                    const scoreA = calculateMatchScore(a, userData, skillsData);
-                    const scoreB = calculateMatchScore(b, userData, skillsData);
-                    return scoreB - scoreA;
-                });
-
-                const topJobs = sortedJobs.slice(0, 5);
-                setJobs(topJobs);
+                setAllJobs(fetchedJobs);
                 setUser(userData);
                 setUserSkills(skillsData);
                 setLoading(false);
-
-                const uniqueIds = [...new Set(topJobs.map(j => j.company_id))];
-                uniqueIds.forEach(id => {
-                    companyService.getById(id)
-                        .then(company => {
-                            if (cancelled) return;
-                            setCompanies(prev => new Map(prev).set(id, company));
-                        })
-                        .catch(() => {});
-                });
             } catch (err) {
                 if (cancelled) return;
                 setLoading(false);
@@ -57,7 +40,25 @@ const RecommendationSidebar = () => {
 
         fetchData();
         return () => { cancelled = true; };
-    }, [jobService, companyService, profileService]);
+    }, [jobService, profileService]);
+
+    const filteredJobs = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+        let result = allJobs;
+
+        if (query) {
+            result = allJobs.filter(job => 
+                job.title.toLowerCase().includes(query) || 
+                job.description.toLowerCase().includes(query)
+            );
+        }
+
+        return result.sort((a, b) => {
+            const scoreA = calculateMatchScore(a, user, userSkills);
+            const scoreB = calculateMatchScore(b, user, userSkills);
+            return scoreB - scoreA;
+        }).slice(0, 5);
+    }, [allJobs, searchQuery, user, userSkills]);
 
     return (
         <SidebarLayout
@@ -70,19 +71,16 @@ const RecommendationSidebar = () => {
             }
         >
             <div className="recommendations-header">
-                <span className="results-count">{jobs.length} результатів</span>
-                <span className="results-query">«UX UI Designer»</span>
+                <span className="results-count">{filteredJobs.length} результатів</span>
+                {searchQuery && <span className="results-query">«{searchQuery}»</span>}
             </div>
 
             <div className="vacancy-list">
                 {loading && <p>Завантаження...</p>}
-                {jobs.map((job) => (
+                {!loading && filteredJobs.map((job) => (
                     <MiniJobCard 
                         key={job.id} 
-                        job={{
-                            ...job,
-                            company: companies.get(job.company_id) || { name: 'Завантаження...', logo_url: '' }
-                        }} 
+                        job={job}
                         matchScore={calculateMatchScore(job, user, userSkills)} 
                     />
                 ))}
