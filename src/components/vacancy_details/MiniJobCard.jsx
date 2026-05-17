@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { JobWrapper } from '../../models/JobWrapper';
 import './MiniJobCard.css';
 
-const MiniJobCard = ({ job, matchScore }: JobWrapper) => {
+const MiniJobCard = ({ job, matchScore }) => {
   const navigate = useNavigate();
-  const [imageError, setImageError] = useState<boolean>(false);
+  const [imageError, setImageError] = useState(false);
 
   const dateAdded = job.date_added instanceof Date ? job.date_added : new Date(job.date_added);
   
