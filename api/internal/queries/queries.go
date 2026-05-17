@@ -116,3 +116,6 @@ var InsertImageSQL string
 
 //go:embed sql/insert_job_application.sql
 var InsertJobApplicationSQL string
+
+//go:embed sql/get_job_applications_by_user_id.sql
+var GetJobApplicationsByUserIDSQL string

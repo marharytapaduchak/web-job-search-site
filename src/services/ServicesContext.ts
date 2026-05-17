@@ -3,12 +3,14 @@ import type { ArticleService } from './ArticleService';
 import type { ProfileService } from './ProfileService';
 import type { JobService } from './JobService';
 import type { CompanyService } from './CompanyService';
+import type { JobApplicationService } from './JobApplicationService';
 
 export interface Services {
   articleService: ArticleService;
   profileService: ProfileService;
   jobService: JobService;
   companyService: CompanyService;
+  jobApplicationService: JobApplicationService;
 }
 
 export const ServicesContext = createContext<Services | null>(null);

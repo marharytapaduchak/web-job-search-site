@@ -1,74 +1,56 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useServices } from "../services/ServicesContext";
 import "./FeedbackHistory.css";
 import eyeIcon from "../img/eye.svg";
 
-const feedbacks = [
-  {
-    id: 1,
-    title: "UI / UX Designer",
-    company: "PixelPath Studios",
-    logoText: "PixelPath Studios",
-    match: 89,
-    views: 24,
-    date: "12 жовтня",
-    description:
-      "PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових...",
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer (Mobile Apps)",
-    company: "AppFlow",
-    logoText: "A",
-    match: 75,
-    views: 18,
-    date: "10 жовтня",
-    description:
-      "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків. У вас буде можливість працювати над продуктами, які охоплю...",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer (Fintech)",
-    company: "BrandCraft",
-    logoText: "FINPRO SOLUTIONS",
-    match: 32,
-    views: 9,
-    date: "8 жовтня",
-    description:
-      "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами, які змінюють підхід до управління фінансами. Ви будете займатися розробкою інту...",
-  },
-];
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const months = [
+    "січня", "лютого", "березня", "квітня", "травня", "червня",
+    "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
+}
 
 function FeedbackCard({ item }) {
+  const match = ((item.id * 13) % 45) + 50;
+
+  const logoText = item.company_name ? item.company_name.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : "?";
+
   return (
     <Link to={`/feedback_history/${item.id}`} className="feedback-card">
-      <div className="feedback-card__logo">{item.logoText}</div>
+      <div className="feedback-card__logo">{logoText}</div>
 
       <div className="feedback-card__content">
-        <h2 className="feedback-card__title">{item.title}</h2>
-        <p className="feedback-card__company">{item.company}</p>
+        <h2 className="feedback-card__title">{item.job_title}</h2>
+        <p className="feedback-card__company">{item.company_name}</p>
 
         <div className="feedback-card__tags">
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
+          {item.job_skills && item.job_skills.length > 0 ? (
+            item.job_skills.map((skill, idx) => <span key={idx}>{skill}</span>)
+          ) : (
+            <>
+              <span>Tag word</span>
+              <span>Tag word</span>
+            </>
+          )}
         </div>
 
-        <p className="feedback-card__description">{item.description}</p>
+        <p className="feedback-card__description">{item.job_description}</p>
 
         <div className="feedback-card__meta">
           <span className="views">
             <img src={eyeIcon} alt="" />
-            {item.views} переглядів
+            {item.job_num_views} переглядів
           </span>
-          <span>{item.date}</span>
+          <span>{formatDate(item.applied_at)}</span>
         </div>
       </div>
 
       <div className="feedback-card__match">
-        <strong>{item.match}%</strong>
+        <strong>{match}%</strong>
         <span>сумісність</span>
       </div>
     </Link>
@@ -76,12 +58,47 @@ function FeedbackCard({ item }) {
 }
 
 export default function FeedbackHistory() {
+  const { jobApplicationService } = useServices();
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const data = await jobApplicationService.getByUserId(1);
+        setApplications(data);
+      } catch (err) {
+        console.error("Failed to fetch applications:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [jobApplicationService]);
+
+  if (loading) {
+    return (
+      <main className="feedback-history-page">
+        <div className="feedback-history-list" style={{ textAlign: "center", padding: "40px" }}>
+          Завантаження...
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="feedback-history-page">
       <div className="feedback-history-list">
-        {feedbacks.map((item) => (
-          <FeedbackCard key={item.id} item={item} />
-        ))}
+        {applications.length > 0 ? (
+          applications.map((item) => (
+            <FeedbackCard key={item.id} item={item} />
+          ))
+        ) : (
+          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+            Ви ще не подали жодної заявки.
+          </div>
+        )}
       </div>
     </main>
   );

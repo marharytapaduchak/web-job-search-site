@@ -9,6 +9,7 @@ import { ArticleService } from './services/ArticleService';
 import { ProfileService } from './services/ProfileService';
 import { JobService } from './services/JobService';
 import { CompanyService } from './services/CompanyService';
+import { JobApplicationService } from './services/JobApplicationService';
 import { SearchProvider } from './contexts/SearchContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
@@ -20,6 +21,7 @@ const services = {
   profileService: new ProfileService(backend, CURRENT_USER_ID),
   jobService: new JobService(backend),
   companyService: new CompanyService(backend),
+  jobApplicationService: new JobApplicationService(backend),
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(

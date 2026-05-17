@@ -118,6 +118,7 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 	applications := r.Group("/api/applications")
 	{
 		applications.POST("", h.applicationCreate)
+		applications.GET("", h.applicationGetByUserID)
 	}
 
 	return r
@@ -779,6 +780,29 @@ func (h *Handler) applicationCreate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, record)
+}
+
+func (h *Handler) applicationGetByUserID(c *gin.Context) {
+	userIDStr := c.Query("userId")
+	if userIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "userId query param required"})
+		return
+	}
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid userId"})
+		return
+	}
+
+	apps, err := models.GetJobApplicationsByUserID(h.ctx, h.conn, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if apps == nil {
+		apps = []*models.JobApplicationWithDetails{}
+	}
+	c.JSON(http.StatusOK, apps)
 }
 
 func savePDF(c *gin.Context, field string) (string, error) {
