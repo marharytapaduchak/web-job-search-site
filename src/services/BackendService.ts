@@ -67,7 +67,7 @@ export class BackendService {
                 method,
                 credentials: 'include',
                 headers: this.buildHeaders(body),
-                body: body !== undefined ? JSON.stringify(body) : undefined,
+                body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
                 signal: controller.signal,
                 ...rest,
             });
@@ -94,7 +94,7 @@ export class BackendService {
 
     private buildHeaders(body?: unknown): HeadersInit {
         const headers: Record<string, string> = { Accept: 'application/json' };
-        if (body !== undefined) headers['Content-Type'] = 'application/json';
+        if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
         return headers;
     }
 

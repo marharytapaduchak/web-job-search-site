@@ -233,6 +233,7 @@ export default function SavedMaterialsPage() {
               value={draftSortBy}
               onChange={(e) => setDraftSortBy(e.target.value)}
             >
+              <option value="">Без сортування</option>
               <option value="saved">Збережені</option>
               <option value="popular">Найбільше переглядів</option>
             </select>

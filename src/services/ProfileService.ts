@@ -151,4 +151,10 @@ export class ProfileService {
         );
         return data as UserRecommendation;
     }
+
+    async uploadImage(file: File): Promise<{ id: number; name: string }> {
+        const formData = new FormData();
+        formData.append("image", file);
+        return this.backend.post<{ id: number; name: string }>("/images", formData);
+    }
 }

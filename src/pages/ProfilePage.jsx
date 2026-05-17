@@ -14,6 +14,11 @@ import { useServices } from "../services/ServicesContext";
 function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
 
+  if (style === "custom") {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    return baseUrl.replace("/api", "/api/static/") + seed;
+  }
+
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
 }
 

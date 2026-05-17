@@ -77,3 +77,9 @@
     color: #9f1239;
     font-weight: 500;
 }
+
+.dropdown-item--clear {
+    color: #9ca3af;
+    font-style: italic;
+    border-bottom: 1px solid #f3f4f6;
+}

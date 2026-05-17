@@ -258,6 +258,7 @@ export default function UsefulMaterials() {
               value={draftSortBy}
               onChange={(e) => setDraftSortBy(e.target.value)}
             >
+              <option value="">Без сортування</option>
               <option value="latest">Останні</option>
               <option value="saved">Найбільше збережень</option>
               <option value="popular">Найбільше переглядів</option>

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import SearchSection from '../components/search_section/SearchSection';
 import RecommendationSidebar from '../components/vacancy_details/RecommendationSidebar';
 import VacancyDetails from '../components/vacancy_details/VacancyDetails';
+import VacancyApplyForm from '../components/vacancy_details/VacancyApplyForm'; // Added import
 import { useServices } from '../services/ServicesContext';
 import { calculateMatchScore } from '../utils/matchScore';
 import './MainVacancies.css';
@@ -33,7 +34,6 @@ const Vacancy = () => {
                 const company = await companyService.getById(job.company_id);
                 if (cancelled) return;
 
-                // Transform Job model to the format VacancyDetails expects
                 const transformedData = {
                     header: {
                         title: job.title,
@@ -103,7 +103,10 @@ const Vacancy = () => {
                     {loading && <div className="loading">Завантаження...</div>}
                     {error && <div className="error">{error}</div>}
                     {!loading && !error && jobData && (
-                        <VacancyDetails jobData={jobData} />
+                        <>
+                            <VacancyDetails jobData={jobData} />
+                            <VacancyApplyForm /> 
+                        </>
                     )}
                     {!loading && !error && !jobData && (
                         <div className="vacancy-not-found">Вакансію не знайдено</div>
