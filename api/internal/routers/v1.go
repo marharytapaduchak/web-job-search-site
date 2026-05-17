@@ -3,11 +3,18 @@ package routers
 
 import (
 	"context"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"net/http"
+	"os"
 	"strconv"
 
+	"github.com/chai2010/webp"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"jobs-server/internal/db/models"
@@ -97,6 +104,13 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 	{
 		recommendations.GET("", h.userRecommendationGetByUserID)
 		recommendations.POST("", h.userRecommendationCreate)
+	}
+
+	r.Static("/api/static", "/uploads")
+
+	imagesAPI := r.Group("/api/images")
+	{
+		imagesAPI.POST("", h.imageUpload)
 	}
 
 	return r
@@ -725,4 +739,48 @@ func (h *Handler) userRecommendationCreate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, recommendation)
+}
+
+// ── Image ─────────────────────────────────────────────────────────────────────
+
+func (h *Handler) imageUpload(c *gin.Context) {
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "image file required"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer src.Close()
+
+	decoded, _, err := image.Decode(src)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported image format"})
+		return
+	}
+
+	name := uuid.New().String() + ".webp"
+	f, err := os.Create("/uploads/" + name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer f.Close()
+
+	if err := webp.Encode(f, decoded, &webp.Options{Lossless: false, Quality: 80}); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	record, err := models.InsertImage(h.ctx, h.conn, name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, record)
 }

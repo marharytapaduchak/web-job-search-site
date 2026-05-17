@@ -110,3 +110,6 @@ var GetUserRecommendationsByUserIDSQL string
 
 //go:embed sql/insert_user_recommendation.sql
 var InsertUserRecommendationSQL string
+
+//go:embed sql/insert_image.sql
+var InsertImageSQL string
