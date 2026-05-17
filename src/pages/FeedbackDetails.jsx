@@ -1,91 +1,112 @@
 import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./FeedbackDetails.css";
 import eyeIcon from "../img/eye.svg";
 
-const feedbacks = [
-  {
-    id: 1,
-    title: "UI / UX Designer",
-    company: "PixelPath Studios",
-    match: 89,
-    status: "Відгук переглянуто",
-    date: "12 жовтня",
-    views: 24,
-    description:
-      "PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових продуктів.",
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer (Mobile Apps)",
-    company: "AppFlow",
-    match: 75,
-    status: "Очікує відповіді",
-    date: "10 жовтня",
-    views: 18,
-    description:
-      "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків.",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer (Fintech)",
-    company: "BrandCraft",
-    match: 32,
-    status: "Відмовлено",
-    date: "8 жовтня",
-    views: 9,
-    description:
-      "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами.",
-  },
-];
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function FeedbackDetails() {
   const { id } = useParams();
-  const feedback = feedbacks.find((item) => String(item.id) === String(id));
 
-  if (!feedback) {
+  const [application, setApplication] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadApplication() {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/jobApplications/${id}?_expand=job`
+        );
+
+        const applicationData = await res.json();
+
+        const companyRes = await fetch(
+          `${API_BASE_URL}/companies/${applicationData.job.company_id}`
+        );
+
+        const company = await companyRes.json();
+
+        setApplication({
+          ...applicationData,
+          company,
+        });
+      } catch (error) {
+        console.error("Помилка завантаження деталей відгуку:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadApplication();
+  }, [id]);
+
+  if (loading) {
+    return <p className="feedback-details-loading">Завантаження відгуку...</p>;
+  }
+
+  if (!application) {
     return (
-      <main className="feedback-details-page">
-        <Link to="/feedback_history" className="feedback-details__back">
-          ← Назад
+      <main className="feedback-details">
+        <Link to="/feedback_history" className="details-back">
+          ← Назад до історії відгуків
         </Link>
+
         <h1>Відгук не знайдено</h1>
       </main>
     );
   }
 
   return (
-    <main className="feedback-details-page">
-      <Link to="/feedback_history" className="feedback-details__back">
+    <main className="feedback-details">
+      <Link to="/feedback_history" className="details-back">
         ← Назад до історії відгуків
       </Link>
 
-      <section className="feedback-details-card">
-        <div className="feedback-details-card__main">
-          <h1>{feedback.title}</h1>
-          <h2>{feedback.company}</h2>
-
-          <div className="feedback-details-card__tags">
-            <span>Tag word</span>
-            <span>Tag word</span>
-            <span>Tag word</span>
-            <span>Tag word</span>
+      <section className="details-card">
+        <div className="details-top">
+          <div className="details-logo">
+            <img
+              src={application.company?.logo_url}
+              alt={application.company?.name}
+            />
           </div>
 
-          <p>{feedback.description}</p>
+          <div className="details-main">
+            <h1>{application.job?.title}</h1>
 
-          <div className="feedback-details-card__meta">
-            <span className="views">
+            <p className="details-company">
+              {application.company?.name}
+            </p>
+
+            <div className="details-tags">
+              {application.job?.skills?.map((skill) => (
+                <span key={skill}>{skill}</span>
+              ))}
+            </div>
+
+            <p className="details-description">
+              {application.job?.description}
+            </p>
+
+            <div className="details-meta">
               <img src={eyeIcon} alt="" />
-              {feedback.views} переглядів
-            </span>
-            <span>{feedback.date}</span>
-            <span>{feedback.status}</span>
+              <span>{application.job?.num_views} переглядів</span>
+              <span>•</span>
+              <span>{application.appliedAt}</span>
+              <span>•</span>
+              <span>{application.status}</span>
+            </div>
           </div>
-        </div>
 
-        <div className="feedback-details-card__match">
-          <strong>{feedback.match}%</strong>
-          <span>сумісність</span>
+          <div
+            className={`details-match ${
+              application.match < 50 ? "low-match" : ""
+            }`}
+          >
+            <span>{application.match}%</span>
+            <p>сумісність</p>
+          </div>
         </div>
       </section>
     </main>

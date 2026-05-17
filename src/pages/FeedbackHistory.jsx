@@ -1,88 +1,104 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FeedbackHistory.css";
 import eyeIcon from "../img/eye.svg";
 
-const feedbacks = [
-  {
-    id: 1,
-    title: "UI / UX Designer",
-    company: "PixelPath Studios",
-    logoText: "PixelPath Studios",
-    match: 89,
-    views: 24,
-    date: "12 жовтня",
-    description:
-      "PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових...",
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer (Mobile Apps)",
-    company: "AppFlow",
-    logoText: "A",
-    match: 75,
-    views: 18,
-    date: "10 жовтня",
-    description:
-      "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків. У вас буде можливість працювати над продуктами, які охоплю...",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer (Fintech)",
-    company: "BrandCraft",
-    logoText: "FINPRO SOLUTIONS",
-    match: 32,
-    views: 9,
-    date: "8 жовтня",
-    description:
-      "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами, які змінюють підхід до управління фінансами. Ви будете займатися розробкою інту...",
-  },
-];
-
-function FeedbackCard({ item }) {
-  return (
-    <Link to={`/feedback_history/${item.id}`} className="feedback-card">
-      <div className="feedback-card__logo">{item.logoText}</div>
-
-      <div className="feedback-card__content">
-        <h2 className="feedback-card__title">{item.title}</h2>
-        <p className="feedback-card__company">{item.company}</p>
-
-        <div className="feedback-card__tags">
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-          <span>Tag word</span>
-        </div>
-
-        <p className="feedback-card__description">{item.description}</p>
-
-        <div className="feedback-card__meta">
-          <span className="views">
-            <img src={eyeIcon} alt="" />
-            {item.views} переглядів
-          </span>
-          <span>{item.date}</span>
-        </div>
-      </div>
-
-      <div className="feedback-card__match">
-        <strong>{item.match}%</strong>
-        <span>сумісність</span>
-      </div>
-    </Link>
-  );
-}
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function FeedbackHistory() {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadApplications() {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/jobApplications?userId=1&_expand=job`
+        );
+
+        const applicationsData = await res.json();
+
+        const applicationsWithCompanies = await Promise.all(
+          applicationsData.map(async (application) => {
+            const companyRes = await fetch(
+              `${API_BASE_URL}/companies/${application.job.company_id}`
+            );
+
+            const company = await companyRes.json();
+
+            return {
+              ...application,
+              company,
+            };
+          })
+        );
+
+        setApplications(applicationsWithCompanies);
+      } catch (error) {
+        console.error("Помилка завантаження історії відгуків:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadApplications();
+  }, []);
+
+  if (loading) {
+    return <p className="feedback-loading">Завантаження історії відгуків...</p>;
+  }
+
   return (
-    <main className="feedback-history-page">
-      <div className="feedback-history-list">
-        {feedbacks.map((item) => (
-          <FeedbackCard key={item.id} item={item} />
-        ))}
-      </div>
+    <main className="feedback-history">
+      {applications.map((application) => (
+        <Link
+          to={`/feedback_history/${application.id}`}
+          key={application.id}
+          className="feedback-card"
+        >
+          <div className="feedback-logo">
+            <img
+              src={application.company?.logo_url}
+              alt={application.company?.name}
+            />
+          </div>
+
+          <div className="feedback-content">
+            <h2>{application.job?.title}</h2>
+
+            <p className="feedback-company">
+              {application.company?.name}
+            </p>
+
+            <div className="feedback-tags">
+              {application.job?.skills?.map((skill) => (
+                <span key={skill}>{skill}</span>
+              ))}
+            </div>
+
+            <p className="feedback-description">
+              {application.job?.description}
+            </p>
+
+            <div className="feedback-meta">
+              <img src={eyeIcon} alt="" />
+              <span>{application.job?.num_views} переглядів</span>
+              <span>•</span>
+              <span>{application.appliedAt}</span>
+            </div>
+          </div>
+
+          <div
+            className={`feedback-match ${
+              application.match < 50 ? "low-match" : ""
+            }`}
+          >
+            <span>{application.match}%</span>
+            <p>сумісність</p>
+          </div>
+        </Link>
+      ))}
     </main>
   );
 }

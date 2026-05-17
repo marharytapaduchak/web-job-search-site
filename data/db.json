@@ -323,41 +323,129 @@
       "description": "У цьому проєкті я була асистентом у створенні UX-дизайну для користувацького потоку. Брала участь у дизайні зручного користувацького потоку для платформи, що дозволяє бронювати квитки та готелі. Я відповідала за розроблення wireframes для ключових сторінок, а також за тестування та коригування інтерфейсу на основі аналітики поведінки користувачів."
     }
   ],
-  "companies": [
-    {
-      "id": 1,
-      "name": "PixelPath Studios",
-      "logo_url": "",
-      "location": "Львів",
-      "description": "Креативна студія цифрових продуктів."
-    }
-  ],
-  "jobs": [
-    {
-      "id": 1,
-      "title": "Frontend Developer",
-      "company_id": 1,
-      "salary": "25000",
-      "level": "Junior",
-      "format": "Remote",
-      "employment_type": "Full-time",
-      "location": "Львів",
-      "english_level": "Intermediate",
-      "description": "Позиція для frontend developer.",
-      "work_conditions": "Remote, Flexible schedule",
-      "skills": [
-        "React",
-        "JavaScript",
-        "CSS"
-      ],
-      "benefits": [
-        "Mentorship",
-        "Flexible hours"
-      ],
-      "num_views": 40,
-      "date_added": "2026-05-14"
-    }
-  ],
+"companies": [
+  {
+    "id": 1,
+    "name": "PixelPath Studios",
+    "logo_url": "/src/img/firm1.svg",
+    "location": "Львів",
+    "description": "Креативна студія цифрових продуктів."
+  },
+  {
+    "id": 2,
+    "name": "AppFlow",
+    "logo_url": "/src/img/firm2.svg",
+    "location": "Київ",
+    "description": "Компанія, що створює сучасні мобільні додатки та цифрові сервіси."
+  },
+  {
+    "id": 3,
+    "name": "FinPro Solutions",
+    "logo_url": "/src/img/firm3.svg",
+    "location": "Львів",
+    "description": "Fintech-компанія, яка розробляє фінансові платформи та системи управління."
+  }
+],
+"jobs": [
+  {
+    "id": 1,
+    "title": "Frontend Developer",
+    "company_id": 1,
+    "salary": "25000",
+    "level": "Junior",
+    "format": "Remote",
+    "employment_type": "Full-time",
+    "location": "Львів",
+    "english_level": "Intermediate",
+    "description": "Позиція для frontend developer.",
+    "work_conditions": "Remote, Flexible schedule",
+    "skills": [
+      "React",
+      "JavaScript",
+      "CSS"
+    ],
+    "benefits": [
+      "Mentorship",
+      "Flexible hours"
+    ],
+    "num_views": 40,
+    "date_added": "2026-05-14"
+  },
+  {
+    "id": 2,
+    "title": "UI/UX Designer (Mobile Apps)",
+    "company_id": 2,
+    "salary": "32000",
+    "level": "Middle",
+    "format": "Office",
+    "employment_type": "Full-time",
+    "location": "Київ",
+    "english_level": "Upper-Intermediate",
+    "description": "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків.",
+    "work_conditions": "Modern office, Team support",
+    "skills": [
+      "Figma",
+      "UX Research",
+      "Mobile Design"
+    ],
+    "benefits": [
+      "Medical insurance",
+      "Courses compensation"
+    ],
+    "num_views": 67,
+    "date_added": "2026-05-13"
+  },
+  {
+    "id": 3,
+    "title": "UI/UX Designer (Fintech)",
+    "company_id": 3,
+    "salary": "38000",
+    "level": "Middle",
+    "format": "Hybrid",
+    "employment_type": "Full-time",
+    "location": "Львів",
+    "english_level": "Advanced",
+    "description": "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами.",
+    "work_conditions": "Hybrid work, Corporate events",
+    "skills": [
+      "Figma",
+      "Design Systems",
+      "Prototyping"
+    ],
+    "benefits": [
+      "Paid vacation",
+      "Annual bonus"
+    ],
+    "num_views": 28,
+    "date_added": "2026-05-12"
+  }
+],
   "userRecommendations": [],
+"jobApplications": [
+  {
+    "id": 1,
+    "userId": 1,
+    "jobId": 1,
+    "status": "Відгук переглянуто",
+    "match": 89,
+    "appliedAt": "2026-05-15"
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "jobId": 2,
+    "status": "Відгук надіслано",
+    "match": 75,
+    "appliedAt": "2026-05-14"
+  },
+  {
+    "id": 3,
+    "userId": 1,
+    "jobId": 3,
+    "status": "Очікує відповіді",
+    "match": 32,
+    "appliedAt": "2026-05-12"
+  }
+],
   "$schema": "./node_modules/json-server/schema.json"
 }
