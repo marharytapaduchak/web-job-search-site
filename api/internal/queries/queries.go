@@ -119,3 +119,18 @@ var InsertJobApplicationSQL string
 
 //go:embed sql/get_job_applications_by_user_id.sql
 var GetJobApplicationsByUserIDSQL string
+
+//go:embed sql/insert_user_with_password.sql
+var InsertUserWithPasswordSQL string
+
+//go:embed sql/get_user_credentials.sql
+var GetUserCredentialsSQL string
+
+//go:embed sql/insert_session.sql
+var InsertSessionSQL string
+
+//go:embed sql/get_session.sql
+var GetSessionSQL string
+
+//go:embed sql/delete_session.sql
+var DeleteSessionSQL string

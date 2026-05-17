@@ -24,7 +24,13 @@ import (
 
 func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		origin := os.Getenv("CORS_ALLOWED_ORIGIN")
+		if origin != "" {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Credentials", "true")
+		} else {
+			c.Header("Access-Control-Allow-Origin", "*")
+		}
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		if c.Request.Method == http.MethodOptions {
@@ -41,6 +47,14 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 
 	ctx := context.Background()
 	h := NewHandler(ctx, conn)
+
+	auth := r.Group("/api/auth")
+	{
+		auth.POST("/register", h.authRegister)
+		auth.POST("/login", h.authLogin)
+		auth.POST("/logout", h.authLogout)
+		auth.GET("/me", h.requireAuth, h.authMe)
+	}
 
 	api := r.Group("/api/company")
 	{
@@ -68,33 +82,33 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 		articles.PATCH("/:id", h.articleUpdate)
 	}
 
-	users := r.Group("/api/users")
+	users := r.Group("/api/users", h.requireAuth)
 	{
 		users.GET("/:id", h.userGetByID)
 		users.PATCH("/:id", h.userUpdate)
 	}
 
-	notifications := r.Group("/api/userNotifications")
+	notifications := r.Group("/api/userNotifications", h.requireAuth)
 	{
 		notifications.GET("", h.userNotificationGetByUserID)
 		notifications.PATCH("/:id", h.userNotificationUpdate)
 	}
 
-	skills := r.Group("/api/userSkills")
+	skills := r.Group("/api/userSkills", h.requireAuth)
 	{
 		skills.GET("", h.userSkillGetByUserID)
 		skills.POST("", h.userSkillCreate)
 		skills.DELETE("/:id", h.userSkillDelete)
 	}
 
-	goals := r.Group("/api/userGoals")
+	goals := r.Group("/api/userGoals", h.requireAuth)
 	{
 		goals.GET("", h.userGoalGetByUserID)
 		goals.POST("", h.userGoalCreate)
 		goals.DELETE("/:id", h.userGoalDelete)
 	}
 
-	projects := r.Group("/api/userProjects")
+	projects := r.Group("/api/userProjects", h.requireAuth)
 	{
 		projects.GET("", h.userProjectGetByUserID)
 		projects.POST("", h.userProjectCreate)
@@ -102,7 +116,7 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 		projects.DELETE("/:id", h.userProjectDelete)
 	}
 
-	recommendations := r.Group("/api/userRecommendations")
+	recommendations := r.Group("/api/userRecommendations", h.requireAuth)
 	{
 		recommendations.GET("", h.userRecommendationGetByUserID)
 		recommendations.POST("", h.userRecommendationCreate)
@@ -110,12 +124,12 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 
 	r.Static("/api/static", "/uploads")
 
-	imagesAPI := r.Group("/api/images")
+	imagesAPI := r.Group("/api/images", h.requireAuth)
 	{
 		imagesAPI.POST("", h.imageUpload)
 	}
 
-	applications := r.Group("/api/applications")
+	applications := r.Group("/api/applications", h.requireAuth)
 	{
 		applications.POST("", h.applicationCreate)
 		applications.GET("", h.applicationGetByUserID)
@@ -773,7 +787,8 @@ func (h *Handler) applicationCreate(c *gin.Context) {
 		return
 	}
 
-	record, err := models.InsertJobApplication(h.ctx, h.conn, jobID, 1, motivation, resumeName, portfolioName)
+	userID := c.MustGet("userID").(uint64)
+	record, err := models.InsertJobApplication(h.ctx, h.conn, jobID, int(userID), motivation, resumeName, portfolioName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

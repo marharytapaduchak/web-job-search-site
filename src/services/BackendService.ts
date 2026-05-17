@@ -20,7 +20,7 @@ export class NetworkError extends Error {
 
 interface RequestOptions extends RequestInit {
     timeout?: number;
-    redirectTo?: string;
+    redirectTo?: string | null;
 }
 
 export class BackendService {
@@ -78,7 +78,7 @@ export class BackendService {
             clearTimeout(timer);
         }
 
-        if (response.status === 401) {
+        if (response.status === 401 && redirectTo) {
             window.location.href = redirectTo;
             throw new HttpError(401, null, 'Unauthenticated');
         }

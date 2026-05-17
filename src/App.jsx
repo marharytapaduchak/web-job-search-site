@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Header from "./components/Header";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import UsefulMaterials from "./pages/UsefulMaterials";
 import SavedMaterials from "./pages/SavedMaterials";
@@ -25,17 +26,29 @@ function App() {
         <Route path="/" element={<MainVacancies />} />
         <Route path="/vacancy/:id" element={<Vacancy />} />
 
-        <Route path="/feedback_history" element={<FeedbackHistory />} />
-        <Route path="/feedback_history/:id" element={<FeedbackDetails />} />
+        <Route path="/feedback_history" element={
+          <ProtectedRoute><FeedbackHistory /></ProtectedRoute>
+        } />
+        <Route path="/feedback_history/:id" element={
+          <ProtectedRoute><FeedbackDetails /></ProtectedRoute>
+        } />
 
         <Route path="/useful_materials" element={<UsefulMaterials />} />
         <Route path="/useful_materials/saved" element={<SavedMaterials />} />
         <Route path="/useful_materials/article/:id" element={<MaterialArticle />} />
 
-        <Route path="/profile_page" element={<ProfilePage />} />
-        <Route path="/profile_contacts" element={<ProfileContacts />} />
-        <Route path="/profile_notification" element={<ProfileNotification />} />
-        <Route path="/profile_edit_info" element={<ProfileEditInfo />} />
+        <Route path="/profile_page" element={
+          <ProtectedRoute><ProfilePage /></ProtectedRoute>
+        } />
+        <Route path="/profile_contacts" element={
+          <ProtectedRoute><ProfileContacts /></ProtectedRoute>
+        } />
+        <Route path="/profile_notification" element={
+          <ProtectedRoute><ProfileNotification /></ProtectedRoute>
+        } />
+        <Route path="/profile_edit_info" element={
+          <ProtectedRoute><ProfileEditInfo /></ProtectedRoute>
+        } />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
