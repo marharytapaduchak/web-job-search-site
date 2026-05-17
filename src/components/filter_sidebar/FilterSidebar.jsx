@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { 
     QUAL_OPTIONS, 
     ENGLISH_OPTIONS, 
@@ -24,7 +24,6 @@ const sliderToSalary = (val) => {
     const n = Number(val);
     if (n === 0) return 0;
     
-    // Logarithmic scale formula: min * (max/min) ^ (val/steps)
     const salary = MIN_SALARY * Math.pow(MAX_SALARY / MIN_SALARY, (n - 1) / (SLIDER_STEPS - 1));
     return Math.round(salary / 100) * 100;
 };
@@ -34,19 +33,18 @@ const salaryToSlider = (salary) => {
     if (s <= 0) return 0;
     if (s <= MIN_SALARY) return 1;
     
-    // Inverse formula: 1 + (steps-1) * log(salary/min) / log(max/min)
     const val = 1 + (SLIDER_STEPS - 1) * Math.log(s / MIN_SALARY) / Math.log(MAX_SALARY / MIN_SALARY);
     return Math.round(val);
 };
 
-const FilterSidebar = ({ onApplyFilters }) => {
+const FilterSidebar = memo(({ onApplyFilters }) => {
     const [filters, setFilters] = useState(INITIAL_FILTER_STATE);
 
-    const updateFilter = (field, value) => {
+    const updateFilter = useCallback((field, value) => {
         setFilters(prev => ({ ...prev, [field]: value }));
-    };
+    }, []);
 
-    const updateNestedFilter = (group, field, value) => {
+    const updateNestedFilter = useCallback((group, field, value) => {
         setFilters(prev => ({
             ...prev,
             [group]: {
@@ -54,15 +52,15 @@ const FilterSidebar = ({ onApplyFilters }) => {
                 [field]: value
             }
         }));
-    };
+    }, []);
 
-    const handleReset = () => {
+    const handleReset = useCallback(() => {
         setFilters(INITIAL_FILTER_STATE);
-    };
+    }, []);
 
-    const handleApply = () => {
+    const handleApply = useCallback(() => {
         onApplyFilters(filters);
-    };
+    }, [onApplyFilters, filters]);
 
     return (
         <SidebarLayout
@@ -128,6 +126,6 @@ const FilterSidebar = ({ onApplyFilters }) => {
             </FilterGroup>
         </SidebarLayout>
     );
-};
+});
 
 export default FilterSidebar;

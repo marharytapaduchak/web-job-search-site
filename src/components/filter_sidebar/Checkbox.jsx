@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import './Checkbox.css';
 
-const Checkbox = ({ label, checked, onChange }) => {
+const Checkbox = memo(({ label, checked, onChange }) => {
     return (
         <label className="checkbox-label">
             <input 
@@ -12,6 +13,6 @@ const Checkbox = ({ label, checked, onChange }) => {
             {label}
         </label>
     );
-};
+});
 
 export default Checkbox;

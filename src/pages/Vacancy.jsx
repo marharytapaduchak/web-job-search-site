@@ -59,11 +59,10 @@ const Vacancy = () => {
                     },
                     tags: job.tags,
                     views: job.num_views,
-                    postedDate: new Intl.DateTimeFormat('uk-UA', { 
-                        day: 'numeric', 
-                        month: 'long' 
-                    }).format(new Date(job.date_added))
-                };
+                    postedDate: new Intl.DateTimeFormat('uk-UA', {
+                        day: 'numeric',
+                        month: 'long'
+                        }).format(new Date(job.date_added))                };
 
                 setJobData(transformedData);
                 setLoading(false);

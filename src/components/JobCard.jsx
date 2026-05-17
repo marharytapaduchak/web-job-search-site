@@ -29,16 +29,17 @@ const JobCard = ({ job, matchScore }) => {
 
     const dateAdded = new Date(job.date_added);
     const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
-        day: 'numeric', 
-        month: 'long' 
-    }).format(dateAdded);
+        day: '2-digit', 
+        month: '2-digit',
+        year: '2-digit'
+    }).format(dateAdded).replace(/\./g, '-');
 
     return (
         <div className="job-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
             
-            <div className="company-logo">
+            <div className="big-company-logo">
                 {company?.logo_url ? (
-                    <img src={company.logo_url} alt={company.name} className="logo-image" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src={company.logo_url} alt={company.name} className="logo-image" />
                 ) : (
                     <div className="logo-placeholder">
                         <span className="logo-text">{company?.name || 'Завантаження...'}</span>
@@ -94,13 +95,6 @@ const JobCard = ({ job, matchScore }) => {
                     <span className="meta-separator">•</span>
                     <div className="footer-item">
                         <span>{formattedDate}</span>
-                    </div>
-
-                    <div className="job-card__footer">
-                        <span>
-                            Додано:{" "}
-                            {job.date_added}
-                        </span>
                     </div>
                 </div>
                 

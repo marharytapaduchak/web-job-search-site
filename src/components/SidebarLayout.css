@@ -1,4 +1,3 @@
-
 :root {
     --sidebar-width: 320px;
     --sidebar-padding-y: 30px;
@@ -14,6 +13,8 @@
     flex-shrink: 0; 
     background-color: var(--bg-surface);
     padding: var(--sidebar-padding-y) var(--sidebar-padding-x);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .filters-main-title {

@@ -1,11 +1,11 @@
 insert into company (id, name, logo_url, location, description)
 overriding system value
 values
-(101, 'AppFlow', 'https://placehold.co/48/red/white?text=Logo', 'Kyiv, Ukraine', 'Innovative app development company.'),
-(102, 'Shop Sphere', 'https://placehold.co/48/red/white?text=Logo', 'Lviv, Ukraine', 'E-commerce solutions provider.'),
-(103, 'BrandCraft', 'https://placehold.co/48/red/white?text=Logo', 'Kyiv, Ukraine', 'Creative branding agency.'),
-(104, 'GameCloud', 'https://placehold.co/48/red/white?text=Logo', 'dnipro, ukraine', 'cloud gaming platform.'),
-(105, 'medtech innovations', 'https://placehold.co/48/red/white?text=Logo', 'odesa, Ukraine', 'Medical technology startup.');
+(101, 'AppFlow', 'https://placehold.co/64/red/white?text=Logo', 'Kyiv, Ukraine', 'Innovative app development company.'),
+(102, 'Shop Sphere', 'https://placehold.co/64/red/white?text=Logo', 'Lviv, Ukraine', 'E-commerce solutions provider.'),
+(103, 'BrandCraft', 'https://placehold.co/64/red/white?text=Logo', 'Kyiv, Ukraine', 'Creative branding agency.'),
+(104, 'GameCloud', 'https://placehold.co/64/red/white?text=Logo', 'Dnipro, ukraine', 'cloud gaming platform.'),
+(105, 'medtech innovations', 'https://placehold.co/64/red/white?text=Logo', 'Odesa, Ukraine', 'Medical technology startup.');
 
 select setval('company_id_seq', (select max(id) from company));
 

@@ -26,9 +26,10 @@ const MiniJobCard = ({ job, matchScore }) => {
   const dateAdded = new Date(job.date_added);
   
   const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
-    day: 'numeric', 
-    month: 'long' 
-  }).format(dateAdded);
+    day: '2-digit', 
+    month: '2-digit',
+    year: '2-digit'
+  }).format(dateAdded).replace(/\./g, '-');
   
   const showImage = Boolean(company?.logo_url && !imageError);
 

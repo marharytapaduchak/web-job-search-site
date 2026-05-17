@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import './DropdownSelect.css';
 
-const DropdownSelect = ({
+const DropdownSelect = memo(({
   options = [],
   value,
   onChange,
@@ -96,6 +96,6 @@ const DropdownSelect = ({
       )}
     </div>
   );
-};
+});
 
 export default DropdownSelect;

@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import DropdownSelect from '../DropdownSelect';
 import './SortDropdown.css';
 
-const SortDropdown = ({ sortValue, onSortChange }) => {
+const SortDropdown = memo(({ sortValue, onSortChange }) => {
     const sortOptions = [
         { value: 'relevant', label: 'За релевантністю' },
         { value: 'date-newest', label: 'За датою (найновіші)' },
@@ -21,6 +22,6 @@ const SortDropdown = ({ sortValue, onSortChange }) => {
             />
         </div>
     );
-};
+});
 
 export default SortDropdown;
