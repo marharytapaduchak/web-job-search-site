@@ -63,12 +63,15 @@ const MainVacancies = () => {
         return () => { cancelled = true; };
     }, [jobService, companyService, profileService]);
 
-    const handleSearchSubmit = () => {
-        console.log({
-            searchQuery,
-            specialization,
-            filters,
-        });
+    const handleSearchSubmit = async () => {
+        try {
+            const results = searchQuery.trim()
+                ? await jobService.search(searchQuery.trim())
+                : await jobService.getAll();
+            setJobs(results);
+        } catch {
+            setError(true);
+        }
     };
 
     const handleApplyFilters = (newFilters) => {
@@ -84,15 +87,6 @@ const MainVacancies = () => {
         .map(t => t.label.toLowerCase());
 
     let filteredJobs = jobs.filter((job) => {
-        const matchesSearch =
-            searchQuery === "" ||
-            job.title
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            job.description
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
-
         const matchesSpecialization =
             specialization === "" ||
             job.title
@@ -129,7 +123,6 @@ const MainVacancies = () => {
         const matchesEnglish = !filters?.englishLevel || job.english_level?.toLowerCase() === filters.englishLevel.toLowerCase();
 
         return (
-            matchesSearch &&
             matchesSpecialization &&
             matchesLocation &&
             matchesQualification &&

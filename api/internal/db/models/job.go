@@ -110,6 +110,26 @@ func GetAllJobs(ctx context.Context, conn *pgxpool.Pool) ([]*Job, error) {
 	return jobs, nil
 }
 
+func SearchJobs(ctx context.Context, conn *pgxpool.Pool, query string) ([]*Job, error) {
+	rows, err := conn.Query(ctx, queries.SearchJobsSQL, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search jobs: %w", err)
+	}
+	defer rows.Close()
+
+	var jobs []*Job
+	for rows.Next() {
+		j := &Job{}
+		if err := rows.Scan(&j.ID, &j.Title, &j.CompanyID, &j.Salary, &j.Level, &j.Format,
+			&j.EmploymentType, &j.Location, &j.EnglishLevel, &j.Description,
+			&j.WorkConditions, &j.Skills, &j.Benefits, &j.NumViews, &j.DateAdded); err != nil {
+			return nil, fmt.Errorf("failed to scan job: %w", err)
+		}
+		jobs = append(jobs, j)
+	}
+	return jobs, nil
+}
+
 func (req *UpdateJobRequest) Update(ctx context.Context, conn *pgxpool.Pool, id uint64) (*Job, error) {
 	var updatedID uint64
 

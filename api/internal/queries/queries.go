@@ -51,6 +51,9 @@ var UpdateJobSQL string
 //go:embed sql/delete_job.sql
 var DeleteJobSQL string
 
+//go:embed sql/search_jobs.sql
+var SearchJobsSQL string
+
 //go:embed sql/get_all_articles.sql
 var GetAllArticlesSQL string
 

@@ -17,4 +17,9 @@ export class JobService {
         const data = await this.backend.get<Job>(`/job/${id}`);
         return data as Job;
     }
+
+    async search(query: string): Promise<Job[]> {
+        const data = await this.backend.get<Job[]>(`/job/search?q=${encodeURIComponent(query)}`);
+        return data as Job[];
+    }
 }

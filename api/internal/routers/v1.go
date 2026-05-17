@@ -45,6 +45,7 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 	jobAPI := r.Group("/api/job")
 	{
 		jobAPI.POST("/create", h.jobCreate)
+		jobAPI.GET("/search", h.jobSearch)
 		jobAPI.GET("", h.jobGetAll)
 		jobAPI.GET("/:id", h.jobGetByID)
 		jobAPI.PUT("/:id", h.jobUpdate)
@@ -237,6 +238,24 @@ func (h *Handler) jobGetAll(c *gin.Context) {
 		jobs = []*models.Job{}
 	}
 
+	c.JSON(http.StatusOK, jobs)
+}
+
+func (h *Handler) jobSearch(c *gin.Context) {
+	q := c.Query("q")
+	if q == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "q query param required"})
+		return
+	}
+
+	jobs, err := models.SearchJobs(h.ctx, h.conn, q)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if jobs == nil {
+		jobs = []*models.Job{}
+	}
 	c.JSON(http.StatusOK, jobs)
 }
 
