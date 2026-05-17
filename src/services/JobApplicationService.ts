@@ -12,4 +12,5 @@ export class JobApplicationService {
         const data = await this.backend.get<JobApplication[]>(`/applications?userId=${userId}`);
         return data as JobApplication[];
     }
+
 }

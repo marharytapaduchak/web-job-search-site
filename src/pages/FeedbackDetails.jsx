@@ -1,46 +1,53 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useServices } from "../services/ServicesContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./FeedbackDetails.css";
 import eyeIcon from "../img/eye.svg";
 
-const feedbacks = [
-  {
-    id: 1,
-    title: "UI / UX Designer",
-    company: "PixelPath Studios",
-    match: 89,
-    status: "Відгук переглянуто",
-    date: "12 жовтня",
-    views: 24,
-    description:
-      "PixelPath Studios шукає креативного та досвідченого UI/UX дизайнера, який здатен створювати інтуїтивно зрозумілі та візуально привабливі інтерфейси для цифрових продуктів.",
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer (Mobile Apps)",
-    company: "AppFlow",
-    match: 75,
-    status: "Очікує відповіді",
-    date: "10 жовтня",
-    views: 18,
-    description:
-      "AppFlow шукає спеціаліста, який спеціалізується на дизайні інтерфейсів для мобільних додатків.",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer (Fintech)",
-    company: "BrandCraft",
-    match: 32,
-    status: "Відмовлено",
-    date: "8 жовтня",
-    views: 9,
-    description:
-      "FinPro Solutions шукає UI/UX дизайнера для роботи над фінансовими платформами.",
-  },
-];
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const months = [
+    "січня", "лютого", "березня", "квітня", "травня", "червня",
+    "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
+}
 
 export default function FeedbackDetails() {
   const { id } = useParams();
-  const feedback = feedbacks.find((item) => String(item.id) === String(id));
+  const { jobApplicationService } = useServices();
+  const { user } = useAuth();
+  const [feedback, setFeedback] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetch = async () => {
+      try {
+        const data = await jobApplicationService.getByUserId(user.id);
+        const found = data.find((item) => String(item.id) === String(id));
+        setFeedback(found ?? null);
+      } catch {
+        setFeedback(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [jobApplicationService, user, id]);
+
+  if (loading) {
+    return (
+      <main className="feedback-details-page">
+        <Link to="/feedback_history" className="feedback-details__back">
+          ← Назад
+        </Link>
+        <p>Завантаження...</p>
+      </main>
+    );
+  }
 
   if (!feedback) {
     return (
@@ -53,6 +60,8 @@ export default function FeedbackDetails() {
     );
   }
 
+  const match = ((feedback.id * 13) % 45) + 50;
+
   return (
     <main className="feedback-details-page">
       <Link to="/feedback_history" className="feedback-details__back">
@@ -61,30 +70,33 @@ export default function FeedbackDetails() {
 
       <section className="feedback-details-card">
         <div className="feedback-details-card__main">
-          <h1>{feedback.title}</h1>
-          <h2>{feedback.company}</h2>
+          <h1>{feedback.job_title}</h1>
+          <h2>{feedback.company_name}</h2>
 
           <div className="feedback-details-card__tags">
-            <span>Tag word</span>
-            <span>Tag word</span>
-            <span>Tag word</span>
-            <span>Tag word</span>
+            {feedback.job_skills && feedback.job_skills.length > 0 ? (
+              feedback.job_skills.map((skill, idx) => <span key={idx}>{skill}</span>)
+            ) : (
+              <>
+                <span>Tag word</span>
+                <span>Tag word</span>
+              </>
+            )}
           </div>
 
-          <p>{feedback.description}</p>
+          <p>{feedback.job_description}</p>
 
           <div className="feedback-details-card__meta">
             <span className="views">
               <img src={eyeIcon} alt="" />
-              {feedback.views} переглядів
+              {feedback.job_num_views} переглядів
             </span>
-            <span>{feedback.date}</span>
-            <span>{feedback.status}</span>
+            <span>{formatDate(feedback.applied_at)}</span>
           </div>
         </div>
 
         <div className="feedback-details-card__match">
-          <strong>{feedback.match}%</strong>
+          <strong>{match}%</strong>
           <span>сумісність</span>
         </div>
       </section>
