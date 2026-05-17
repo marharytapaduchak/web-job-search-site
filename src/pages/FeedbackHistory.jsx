@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useServices } from "../services/ServicesContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./FeedbackHistory.css";
 import eyeIcon from "../img/eye.svg";
 
@@ -59,13 +60,15 @@ function FeedbackCard({ item }) {
 
 export default function FeedbackHistory() {
   const { jobApplicationService } = useServices();
+  const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     const fetchApplications = async () => {
       try {
-        const data = await jobApplicationService.getByUserId(1);
+        const data = await jobApplicationService.getByUserId(user.id);
         setApplications(data);
       } catch (err) {
         console.error("Failed to fetch applications:", err);
@@ -75,7 +78,7 @@ export default function FeedbackHistory() {
     };
 
     fetchApplications();
-  }, [jobApplicationService]);
+  }, [jobApplicationService, user]);
 
   if (loading) {
     return (
