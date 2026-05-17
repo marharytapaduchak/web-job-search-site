@@ -1,8 +1,12 @@
 import "./JobCard.css";
+import { useSavedJobs } from "../context/SavedJobsContext";
 
 const JobCard = ({ job, company }) => {
     const companyName = company?.name || "Компанія";
     const salaryText = job.salary ? `${job.salary}₴` : "Зарплата не вказана";
+
+    const { toggleSavedJob, isJobSaved } = useSavedJobs();
+    const saved = isJobSaved(job.id);
 
     return (
         <article className="job-card">
@@ -12,9 +16,21 @@ const JobCard = ({ job, company }) => {
                     <h3 className="job-card__title">{job.title}</h3>
                 </div>
 
-                <span className="job-card__views">
-                    {job.num_views} переглядів
-                </span>
+                <div className="job-card__actions">
+                    <span className="job-card__views">
+                        {job.num_views} переглядів
+                    </span>
+
+                    <button
+                        type="button"
+                        className={`job-card__save-button ${
+                            saved ? "job-card__save-button--active" : ""
+                        }`}
+                        onClick={() => toggleSavedJob(job)}
+                    >
+                        {saved ? "Збережено" : "Зберегти"}
+                    </button>
+                </div>
             </div>
 
             <p className="job-card__meta">
