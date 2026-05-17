@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../services/ServicesContext';
 import './JobCard.css';
 
-const JobCard = ({ job, matchScore }) => {
+const JobCard = memo(({ job, matchScore }) => {
     const navigate = useNavigate();
     const { companyService } = useServices();
     const [company, setCompany] = useState(null);
@@ -30,8 +30,8 @@ const JobCard = ({ job, matchScore }) => {
     const dateAdded = new Date(job.date_added);
     const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
         day: '2-digit', 
-        month: '2-digit',
-        year: '2-digit'
+        month: '2-digit', 
+        year: '2-digit' 
     }).format(dateAdded).replace(/\./g, '-');
 
     return (
@@ -101,6 +101,6 @@ const JobCard = ({ job, matchScore }) => {
             </div>
         </div>
     );
-};
+});
 
 export default JobCard;

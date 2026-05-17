@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SearchSection from '../components/search_section/SearchSection';
 import FilterSidebar from '../components/filter_sidebar/FilterSidebar';
 import JobCard from '../components/JobCard';
@@ -67,80 +67,93 @@ const MainVacancies = () => {
         setFilters(newFilters);
     };
 
-    const activeEmploymentTypes = EMPLOYMENT_TYPES
-        .filter(t => filters?.employmentType?.[t.id])
-        .map(t => t.label.toLowerCase());
+    const filteredJobs = useMemo(() => {
+        const activeEmploymentTypes = EMPLOYMENT_TYPES
+            .filter(t => filters?.employmentType?.[t.id])
+            .map(t => t.label.toLowerCase());
 
-    const activeWorkFormats = WORK_FORMATS
-        .filter(t => filters?.workFormat?.[t.id])
-        .map(t => t.label.toLowerCase());
+        const activeWorkFormats = WORK_FORMATS
+            .filter(t => filters?.workFormat?.[t.id])
+            .map(t => t.label.toLowerCase());
 
-    let filteredJobs = jobs.filter((job) => {
-        const matchesSpecialization =
-            specialization === "" ||
-            job.title
-                .toLowerCase()
-                .includes(specialization.toLowerCase());
+        let result = jobs.filter((job) => {
+            const matchesSpecialization =
+                specialization === "" ||
+                job.title
+                    .toLowerCase()
+                    .includes(specialization.toLowerCase());
 
-        const matchesLocation =
-            !filters?.location ||
-            job.location
-                .toLowerCase()
-                .includes(filters.location.toLowerCase());
+            const matchesLocation =
+                !filters?.location ||
+                job.location
+                    .toLowerCase()
+                    .includes(filters.location.toLowerCase());
 
-        const matchesQualification =
-            !filters?.qualification ||
-            job.level.toLowerCase() === filters.qualification.toLowerCase();
+            const matchesQualification =
+                !filters?.qualification ||
+                job.level.toLowerCase() === filters.qualification.toLowerCase();
 
-        const matchesSalary =
-            !filters?.salary ||
-            Number(job.salary) >= Number(filters.salary);
+            const matchesSalary =
+                !filters?.salary ||
+                Number(job.salary) >= Number(filters.salary);
 
-        const jobEmpType = job.employment_type?.toLowerCase() || '';
-        const matchesEmpType = activeEmploymentTypes.length === 0 || activeEmploymentTypes.some(type => {
-            if (type.includes('часткова') && jobEmpType.includes('неповна')) return true;
-            if (type.includes('неповна') && jobEmpType.includes('часткова')) return true;
-            return jobEmpType.includes(type) || type.includes(jobEmpType);
+            const jobEmpType = job.employment_type?.toLowerCase() || '';
+            const matchesEmpType = activeEmploymentTypes.length === 0 || activeEmploymentTypes.some(type => {
+                if (type.includes('часткова') && jobEmpType.includes('неповна')) return true;
+                if (type.includes('неповна') && jobEmpType.includes('часткова')) return true;
+                return jobEmpType.includes(type) || type.includes(jobEmpType);
+            });
+
+            const jobFormat = job.format?.toLowerCase() || '';
+            const matchesFormat = activeWorkFormats.length === 0 || activeWorkFormats.some(format => {
+                const rootFormat = format.replace('а', ''); 
+                return jobFormat.includes(rootFormat);
+            });
+
+            const matchesEnglish = !filters?.englishLevel || job.english_level?.toLowerCase() === filters.englishLevel.toLowerCase();
+
+            return (
+                matchesSpecialization &&
+                matchesLocation &&
+                matchesQualification &&
+                matchesSalary &&
+                matchesEmpType &&
+                matchesFormat &&
+                matchesEnglish
+            );
         });
 
-        const jobFormat = job.format?.toLowerCase() || '';
-        const matchesFormat = activeWorkFormats.length === 0 || activeWorkFormats.some(format => {
-            const rootFormat = format.replace('а', ''); 
-            return jobFormat.includes(rootFormat);
-        });
+        if (filters?.sortBy) {
+            result = [...result].sort((a, b) => {
+                if (filters.sortBy === 'date-newest') {
+                    return new Date(b.date_added) - new Date(a.date_added);
+                }
+                if (filters.sortBy === 'salary-high') {
+                    return Number(b.salary) - Number(a.salary);
+                }
+                if (filters.sortBy === 'salary-low') {
+                    return Number(a.salary) - Number(b.salary);
+                }
+                if (filters.sortBy === 'relevant') {
+                    const scoreA = calculateMatchScore(a, user, userSkills);
+                    const scoreB = calculateMatchScore(b, user, userSkills);
+                    return scoreB - scoreA;
+                }
+                return 0;
+            });
+        }
+        return result;
+    }, [jobs, filters, specialization, user, userSkills]);
 
-        const matchesEnglish = !filters?.englishLevel || job.english_level?.toLowerCase() === filters.englishLevel.toLowerCase();
-
-        return (
-            matchesSpecialization &&
-            matchesLocation &&
-            matchesQualification &&
-            matchesSalary &&
-            matchesEmpType &&
-            matchesFormat &&
-            matchesEnglish
-        );
-    });
-
-    if (filters?.sortBy) {
-        filteredJobs = [...filteredJobs].sort((a, b) => {
-            if (filters.sortBy === 'date-newest') {
-                return new Date(b.date_added) - new Date(a.date_added);
-            }
-            if (filters.sortBy === 'salary-high') {
-                return Number(b.salary) - Number(a.salary);
-            }
-            if (filters.sortBy === 'salary-low') {
-                return Number(a.salary) - Number(b.salary);
-            }
-            if (filters.sortBy === 'relevant') {
-                const scoreA = calculateMatchScore(a, user, userSkills);
-                const scoreB = calculateMatchScore(b, user, userSkills);
-                return scoreB - scoreA;
-            }
-            return 0;
-        });
-    }
+    const jobList = useMemo(() => {
+        return filteredJobs.map((job) => (
+            <JobCard
+                key={job.id}
+                job={job}
+                matchScore={calculateMatchScore(job, user, userSkills)}
+            />
+        ));
+    }, [filteredJobs, user, userSkills]);
 
     return (
         <main className="main-vacancies">
@@ -177,13 +190,7 @@ const MainVacancies = () => {
                         )}
 
                 <div className="job-list-area">
-                    {filteredJobs.map((job) => (
-                        <JobCard
-                            key={job.id}
-                            job={job}
-                            matchScore={calculateMatchScore(job, user, userSkills)}
-                        />
-                    ))}
+                    {jobList}
                 </div>
                 </section>
             </div>

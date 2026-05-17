@@ -3,6 +3,14 @@ import DropdownSelect from '../DropdownSelect';
 import PrimaryButton from '../PrimaryButton';
 import './SearchSection.css';
 
+const specializationOptions = [
+  { value: 'ui / ux', label: 'UI / UX Designer' },
+  { value: 'моушн', label: 'Моушн дизайнер' },
+  { value: 'бренд', label: 'Бренд-дизайнер' },
+  { value: 'ілюстратор', label: 'Ілюстратор' },
+  { value: 'інфографік', label: 'Дизайнер інфографіки' }
+];
+
 const SearchSection = ({ 
   searchQuery, 
   onSearchChange, 
@@ -10,14 +18,6 @@ const SearchSection = ({
   onSpecializationChange, 
   onSearchSubmit 
 }) => {
-
-  const specializationOptions = [
-    { value: 'ui / ux', label: 'UI / UX Designer' },
-    { value: 'моушн', label: 'Моушн дизайнер' },
-    { value: 'бренд', label: 'Бренд-дизайнер' },
-    { value: 'ілюстратор', label: 'Ілюстратор' },
-    { value: 'інфографік', label: 'Дизайнер інфографіки' }
-  ];
 
   return (
     <section className="search-section-hero">

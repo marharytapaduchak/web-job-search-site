@@ -2,13 +2,14 @@ import { memo } from 'react';
 import DropdownSelect from '../DropdownSelect';
 import './SortDropdown.css';
 
+const sortOptions = [
+    { value: 'relevant', label: 'За релевантністю' },
+    { value: 'date-newest', label: 'За датою (найновіші)' },
+    { value: 'salary-high', label: 'За зарплатою (висока > низька)' },
+    { value: 'salary-low', label: 'За зарплатою (низька > висока)' },
+];
+
 const SortDropdown = memo(({ sortValue, onSortChange }) => {
-    const sortOptions = [
-        { value: 'relevant', label: 'За релевантністю' },
-        { value: 'date-newest', label: 'За датою (найновіші)' },
-        { value: 'salary-high', label: 'За зарплатою (висока > низька)' },
-        { value: 'salary-low', label: 'За зарплатою (низька > висока)' },
-    ];
 
     return (
         <div className="sort-section">
