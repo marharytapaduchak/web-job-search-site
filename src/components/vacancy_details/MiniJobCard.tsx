@@ -7,14 +7,14 @@ const MiniJobCard = ({ job, matchScore }: JobWrapper) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState<boolean>(false);
 
-  const dateAdded = job.date_added instanceof Date ? job.date_added : new Date(job.date_added);
+  const dateAdded = new Date(job.date_added);
   
   const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
     day: 'numeric', 
     month: 'long' 
   }).format(dateAdded);
   
-  const showImage = Boolean(job.company.logoURL && !imageError);
+  const showImage = Boolean(job.company.logo_url && !imageError);
 
   const handleCardClick = () => {
     navigate(`/vacancy/${job.id}`);
@@ -26,7 +26,7 @@ const MiniJobCard = ({ job, matchScore }: JobWrapper) => {
         <div className="company-logo">
           {showImage ? (
             <img 
-              src={job.company.logoURL} 
+              src={job.company.logo_url}
               alt={`${job.company.name} logo`} 
               className="logo-image"
               onError={() => setImageError(true)}

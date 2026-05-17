@@ -11,7 +11,7 @@ const JobCard = ({ job, matchScore }) => {
         navigate(`/vacancy/${job.id}`);
     };
 
-    const dateAdded = job.date_added instanceof Date ? job.date_added : new Date(job.date_added);
+    const dateAdded = new Date(job.date_added);
     const formattedDate = new Intl.DateTimeFormat('uk-UA', { 
         day: 'numeric', 
         month: 'long' 
@@ -22,8 +22,8 @@ const JobCard = ({ job, matchScore }) => {
             <div className="job-card-header">
                 <div className="company-info">
                     <div className="company-logo">
-                        {job.company.logoURL ? (
-                            <img src={job.company.logoURL} alt={job.company.name} className="logo-image" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        {job.company.logo_url ? (
+                            <img src={job.company.logo_url} alt={job.company.name} className="logo-image" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                         ) : (
                             <div className="logo-placeholder">
                                 <span className="logo-text">{job.company.name}</span>
@@ -80,9 +80,7 @@ const JobCard = ({ job, matchScore }) => {
                 <div className="job-card__footer">
                     <span>
                         Додано:{" "}
-                        {job.date_added instanceof Date
-                            ? job.date_added.toLocaleDateString("uk-UA")
-                            : job.date_added}
+                        {job.date_added}
                     </span>
                 </div>
             </div>

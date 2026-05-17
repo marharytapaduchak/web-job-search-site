@@ -48,11 +48,11 @@ const Vacancy = () => {
                         ]
                     },
                     about: [job.description],
-                    conditions: job.work_conditions,
+                    conditions: job.work_conditions.split(',').map(s => s.trim()),
                     skills: job.skills,
                     benefits: job.benefits,
                     company: {
-                        logo: company.logoURL,
+                        logo: company.logo_url,
                         name: company.name,
                         location: company.location,
                         description: company.description

@@ -111,7 +111,7 @@ const MainVacancies = () => {
 
         const matchesSalary =
             !filters?.salary ||
-            job.salary >= Number(filters.salary);
+            Number(job.salary) >= Number(filters.salary);
 
         const jobEmpType = job.employment_type?.toLowerCase() || '';
         const matchesEmpType = activeEmploymentTypes.length === 0 || activeEmploymentTypes.some(type => {
@@ -146,10 +146,10 @@ const MainVacancies = () => {
                 return new Date(b.date_added) - new Date(a.date_added);
             }
             if (filters.sortBy === 'salary-high') {
-                return b.salary - a.salary;
+                return Number(b.salary) - Number(a.salary);
             }
             if (filters.sortBy === 'salary-low') {
-                return a.salary - b.salary;
+                return Number(a.salary) - Number(b.salary);
             }
             if (filters.sortBy === 'relevant') {
                 const scoreA = calculateMatchScore(a, user, userSkills);
