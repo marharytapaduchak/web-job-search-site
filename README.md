@@ -171,11 +171,13 @@ VITE_API_BASE_URL=http://localhost:8080/api
 
 # Running the Project
 
-## Frontend
+# Build
 
 ```shell
-npm run dev
+docker compose build
 ```
+
+---
 
 ## Backend
 
@@ -193,13 +195,6 @@ docker-compose up
 
 ---
 
-# Build
-
-```shell
-npm run build
-```
-
----
 
 # Useful Materials
 
