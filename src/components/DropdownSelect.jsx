@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import './DropdownSelect.css';
 
-const DropdownSelect = ({
+const DropdownSelect = memo(({
   options = [],
   value,
   onChange,
@@ -72,6 +72,12 @@ const DropdownSelect = ({
 
       {isOpen && (
         <ul className={`dropdown-menu ${direction}`}>
+          <li
+            className={`dropdown-item ${!value ? 'selected' : ''} dropdown-item--clear`}
+            onClick={() => handleSelect('')}
+          >
+            Очистити вибір
+          </li>
           {options.map((option) => (
             <li
               key={option.value}
@@ -90,6 +96,6 @@ const DropdownSelect = ({
       )}
     </div>
   );
-};
+});
 
 export default DropdownSelect;

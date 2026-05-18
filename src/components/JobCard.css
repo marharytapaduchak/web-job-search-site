@@ -11,20 +11,16 @@
     border: 1px solid var(--border-color);
     padding: 24px;
     background-color: #fff;
-    border-radius: 4px;
-    margin: 20px;
-}
-
-.job-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
-}
-
-.company-info {
-    display: flex;
+    margin: 10px;
+    display: grid;
+    grid-template-columns: 64px 1fr;
     gap: 16px;
+}
+
+.big-company-logo {
+    overflow: hidden;
+    width: 64px;
+    height: 64px;
 }
 
 .logo-placeholder {
@@ -38,6 +34,25 @@
     padding: 4px;
     font-size: 10px;
     font-weight: bold;
+    box-sizing: border-box;
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.title-section {
+    display: flex;
+    flex-direction: column;
 }
 
 .job-title {
@@ -56,6 +71,7 @@
 .compatibility-score {
     text-align: center;
     color: var(--primary-burgundy);
+    flex-shrink: 0;
 }
 
 .score-number {

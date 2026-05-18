@@ -1,13 +1,53 @@
-import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useServices } from "../services/ServicesContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./FeedbackDetails.css";
 import eyeIcon from "../img/eye.svg";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const months = [
+    "січня", "лютого", "березня", "квітня", "травня", "червня",
+    "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
+}
 
 export default function FeedbackDetails() {
   const { id } = useParams();
+  const { jobApplicationService } = useServices();
+  const { user } = useAuth();
+  const [feedback, setFeedback] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetch = async () => {
+      try {
+        const data = await jobApplicationService.getByUserId(user.id);
+        const found = data.find((item) => String(item.id) === String(id));
+        setFeedback(found ?? null);
+      } catch {
+        setFeedback(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [jobApplicationService, user, id]);
+
+  if (loading) {
+    return (
+      <main className="feedback-details-page">
+        <Link to="/feedback_history" className="feedback-details__back">
+          ← Назад
+        </Link>
+        <p>Завантаження...</p>
+      </main>
+    );
+  }
 
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,27 +97,31 @@ export default function FeedbackDetails() {
     );
   }
 
+  const match = ((feedback.id * 13) % 45) + 50;
+
   return (
     <main className="feedback-details">
       <Link to="/feedback_history" className="details-back">
         ← Назад до історії відгуків
       </Link>
 
-      <section className="details-card">
-        <div className="details-top">
-          <div className="details-logo">
-            <img
-              src={application.company?.logo_url}
-              alt={application.company?.name}
-            />
+      <section className="feedback-details-card">
+        <div className="feedback-details-card__main">
+          <h1>{feedback.job_title}</h1>
+          <h2>{feedback.company_name}</h2>
+
+          <div className="feedback-details-card__tags">
+            {feedback.job_skills && feedback.job_skills.length > 0 ? (
+              feedback.job_skills.map((skill, idx) => <span key={idx}>{skill}</span>)
+            ) : (
+              <>
+                <span>Tag word</span>
+                <span>Tag word</span>
+              </>
+            )}
           </div>
 
-          <div className="details-main">
-            <h1>{application.job?.title}</h1>
-
-            <p className="details-company">
-              {application.company?.name}
-            </p>
+          <p>{feedback.job_description}</p>
 
             <div className="details-tags">
               {application.job?.skills?.map((skill) => (
@@ -91,22 +135,14 @@ export default function FeedbackDetails() {
 
             <div className="details-meta">
               <img src={eyeIcon} alt="" />
-              <span>{application.job?.num_views} переглядів</span>
-              <span>•</span>
-              <span>{application.appliedAt}</span>
-              <span>•</span>
-              <span>{application.status}</span>
-            </div>
+              {feedback.job_num_views} переглядів
+            </span>
+            <span>{formatDate(feedback.applied_at)}</span>
           </div>
 
-          <div
-            className={`details-match ${
-              application.match < 50 ? "low-match" : ""
-            }`}
-          >
-            <span>{application.match}%</span>
-            <p>сумісність</p>
-          </div>
+        <div className="feedback-details-card__match">
+          <strong>{match}%</strong>
+          <span>сумісність</span>
         </div>
       </section>
     </main>

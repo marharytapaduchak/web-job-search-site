@@ -42,3 +42,55 @@
 .header__link--active {
     background-color: #6f6f6f;
 }
+
+.header__profile {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+  }
+  
+  .header__profile-link {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .header__arrow {
+    width: 16px;
+    height: 16px;
+    display: block;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .header__dropdown {
+    position: absolute;
+    top: 72px;
+    right: 0;
+    min-width: 150px;
+    background-color: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    display: none;
+    z-index: 1000;
+  }
+  
+  .header__profile:hover .header__dropdown {
+    display: block;
+  }
+  
+  .header__dropdown-button {
+    width: 100%;
+    padding: 14px 18px;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .header__dropdown-button:hover {
+    background-color: #8f1731;
+  }

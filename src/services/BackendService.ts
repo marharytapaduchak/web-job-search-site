@@ -20,7 +20,7 @@ export class NetworkError extends Error {
 
 interface RequestOptions extends RequestInit {
     timeout?: number;
-    redirectTo?: string;
+    redirectTo?: string | null;
 }
 
 export class BackendService {
@@ -67,7 +67,7 @@ export class BackendService {
                 method,
                 credentials: 'include',
                 headers: this.buildHeaders(body),
-                body: body !== undefined ? JSON.stringify(body) : undefined,
+                body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
                 signal: controller.signal,
                 ...rest,
             });
@@ -78,7 +78,7 @@ export class BackendService {
             clearTimeout(timer);
         }
 
-        if (response.status === 401) {
+        if (response.status === 401 && redirectTo) {
             window.location.href = redirectTo;
             throw new HttpError(401, null, 'Unauthenticated');
         }
@@ -94,7 +94,7 @@ export class BackendService {
 
     private buildHeaders(body?: unknown): HeadersInit {
         const headers: Record<string, string> = { Accept: 'application/json' };
-        if (body !== undefined) headers['Content-Type'] = 'application/json';
+        if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
         return headers;
     }
 

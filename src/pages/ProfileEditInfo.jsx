@@ -9,42 +9,17 @@ import infoIcon from "../img/info.svg";
 import uploadWhiteIcon from "../img/whiteUpload.svg";
 import linkIcon from "../img/link_white.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
-import { useEffect, useState } from "react";
-import {
-  getProfile,
-  getProfileSkills,
-  getProfileGoals,
-  getProfileProjects,
-  updateProfile,
-  createProfileGoal,
-  deleteProfileGoal,
-  createProfileSkill,
-  deleteProfileSkill,
-  createProfileProject,
-  updateProfileProject,
-  deleteProfileProject,
-  getProfileRecommendations,
-  createProfileRecommendation,
-} from "../services/profileService";
-
-const AVATAR_STYLES = [
-  { id: "micah", label: "Micah" },
-  { id: "open-peeps", label: "Open Peeps" },
-];
-
-const AVATAR_SEEDS = [
-  "avatar-1",
-  "avatar-2",
-  "avatar-3",
-  "avatar-4",
-  "avatar-5",
-  "avatar-6",
-  "avatar-7",
-  "avatar-8",
-];
+import { useEffect, useState, useRef } from "react";
+import { useServices } from "../services/ServicesContext";
 
 function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
+
+  if (style === "custom") {
+    const baseUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    return baseUrl.replace("/api", "/api/static/") + seed;
+  }
 
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
 }
@@ -127,15 +102,19 @@ function RecommendationCard({ recommendation }) {
         </div>
       </div>
 
-      <p className="profile-edit-recommendation-card__label">
-        Підтверджені навички:
-      </p>
+      {recommendation.skills?.length > 0 && (
+        <>
+          <p className="recommendation-card__subtitle">Підтверджені навички:</p>
 
-      <div className="profile-edit-recommendation-card__skills">
-        {recommendation.skills?.map((skill, index) => (
-          <span key={index}>{skill}</span>
-        ))}
-      </div>
+          <div className="recommendation-card__skills">
+            {recommendation.skills.map((skill) => (
+              <span className="recommendation-card__skill" key={skill}>
+                {skill}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
 
       <p className="profile-edit-recommendation-card__text">
         {recommendation.message}
@@ -145,6 +124,8 @@ function RecommendationCard({ recommendation }) {
 }
 
 export default function ProfileEditInfo() {
+  const { profileService } = useServices();
+  const fileInputRef = useRef(null);
   const [newGoalText, setNewGoalText] = useState("");
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [deletedGoalIds, setDeletedGoalIds] = useState([]);
@@ -168,8 +149,24 @@ export default function ProfileEditInfo() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [newRecommendations, setNewRecommendations] = useState([]);
-  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isEditingResume, setIsEditingResume] = useState(false);
+
+  async function handleFileChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const response = await profileService.uploadImage(file);
+      setFormData((prev) => ({
+        ...prev,
+        avatarStyle: "custom",
+        avatarSeed: response.name,
+      }));
+    } catch (error) {
+      console.error("Failed to upload avatar:", error);
+      alert("Не вдалося завантажити аватар");
+    }
+  }
 
   const [recommendationForm, setRecommendationForm] = useState({
     name: "",
@@ -243,11 +240,11 @@ export default function ProfileEditInfo() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const profile = await getProfile();
-        const skillsData = await getProfileSkills();
-        const goalsData = await getProfileGoals();
-        const projectsData = await getProfileProjects();
-        const recommendationsData = await getProfileRecommendations();
+        const profile = await profileService.getUser();
+        const skillsData = await profileService.getSkills();
+        const goalsData = await profileService.getGoals();
+        const projectsData = await profileService.getProjects();
+        const recommendationsData = await profileService.getRecommendations();
 
         setProfile(profile);
         setSkills(skillsData);
@@ -404,7 +401,7 @@ export default function ProfileEditInfo() {
     }
 
     try {
-      const createdGoal = await createProfileGoal(trimmedGoal);
+      const createdGoal = await profileService.createGoal(trimmedGoal);
 
       setGoals((prev) => [...prev, createdGoal]);
       setNewGoalText("");
@@ -497,11 +494,6 @@ export default function ProfileEditInfo() {
 
     if (!name || !email || !message) {
       alert("Заповніть ім’я, email і супровідний лист");
-      return;
-    }
-
-    if (recommendationForm.skills.length === 0) {
-      alert("Оберіть хоча б одну навичку для підтвердження");
       return;
     }
 
@@ -617,7 +609,7 @@ export default function ProfileEditInfo() {
     }
 
     try {
-      await updateProfile({
+      await profileService.updateUser({
         firstName: formData.firstName,
         lastName: formData.lastName,
         about: formData.about,
@@ -643,16 +635,18 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedSkillIds
           .filter((skillId) => !String(skillId).startsWith("temp-"))
-          .map((skillId) => deleteProfileSkill(skillId))
+          .map((skillId) => profileService.deleteSkill(skillId))
       );
 
       await Promise.all(
-        newSkills.map((skill) => createProfileSkill(skill.name, skill.level))
+        newSkills.map((skill) =>
+          profileService.createSkill(skill.name, skill.level)
+        )
       );
 
       await Promise.all(
         newRecommendations.map((recommendation) =>
-          createProfileRecommendation({
+          profileService.createRecommendation({
             name: recommendation.name,
             email: recommendation.email,
             message: recommendation.message,
@@ -664,14 +658,14 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedProjectIds
           .filter((projectId) => !String(projectId).startsWith("temp-"))
-          .map((projectId) => deleteProfileProject(projectId))
+          .map((projectId) => profileService.deleteProject(projectId))
       );
 
       await Promise.all(
         projects
           .filter((project) => project.isNew)
           .map((project) =>
-            createProfileProject(project.title, project.description)
+            profileService.createProject(project.title, project.description)
           )
       );
 
@@ -682,7 +676,7 @@ export default function ProfileEditInfo() {
               !project.isNew && !String(project.id).startsWith("temp-")
           )
           .map((project) =>
-            updateProfileProject(project.id, {
+            profileService.updateProject(project.id, {
               title: project.title,
               description: project.description,
             })
@@ -692,7 +686,7 @@ export default function ProfileEditInfo() {
       await Promise.all(
         deletedGoalIds
           .filter((goalId) => !String(goalId).startsWith("temp-"))
-          .map((goalId) => deleteProfileGoal(goalId))
+          .map((goalId) => profileService.deleteGoal(goalId))
       );
 
       setDeletedSkillIds([]);
@@ -821,7 +815,17 @@ export default function ProfileEditInfo() {
             <h2 className="profile-edit-section__title">Про мене</h2>
 
             <div className="profile-edit-about-row">
-              <div className="profile-edit-avatar">
+              <div
+                className="profile-edit-avatar"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
                 {formData.avatarStyle && formData.avatarSeed ? (
                   <img
                     src={getAvatarUrl(
@@ -829,36 +833,33 @@ export default function ProfileEditInfo() {
                       formData.avatarSeed
                     )}
                     alt="avatar"
-                    className="profile-edit-avatar__image"
+                    className="profile-edit-avatar__image profile-edit-avatar__image--clickable"
                   />
                 ) : (
                   <img
                     src={defaultAvatarIcon}
                     alt="default avatar"
-                    className="profile-edit-avatar__image profile-edit-avatar__image--default"
+                    className="profile-edit-avatar__image profile-edit-avatar__image--default profile-edit-avatar__image--clickable"
                   />
                 )}
 
                 <div className="profile-edit-avatar__overlay">
-                  <button
-                    type="button"
-                    className="profile-edit-avatar__overlay-button"
-                    onClick={() => setIsAvatarPickerOpen(true)}
-                  >
-                    Обрати
-                  </button>
+                  <span className="profile-edit-avatar__overlay-text">
+                    Завантажити фото
+                  </span>
 
                   {formData.avatarStyle && formData.avatarSeed && (
                     <button
                       type="button"
                       className="profile-edit-avatar__delete-button"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setFormData((prev) => ({
                           ...prev,
                           avatarStyle: "",
                           avatarSeed: "",
-                        }))
-                      }
+                        }));
+                      }}
                     >
                       <img src={trashIcon} alt="delete avatar" />
                     </button>
@@ -1951,78 +1952,6 @@ export default function ProfileEditInfo() {
                 Надіслати лист
               </button>
             </div>
-          </div>
-        </div>
-      )}
-      {isAvatarPickerOpen && (
-        <div className="avatar-picker-overlay">
-          <div className="avatar-picker">
-            <button
-              className="avatar-picker__close"
-              type="button"
-              onClick={() => setIsAvatarPickerOpen(false)}
-            >
-              ×
-            </button>
-
-            <h2 className="avatar-picker__title">Оберіть аватарку</h2>
-
-            {AVATAR_STYLES.map((style) => (
-              <div className="avatar-picker__section" key={style.id}>
-                <h3 className="avatar-picker__subtitle">{style.label}</h3>
-
-                <div className="avatar-picker__grid">
-                  {AVATAR_SEEDS.map((seed) => {
-                    const isSelected =
-                      formData.avatarStyle === style.id &&
-                      formData.avatarSeed === seed;
-
-                    return (
-                      <button
-                        key={`${style.id}-${seed}`}
-                        type="button"
-                        className={`avatar-picker__option ${
-                          isSelected ? "avatar-picker__option--selected" : ""
-                        }`}
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            avatarStyle: style.id,
-                            avatarSeed: seed,
-                          }));
-
-                          setIsAvatarPickerOpen(false);
-                        }}
-                      >
-                        <img
-                          src={getAvatarUrl(style.id, seed)}
-                          alt=""
-                          className="avatar-picker__image"
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {(formData.avatarStyle || formData.avatarSeed) && (
-              <button
-                className="avatar-picker__remove"
-                type="button"
-                onClick={() => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    avatarStyle: "",
-                    avatarSeed: "",
-                  }));
-
-                  setIsAvatarPickerOpen(false);
-                }}
-              >
-                Прибрати аватарку
-              </button>
-            )}
           </div>
         </div>
       )}

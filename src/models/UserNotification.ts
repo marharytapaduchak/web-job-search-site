@@ -1,11 +1,9 @@
-export class UserNotification {
-    constructor(
-      public id: number,
-      public userId: number,
-      public allNewVacancies: boolean,
-      public recommendedVacancies: boolean,
-      public disableNotifications: boolean,
-      public sendToMainEmail: boolean,
-      public sendToOtherEmail: boolean,
-    ) {}
-  }
+export interface UserNotification {
+    id: number;
+    userId: number;
+    allNewVacancies: boolean;
+    recommendedVacancies: boolean;
+    disableNotifications: boolean;
+    sendToMainEmail: boolean;
+    sendToOtherEmail: boolean;
+}

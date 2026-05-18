@@ -4,7 +4,7 @@ import "./SavedMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import { getSavedArticles, unsaveArticle } from "../services/articlesService";
+import { useServices } from "../services/ServicesContext";
 
 function SavedArticleCard({ article, onRemove, submittedQuery }) {
   return (
@@ -63,6 +63,7 @@ function SavedArticleCard({ article, onRemove, submittedQuery }) {
 }
 
 export default function SavedMaterialsPage() {
+  const { articleService } = useServices();
   const [articles, setArticles] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
@@ -79,7 +80,7 @@ export default function SavedMaterialsPage() {
         setLoading(true);
         setError("");
 
-        const data = await getSavedArticles();
+        const data = await articleService.getSaved();
 
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
@@ -128,7 +129,7 @@ export default function SavedMaterialsPage() {
     setArticles((prev) => prev.filter((item) => item.id !== article.id));
 
     try {
-      await unsaveArticle(article.id);
+      await articleService.unsave(article.id);
     } catch {
       setArticles(previousArticles);
     }
@@ -232,6 +233,7 @@ export default function SavedMaterialsPage() {
               value={draftSortBy}
               onChange={(e) => setDraftSortBy(e.target.value)}
             >
+              <option value="">Без сортування</option>
               <option value="saved">Збережені</option>
               <option value="popular">Найбільше переглядів</option>
             </select>

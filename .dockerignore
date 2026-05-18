@@ -9,3 +9,6 @@ docker-compose.yml
 npm-debug.log
 yarn-error.log
 .DS_Store
+.env
+.env.local
+.env.*.local

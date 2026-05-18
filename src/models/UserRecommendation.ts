@@ -1,10 +1,8 @@
-export class UserRecommendation {
-    constructor(
-      public id: number,
-      public userId: number,
-      public name: string,
-      public email: string,
-      public message: string,
-      public skills: string[],
-    ) {}
-  }
+export interface UserRecommendation {
+    id: number;
+    userId: number;
+    name: string;
+    email: string;
+    message: string;
+    skills: string[];
+}

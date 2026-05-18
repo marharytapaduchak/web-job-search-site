@@ -4,11 +4,7 @@ import "./UsefulMaterials.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import {
-  getAllArticles,
-  saveArticle,
-  unsaveArticle,
-} from "../services/articlesService";
+import { useServices } from "../services/ServicesContext";
 
 function ArticleCard({ article, onToggleSave, submittedQuery }) {
   return (
@@ -74,6 +70,7 @@ function ArticleCard({ article, onToggleSave, submittedQuery }) {
 }
 
 export default function UsefulMaterials() {
+  const { articleService } = useServices();
   const [articles, setArticles] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
@@ -90,7 +87,7 @@ export default function UsefulMaterials() {
         setLoading(true);
         setError("");
 
-        const data = await getAllArticles();
+        const data = await articleService.getAll();
 
         if (!ignore) {
           setArticles(Array.isArray(data) ? data : []);
@@ -150,8 +147,8 @@ export default function UsefulMaterials() {
     );
 
     try {
-      if (nextSaved) await saveArticle(article.id);
-      else await unsaveArticle(article.id);
+      if (nextSaved) await articleService.save(article.id);
+      else await articleService.unsave(article.id);
     } catch {
       setArticles((prev) =>
         prev.map((item) =>
@@ -261,6 +258,7 @@ export default function UsefulMaterials() {
               value={draftSortBy}
               onChange={(e) => setDraftSortBy(e.target.value)}
             >
+              <option value="">Без сортування</option>
               <option value="latest">Останні</option>
               <option value="saved">Найбільше збережень</option>
               <option value="popular">Найбільше переглядів</option>

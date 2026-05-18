@@ -1,7 +1,5 @@
-export class UserGoal {
-    constructor(
-      public id: number,
-      public userId: number,
-      public text: string,
-    ) {}
-  }
+export interface UserGoal {
+    id: number;
+    userId: number;
+    text: string;
+}

@@ -1,29 +1,14 @@
-.filter-sidebar {
-    width: 32.5vw;
-    flex-shrink: 0; 
-    background-color: #ffffff;
-    padding: 30px 50px;
-}
-
-.filters-main-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-    margin-top: 0;
-    margin-bottom: 24px;
-}
-
-.filters-scroll-container {
-    display: flex;
-    flex-direction: column;
-    gap: 24px; 
+:root {
+    --accent-brand: #8B1D3B;
+    --slider-track: #e5e7eb;
+    --text-muted: #6b7280;
 }
 
 .salary-slider {
     width: 100%;
     appearance: none;
     height: 4px;
-    background: #e5e7eb;
+    background: var(--slider-track);
     border-radius: 2px;
     outline: none;
 }
@@ -33,12 +18,12 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #8B1D3B; 
+    background: var(--accent-brand); 
     cursor: pointer;
 }
 
 .salary-label {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--text-muted);
     margin-top: 8px;
 }

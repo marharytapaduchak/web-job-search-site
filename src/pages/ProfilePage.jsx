@@ -9,21 +9,22 @@ import Phone from "../img/phone.svg";
 import defaultAvatarIcon from "../img/person-circle.svg";
 
 import { useEffect, useState } from "react";
-import {
-  getProfile,
-  getProfileSkills,
-  getProfileGoals,
-  getProfileProjects,
-  getProfileRecommendations,
-} from "../services/profileService";
+import { useServices } from "../services/ServicesContext";
 
 function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
+
+  if (style === "custom") {
+    const baseUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    return baseUrl.replace("/api", "/api/static/") + seed;
+  }
 
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}`;
 }
 
 export default function Profile() {
+  const { profileService } = useServices();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [skills, setSkills] = useState([]);
@@ -41,11 +42,11 @@ export default function Profile() {
           projectsData,
           recommendationsData,
         ] = await Promise.all([
-          getProfile(),
-          getProfileSkills(),
-          getProfileGoals(),
-          getProfileProjects(),
-          getProfileRecommendations(),
+          profileService.getUser(),
+          profileService.getSkills(),
+          profileService.getGoals(),
+          profileService.getProjects(),
+          profileService.getRecommendations(),
         ]);
 
         setProfile(profileData);
@@ -109,43 +110,51 @@ export default function Profile() {
 
                 <div className="profile-card__info-grid">
                   <div className="profile-card__info-column">
-                    <p className="profile-card__info-item">
-                      <img
-                        src={ProfileIcon}
-                        alt="profileIcon"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.firstName} {profile.lastName}
-                    </p>
+                    {(profile.firstName || profile.lastName) && (
+                      <p className="profile-card__info-item">
+                        <img
+                          src={ProfileIcon}
+                          alt="profileIcon"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.firstName} {profile.lastName}
+                      </p>
+                    )}
 
-                    <p className="profile-card__info-item">
-                      <img
-                        src={ProfileIcon}
-                        alt="profileIcon"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.email}
-                    </p>
+                    {profile.email && (
+                      <p className="profile-card__info-item">
+                        <img
+                          src={ProfileIcon}
+                          alt="profileIcon"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.email}
+                      </p>
+                    )}
 
-                    <p className="profile-card__info-item">
-                      <img
-                        src={Location}
-                        alt="location"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.city}
-                    </p>
+                    {profile.city && (
+                      <p className="profile-card__info-item">
+                        <img
+                          src={Location}
+                          alt="location"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.city}
+                      </p>
+                    )}
                   </div>
 
                   <div className="profile-card__info-column">
-                    <p className="profile-card__info-item">
-                      <img
-                        src={Phone}
-                        alt="phone"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.phone}
-                    </p>
+                    {profile.phone && (
+                      <p className="profile-card__info-item">
+                        <img
+                          src={Phone}
+                          alt="phone"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.phone}
+                      </p>
+                    )}
 
                     {profile.portfolioUrl && (
                       <a
@@ -163,14 +172,21 @@ export default function Profile() {
                       </a>
                     )}
 
-                    <a href={profile.linkedin} className="profile-card__link">
-                      <img
-                        src={LinkImg}
-                        alt="link"
-                        className="profile-card__info-svg"
-                      />
-                      {profile.linkedin}
-                    </a>
+                    {profile.linkedin && (
+                      <a
+                        href={profile.linkedin}
+                        className="profile-card__link"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={LinkImg}
+                          alt="link"
+                          className="profile-card__info-svg"
+                        />
+                        {profile.linkedin}
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -240,45 +256,72 @@ export default function Profile() {
               ))}
             </section>
 
-            <section className="profile-files">
-              <div className="profile-file-block">
-                <h2 className="profile-section__title">Резюме</h2>
-                <a href="#" className="profile-file">
-                  <span>CV Kateryna Marchuk.pdf</span>
-                  <img
-                    src={arrowUp}
-                    alt="arrow"
-                    className="profile-file__arrow"
-                  />
-                </a>
-              </div>
+            {(profile.resumeUrl || profile.portfolioUrl) && (
+              <section className="profile-files">
+                {profile.resumeUrl && (
+                  <div className="profile-file-block">
+                    <h2 className="profile-section__title">Резюме</h2>
+                    <a
+                      href={profile.resumeUrl}
+                      className="profile-file"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span>{profile.resumeTitle || "Резюме"}</span>
+                      <img
+                        src={arrowUp}
+                        alt="arrow"
+                        className="profile-file__arrow"
+                      />
+                    </a>
+                  </div>
+                )}
 
-              <div className="profile-file-block">
-                <h2 className="profile-section__title">Портфоліо</h2>
-                <a href="#" className="profile-file">
-                  <span>Kateryna Marchuk.pdf</span>
-                  <img
-                    src={arrowUp}
-                    alt="arrow"
-                    className="profile-file__arrow"
-                  />
-                </a>
-              </div>
-            </section>
+                {profile.portfolioUrl && (
+                  <div className="profile-file-block">
+                    <h2 className="profile-section__title">Портфоліо</h2>
+                    <a
+                      href={profile.portfolioUrl}
+                      className="profile-file"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span>Портфоліо</span>
+                      <img
+                        src={arrowUp}
+                        alt="arrow"
+                        className="profile-file__arrow"
+                      />
+                    </a>
+                  </div>
+                )}
+              </section>
+            )}
 
-            <section className="profile-section">
-              <h2 className="profile-section__title">
-                Сертифікати про закінчення навчання
-              </h2>
-              <a href="#" className="profile-file profile-file--single">
-                <span>Курси IT School</span>
-                <img
-                  src={arrowUp}
-                  alt="arrow"
-                  className="profile-file__arrow"
-                />
-              </a>
-            </section>
+            {profile.certificates?.length > 0 && (
+              <section className="profile-section">
+                <h2 className="profile-section__title">
+                  Сертифікати про закінчення навчання
+                </h2>
+
+                {profile.certificates.map((certificate) => (
+                  <a
+                    key={certificate.id}
+                    href={certificate.url}
+                    className="profile-file profile-file--single"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>{certificate.title}</span>
+                    <img
+                      src={arrowUp}
+                      alt="arrow"
+                      className="profile-file__arrow"
+                    />
+                  </a>
+                ))}
+              </section>
+            )}
 
             <section className="profile-section profile-section--recommendations">
               <h2 className="profile-section__title">Рекомендації</h2>
@@ -297,17 +340,24 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  <p className="recommendation-card__subtitle">
-                    Підтверджені навички:
-                  </p>
+                  {recommendation.skills?.length > 0 && (
+                    <>
+                      <p className="recommendation-card__subtitle">
+                        Підтверджені навички:
+                      </p>
 
-                  <div className="recommendation-card__skills">
-                    {recommendation.skills?.map((skill) => (
-                      <span className="recommendation-card__skill" key={skill}>
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+                      <div className="recommendation-card__skills">
+                        {recommendation.skills.map((skill) => (
+                          <span
+                            className="recommendation-card__skill"
+                            key={skill}
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
 
                   <p className="recommendation-card__text">
                     {recommendation.message}

@@ -1,130 +1,159 @@
-import { useEffect, useMemo, useState } from "react";
-
-import SearchSection from "../components/search_section/SearchSection";
-import FilterSidebar from "../components/filter_sidebar/FilterSidebar";
-import JobCard from "../components/JobCard";
-
-import { BackendService } from "../services/BackendService";
-import { JobService } from "../services/JobService";
-import { CompanyService } from "../services/CompanyService";
-
-import "./MainVacancies.css";
+import { useState, useEffect, useMemo } from 'react';
+import SearchSection from '../components/search_section/SearchSection';
+import FilterSidebar from '../components/filter_sidebar/FilterSidebar';
+import JobCard from '../components/JobCard';
+import { 
+    INITIAL_FILTER_STATE,
+    EMPLOYMENT_TYPES,
+    WORK_FORMATS 
+} from '../components/filter_sidebar/filterConstants';
+import { useServices } from '../services/ServicesContext';
+import { useSearch } from '../contexts/SearchContext';
+import { calculateMatchScore } from '../utils/matchScore';
+import './MainVacancies.css';
 
 const MainVacancies = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [specialization, setSpecialization] = useState("");
-    const [filters, setFilters] = useState(null);
-
+    const { jobService, companyService, profileService } = useServices();
+    const { searchQuery, setSearchQuery, specialization, setSpecialization } = useSearch();
     const [jobs, setJobs] = useState([]);
-    const [companies, setCompanies] = useState(new Map());
-
+    const [user, setUser] = useState(null);
+    const [userSkills, setUserSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const services = useMemo(() => {
-        const API_BASE_URL =
-            import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
-
-        const backend = new BackendService(API_BASE_URL);
-
-        return {
-            jobService: new JobService(backend),
-            companyService: new CompanyService(backend),
-        };
-    }, []);
+    const [filters, setFilters] = useState(INITIAL_FILTER_STATE);
 
     useEffect(() => {
-        const loadData = async () => {
+        let cancelled = false;
+
+        const fetchData = async () => {
             try {
-                setLoading(true);
-                setError(null);
+                const fetchedJobs = await jobService.getAll();
+                if (cancelled) return;
+                setJobs(fetchedJobs);
 
-                const loadedJobs =
-                    await services.jobService.getAll();
-
-                const companyIds = [
-                    ...new Set(
-                        loadedJobs.map(
-                            (job) => job.company_id,
-                        ),
-                    ),
-                ];
-
-                const companyPairs = await Promise.all(
-                    companyIds.map(async (id) => {
-                        const company =
-                            await services.companyService.getById(id);
-
-                        return [id, company];
-                    }),
-                );
-
-                setJobs(loadedJobs);
-                setCompanies(new Map(companyPairs));
-            } catch (err) {
-                console.error(err);
-
-                setError(
-                    "Не вдалося завантажити вакансії",
-                );
-            } finally {
+                // Fetch user and skills for match score
+                const [userData, skillsData] = await Promise.all([
+                    profileService.getUser(),
+                    profileService.getSkills()
+                ]);
+                
+                if (cancelled) return;
+                setUser(userData);
+                setUserSkills(skillsData);
+                setLoading(false);
+            } catch {
+                if (cancelled) return;
+                setError(true);
                 setLoading(false);
             }
         };
 
-        loadData();
-    }, [services]);
+        fetchData();
+        return () => { cancelled = true; };
+    }, [jobService, companyService, profileService]);
 
-    const handleSearchSubmit = () => {
-        console.log({
-            searchQuery,
-            specialization,
-            filters,
-        });
+    const handleSearchSubmit = async () => {
+        try {
+            const results = searchQuery.trim()
+                ? await jobService.search(searchQuery.trim())
+                : await jobService.getAll();
+            setJobs(results);
+        } catch {
+            setError(true);
+        }
     };
 
     const handleApplyFilters = (newFilters) => {
         setFilters(newFilters);
     };
 
-    const filteredJobs = jobs.filter((job) => {
-        const matchesSearch =
-            searchQuery === "" ||
-            job.title
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            job.description
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
+    const filteredJobs = useMemo(() => {
+        const activeEmploymentTypes = EMPLOYMENT_TYPES
+            .filter(t => filters?.employmentType?.[t.id])
+            .map(t => t.label.toLowerCase());
 
-        const matchesSpecialization =
-            specialization === "" ||
-            job.title
-                .toLowerCase()
-                .includes(specialization.toLowerCase());
+        const activeWorkFormats = WORK_FORMATS
+            .filter(t => filters?.workFormat?.[t.id])
+            .map(t => t.label.toLowerCase());
 
-        const matchesLocation =
-            !filters?.location ||
-            job.location
-                .toLowerCase()
-                .includes(filters.location.toLowerCase());
+        let result = jobs.filter((job) => {
+            const matchesSpecialization =
+                specialization === "" ||
+                job.title
+                    .toLowerCase()
+                    .includes(specialization.toLowerCase());
 
-        const matchesQualification =
-            !filters?.qualification ||
-            job.level === filters.qualification;
+            const matchesLocation =
+                !filters?.location ||
+                job.location
+                    .toLowerCase()
+                    .includes(filters.location.toLowerCase());
 
-        const matchesSalary =
-            !filters?.salary ||
-            job.salary >= Number(filters.salary);
+            const matchesQualification =
+                !filters?.qualification ||
+                job.level.toLowerCase() === filters.qualification.toLowerCase();
 
-        return (
-            matchesSearch &&
-            matchesSpecialization &&
-            matchesLocation &&
-            matchesQualification &&
-            matchesSalary
-        );
-    });
+            const matchesSalary =
+                !filters?.salary ||
+                Number(job.salary) >= Number(filters.salary);
+
+            const jobEmpType = job.employment_type?.toLowerCase() || '';
+            const matchesEmpType = activeEmploymentTypes.length === 0 || activeEmploymentTypes.some(type => {
+                if (type.includes('часткова') && jobEmpType.includes('неповна')) return true;
+                if (type.includes('неповна') && jobEmpType.includes('часткова')) return true;
+                return jobEmpType.includes(type) || type.includes(jobEmpType);
+            });
+
+            const jobFormat = job.format?.toLowerCase() || '';
+            const matchesFormat = activeWorkFormats.length === 0 || activeWorkFormats.some(format => {
+                const rootFormat = format.replace('а', ''); 
+                return jobFormat.includes(rootFormat);
+            });
+
+            const matchesEnglish = !filters?.englishLevel || job.english_level?.toLowerCase() === filters.englishLevel.toLowerCase();
+
+            return (
+                matchesSpecialization &&
+                matchesLocation &&
+                matchesQualification &&
+                matchesSalary &&
+                matchesEmpType &&
+                matchesFormat &&
+                matchesEnglish
+            );
+        });
+
+        if (filters?.sortBy) {
+            result = [...result].sort((a, b) => {
+                if (filters.sortBy === 'date-newest') {
+                    return new Date(b.date_added) - new Date(a.date_added);
+                }
+                if (filters.sortBy === 'salary-high') {
+                    return Number(b.salary) - Number(a.salary);
+                }
+                if (filters.sortBy === 'salary-low') {
+                    return Number(a.salary) - Number(b.salary);
+                }
+                if (filters.sortBy === 'relevant') {
+                    const scoreA = calculateMatchScore(a, user, userSkills);
+                    const scoreB = calculateMatchScore(b, user, userSkills);
+                    return scoreB - scoreA;
+                }
+                return 0;
+            });
+        }
+        return result;
+    }, [jobs, filters, specialization, user, userSkills]);
+
+    const jobList = useMemo(() => {
+        return filteredJobs.map((job) => (
+            <JobCard
+                key={job.id}
+                job={job}
+                matchScore={calculateMatchScore(job, user, userSkills)}
+            />
+        ));
+    }, [filteredJobs, user, userSkills]);
 
     return (
         <main className="main-vacancies">
@@ -160,17 +189,9 @@ const MainVacancies = () => {
                             </p>
                         )}
 
-                    {!loading &&
-                        !error &&
-                        filteredJobs.map((job) => (
-                            <JobCard
-                                key={job.id}
-                                job={job}
-                                company={companies.get(
-                                    job.company_id,
-                                )}
-                            />
-                        ))}
+                <div className="job-list-area">
+                    {jobList}
+                </div>
                 </section>
             </div>
         </main>

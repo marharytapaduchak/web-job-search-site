@@ -1,0 +1,37 @@
+update users
+set
+    first_name          = coalesce($1,          first_name),
+    last_name           = coalesce($2,          last_name),
+    email               = coalesce($3,          email),
+    phone               = coalesce($4,          phone),
+    telegram            = coalesce($5,          telegram),
+    linkedin            = coalesce($6,          linkedin),
+    position            = coalesce($7,          position),
+    qualification_level = coalesce($8,          qualification_level),
+    english_level       = coalesce($9,          english_level),
+    city                = coalesce($10,         city),
+    salary              = coalesce($11,         salary),
+    hourly_rate         = coalesce($12,         hourly_rate),
+    portfolio_url       = coalesce($13,         portfolio_url),
+    work_format         = coalesce($14,         work_format),
+    employment_type     = coalesce($15,         employment_type),
+    location_scope      = coalesce($16,         location_scope),
+    about               = coalesce($17,         about),
+    positions           = coalesce($18::jsonb,  positions),
+    languages           = coalesce($19::jsonb,  languages),
+    work_formats        = coalesce($20,         work_formats),
+    employment_types    = coalesce($21,         employment_types),
+    can_relocate        = coalesce($22,         can_relocate),
+    resume_title        = coalesce($23,         resume_title),
+    resume_url          = coalesce($24,         resume_url),
+    resume_added_at     = coalesce($25,         resume_added_at),
+    certificates        = coalesce($26::jsonb,  certificates),
+    avatar_style        = coalesce($27,         avatar_style),
+    avatar_seed         = coalesce($28,         avatar_seed)
+where id = $29
+returning
+    id, first_name, last_name, email, phone, telegram, linkedin,
+    position, qualification_level, english_level, city, salary, hourly_rate,
+    portfolio_url, work_format, employment_type, location_scope, about,
+    positions, languages, work_formats, employment_types, can_relocate,
+    resume_title, resume_url, resume_added_at, certificates, avatar_style, avatar_seed

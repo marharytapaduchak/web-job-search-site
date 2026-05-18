@@ -17,36 +17,34 @@ export interface UserCertificate {
   addedAt: string;
 }
 
-export class User {
-  constructor(
-    public id: number,
-    public firstName: string,
-    public lastName: string,
-    public email: string,
-    public phone: string,
-    public telegram: string,
-    public linkedin: string,
-    public position: string,
-    public qualificationLevel: string,
-    public englishLevel: string,
-    public city: string,
-    public salary: string,
-    public hourlyRate: string,
-    public portfolioUrl: string,
-    public workFormat: string,
-    public employmentType: string,
-    public locationScope: string,
-    public about: string,
-    public positions: UserPosition[] = [],
-    public languages: UserLanguage[] = [],
-    public workFormats: string[] = [],
-    public employmentTypes: string[] = [],
-    public canRelocate: boolean = false,
-    public resumeTitle: string = "",
-    public resumeUrl: string = "",
-    public resumeAddedAt: string = "",
-    public certificates: UserCertificate[] = [],
-    public avatarStyle: string = "",
-    public avatarSeed: string = ""
-  ) {}
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  telegram: string;
+  linkedin: string;
+  position: string;
+  qualificationLevel: string;
+  englishLevel: string;
+  city: string;
+  salary: string;
+  hourlyRate: string;
+  portfolioUrl: string;
+  workFormat: string;
+  employmentType: string;
+  locationScope: string;
+  about: string;
+  positions?: UserPosition[];
+  languages?: UserLanguage[];
+  workFormats?: string[];
+  employmentTypes?: string[];
+  canRelocate?: boolean;
+  resumeTitle?: string;
+  resumeUrl?: string;
+  resumeAddedAt?: string;
+  certificates?: UserCertificate[];
+  avatarStyle?: string;
+  avatarSeed?: string;
 }

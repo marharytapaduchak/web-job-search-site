@@ -1,104 +1,108 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useServices } from "../services/ServicesContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./FeedbackHistory.css";
 import eyeIcon from "../img/eye.svg";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const months = [
+    "січня", "лютого", "березня", "квітня", "травня", "червня",
+    "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
+}
+
+function FeedbackCard({ item }) {
+  const match = ((item.id * 13) % 45) + 50;
+
+  const logoText = item.company_name ? item.company_name.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : "?";
+
+  return (
+    <Link to={`/feedback_history/${item.id}`} className="feedback-card">
+      <div className="feedback-card__logo">{logoText}</div>
+
+      <div className="feedback-card__content">
+        <h2 className="feedback-card__title">{item.job_title}</h2>
+        <p className="feedback-card__company">{item.company_name}</p>
+
+        <div className="feedback-card__tags">
+          {item.job_skills && item.job_skills.length > 0 ? (
+            item.job_skills.map((skill, idx) => <span key={idx}>{skill}</span>)
+          ) : (
+            <>
+              <span>Tag word</span>
+              <span>Tag word</span>
+            </>
+          )}
+        </div>
+
+        <p className="feedback-card__description">{item.job_description}</p>
+
+        <div className="feedback-card__meta">
+          <span className="views">
+            <img src={eyeIcon} alt="" />
+            {item.job_num_views} переглядів
+          </span>
+          <span>{formatDate(item.applied_at)}</span>
+        </div>
+      </div>
+
+      <div className="feedback-card__match">
+        <strong>{match}%</strong>
+        <span>сумісність</span>
+      </div>
+    </Link>
+  );
+}
 
 export default function FeedbackHistory() {
+  const { jobApplicationService } = useServices();
+  const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadApplications() {
+    if (!user) return;
+    const fetchApplications = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/jobApplications?userId=1&_expand=job`
-        );
-
-        const applicationsData = await res.json();
-
-        const applicationsWithCompanies = await Promise.all(
-          applicationsData.map(async (application) => {
-            const companyRes = await fetch(
-              `${API_BASE_URL}/companies/${application.job.company_id}`
-            );
-
-            const company = await companyRes.json();
-
-            return {
-              ...application,
-              company,
-            };
-          })
-        );
-
-        setApplications(applicationsWithCompanies);
-      } catch (error) {
-        console.error("Помилка завантаження історії відгуків:", error);
+        const data = await jobApplicationService.getByUserId(user.id);
+        setApplications(data);
+      } catch (err) {
+        console.error("Failed to fetch applications:", err);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    loadApplications();
-  }, []);
+    fetchApplications();
+  }, [jobApplicationService, user]);
 
   if (loading) {
-    return <p className="feedback-loading">Завантаження історії відгуків...</p>;
+    return (
+      <main className="feedback-history-page">
+        <div className="feedback-history-list" style={{ textAlign: "center", padding: "40px" }}>
+          Завантаження...
+        </div>
+      </main>
+    );
   }
 
   return (
-    <main className="feedback-history">
-      {applications.map((application) => (
-        <Link
-          to={`/feedback_history/${application.id}`}
-          key={application.id}
-          className="feedback-card"
-        >
-          <div className="feedback-logo">
-            <img
-              src={application.company?.logo_url}
-              alt={application.company?.name}
-            />
+    <main className="feedback-history-page">
+      <div className="feedback-history-list">
+        {applications.length > 0 ? (
+          applications.map((item) => (
+            <FeedbackCard key={item.id} item={item} />
+          ))
+        ) : (
+          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+            Ви ще не подали жодної заявки.
           </div>
-
-          <div className="feedback-content">
-            <h2>{application.job?.title}</h2>
-
-            <p className="feedback-company">
-              {application.company?.name}
-            </p>
-
-            <div className="feedback-tags">
-              {application.job?.skills?.map((skill) => (
-                <span key={skill}>{skill}</span>
-              ))}
-            </div>
-
-            <p className="feedback-description">
-              {application.job?.description}
-            </p>
-
-            <div className="feedback-meta">
-              <img src={eyeIcon} alt="" />
-              <span>{application.job?.num_views} переглядів</span>
-              <span>•</span>
-              <span>{application.appliedAt}</span>
-            </div>
-          </div>
-
-          <div
-            className={`feedback-match ${
-              application.match < 50 ? "low-match" : ""
-            }`}
-          >
-            <span>{application.match}%</span>
-            <p>сумісність</p>
-          </div>
-        </Link>
-      ))}
+        )}
+      </div>
     </main>
   );
 }

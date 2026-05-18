@@ -4,12 +4,7 @@ import "./MaterialArticle.css";
 import searchIcon from "../img/Search.svg";
 import bookmarkIcon from "../img/bookmark.svg";
 import eyeIcon from "../img/eye.svg";
-import {
-  getAllArticles,
-  getArticleById,
-  saveArticle,
-  unsaveArticle,
-} from "../services/articlesService";
+import { useServices } from "../services/ServicesContext";
 
 function SidebarResultCard({ article, isActive, submittedQuery }) {
   return (
@@ -80,6 +75,7 @@ function renderArticleContent(content) {
 }
 
 export default function MaterialArticlePage() {
+  const { articleService } = useServices();
   const { id } = useParams();
 
   const [searchValue, setSearchValue] = useState("");
@@ -98,7 +94,7 @@ export default function MaterialArticlePage() {
         setLoadingArticle(true);
         setError("");
 
-        const data = await getArticleById(id);
+        const data = await articleService.getById(id);
 
         if (!ignore) setArticle(data);
       } catch {
@@ -125,7 +121,7 @@ export default function MaterialArticlePage() {
       try {
         setLoadingList(true);
 
-        const data = await getAllArticles();
+        const data = await articleService.getAll();
 
         if (!ignore) setAllArticles(Array.isArray(data) ? data : []);
       } catch {
@@ -164,8 +160,8 @@ export default function MaterialArticlePage() {
     setArticle((prev) => ({ ...prev, saved: nextSaved }));
 
     try {
-      if (nextSaved) await saveArticle(article.id);
-      else await unsaveArticle(article.id);
+      if (nextSaved) await articleService.save(article.id);
+      else await articleService.unsave(article.id);
     } catch {
       setArticle((prev) => ({ ...prev, saved: previousSaved }));
     }

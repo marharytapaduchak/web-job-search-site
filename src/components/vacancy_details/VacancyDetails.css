@@ -1,0 +1,94 @@
+.vacancy-details {
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1a1a1a;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.vacancy-details-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #757575;
+  font-size: 16px;
+}
+
+.vacancy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.description-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.description-text:last-child {
+  margin-bottom: 0;
+}
+
+.bullet-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+}
+
+.bullet-list li {
+  margin-bottom: 8px;
+}
+
+.bullet-list li:last-child {
+  margin-bottom: 0;
+}
+
+.inline-dot-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333333;
+}
+
+.inline-dot-list li {
+  display: flex;
+  align-items: center;
+}
+
+.inline-dot-list li:not(:last-child)::after {
+  content: "•";
+  color: #cccccc;
+  margin-left: 8px;
+}
+
+.company-description {
+  margin-top: 16px;
+}
+
+.vacancy-footer-meta {
+  margin-top: 24px;
+  font-size: 13px;
+  color: #757575;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.views-icon {
+  font-size: 14px;
+}

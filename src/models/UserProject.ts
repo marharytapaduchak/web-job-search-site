@@ -1,8 +1,6 @@
-export class UserProject {
-    constructor(
-      public id: number,
-      public userId: number,
-      public title: string,
-      public description: string,
-    ) {}
-  }
+export interface UserProject {
+    id: number;
+    userId: number;
+    title: string;
+    description: string;
+}

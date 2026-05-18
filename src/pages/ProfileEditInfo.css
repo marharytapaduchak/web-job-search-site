@@ -861,6 +861,10 @@
   display: block;
 }
 
+.profile-edit-avatar__image--clickable {
+  cursor: pointer;
+}
+
 .profile-edit-avatar__placeholder {
   width: 100%;
   height: 100%;
