@@ -65,49 +65,12 @@ export default function FeedbackDetails() {
     );
   }
 
-  const [application, setApplication] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadApplication() {
-      try {
-        const res = await fetch(
-          `${API_BASE_URL}/jobApplications/${id}?_expand=job`
-        );
-
-        const applicationData = await res.json();
-
-        const companyRes = await fetch(
-          `${API_BASE_URL}/companies/${applicationData.job.company_id}`
-        );
-
-        const company = await companyRes.json();
-
-        setApplication({
-          ...applicationData,
-          company,
-        });
-      } catch (error) {
-        console.error("Помилка завантаження деталей відгуку:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadApplication();
-  }, [id]);
-
-  if (loading) {
-    return <p className="feedback-details-loading">Завантаження відгуку...</p>;
-  }
-
-  if (!application) {
+  if (!feedback) {
     return (
-      <main className="feedback-details">
-        <Link to="/feedback_history" className="details-back">
-          ← Назад до історії відгуків
+      <main className="feedback-details-page">
+        <Link to="/feedback_history" className="feedback-details__back">
+          ← Назад
         </Link>
-
         <h1>Відгук не знайдено</h1>
       </main>
     );
@@ -116,8 +79,8 @@ export default function FeedbackDetails() {
   const matchScore = (job && fullUser) ? calculateMatchScore(job, fullUser, userSkills) : 0;
 
   return (
-    <main className="feedback-details">
-      <Link to="/feedback_history" className="details-back">
+    <main className="feedback-details-page">
+      <Link to="/feedback_history" className="feedback-details__back">
         ← Назад до історії відгуків
       </Link>
 
@@ -139,22 +102,14 @@ export default function FeedbackDetails() {
 
           <p>{feedback.job_description}</p>
 
-            <div className="details-tags">
-              {application.job?.skills?.map((skill) => (
-                <span key={skill}>{skill}</span>
-              ))}
-            </div>
-
-            <p className="details-description">
-              {application.job?.description}
-            </p>
-
-            <div className="details-meta">
+          <div className="feedback-details-card__meta">
+            <span className="views">
               <img src={eyeIcon} alt="" />
               {feedback.job_num_views} переглядів
             </span>
             <span>{formatDate(feedback.applied_at)}</span>
           </div>
+        </div>
 
         <div className="feedback-details-card__match">
           <strong>{matchScore}%</strong>

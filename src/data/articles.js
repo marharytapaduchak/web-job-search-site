@@ -43,7 +43,7 @@ export const articlesMock = [
     `.trim(),
     views: 48,
     date: "10 жовтня",
-    saved: true,
+    saved: false,
   },
   {
     id: "3",
@@ -66,7 +66,7 @@ export const articlesMock = [
     `.trim(),
     views: 62,
     date: "7 жовтня",
-    saved: true,
+    saved: false,
   },
   {
     id: "4",
@@ -108,6 +108,6 @@ export const articlesMock = [
     `.trim(),
     views: 71,
     date: "1 жовтня",
-    saved: true,
+    saved: false,
   },
 ];

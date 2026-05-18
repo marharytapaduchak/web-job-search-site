@@ -77,9 +77,9 @@ func NewRouter(conn *pgxpool.Pool) *gin.Engine {
 
 	articles := r.Group("/api/articles")
 	{
-		articles.GET("", h.articleGetAll)
-		articles.GET("/:id", h.articleGetByID)
-		articles.PATCH("/:id", h.articleUpdate)
+		articles.GET("", h.optionalAuth, h.articleGetAll)
+		articles.GET("/:id", h.optionalAuth, h.articleGetByID)
+		articles.PATCH("/:id", h.requireAuth, h.articleUpdate)
 	}
 
 	users := r.Group("/api/users", h.requireAuth)
@@ -364,13 +364,18 @@ func (h *Handler) jobDelete(c *gin.Context) {
 // ── Article ───────────────────────────────────────────────────────────────────
 
 func (h *Handler) articleGetAll(c *gin.Context) {
+	var userID uint64
+	if id, ok := c.Get("userID"); ok {
+		userID = id.(uint64)
+	}
+
 	var savedFilter *bool
 	if savedParam := c.Query("saved"); savedParam == "true" {
 		t := true
 		savedFilter = &t
 	}
 
-	articles, err := models.GetAllArticles(h.ctx, h.conn, savedFilter)
+	articles, err := models.GetAllArticles(h.ctx, h.conn, userID, savedFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -382,13 +387,18 @@ func (h *Handler) articleGetAll(c *gin.Context) {
 }
 
 func (h *Handler) articleGetByID(c *gin.Context) {
+	var userID uint64
+	if id, ok := c.Get("userID"); ok {
+		userID = id.(uint64)
+	}
+
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
 
-	article, err := models.GetArticleByID(h.ctx, h.conn, id)
+	article, err := models.GetArticleByID(h.ctx, h.conn, userID, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -401,7 +411,8 @@ func (h *Handler) articleGetByID(c *gin.Context) {
 }
 
 func (h *Handler) articleUpdate(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	userID := c.MustGet("userID").(uint64)
+	articleID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
@@ -413,7 +424,19 @@ func (h *Handler) articleUpdate(c *gin.Context) {
 		return
 	}
 
-	article, err := req.Update(h.ctx, h.conn, id)
+	if req.Saved != nil {
+		if *req.Saved {
+			err = models.SaveArticle(h.ctx, h.conn, userID, articleID)
+		} else {
+			err = models.UnsaveArticle(h.ctx, h.conn, userID, articleID)
+		}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	article, err := models.GetArticleByID(h.ctx, h.conn, userID, articleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -896,4 +919,21 @@ func (h *Handler) imageUpload(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, record)
+}
+
+func (h *Handler) optionalAuth(c *gin.Context) {
+	sessionID, err := c.Cookie("session_id")
+	if err != nil || sessionID == "" {
+		c.Next()
+		return
+	}
+
+	userID, err := models.GetSessionUserID(h.ctx, h.conn, sessionID)
+	if err != nil {
+		c.Next()
+		return
+	}
+
+	c.Set("userID", userID)
+	c.Next()
 }

@@ -60,8 +60,11 @@ var GetAllArticlesSQL string
 //go:embed sql/get_article_by_id.sql
 var GetArticleByIDSQL string
 
-//go:embed sql/update_article.sql
-var UpdateArticleSQL string
+//go:embed sql/save_article.sql
+var SaveArticleSQL string
+
+//go:embed sql/unsave_article.sql
+var UnsaveArticleSQL string
 
 //go:embed sql/get_user_by_id.sql
 var GetUserByIDSQL string
