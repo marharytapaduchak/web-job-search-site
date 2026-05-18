@@ -1,13 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useSearch } from "../contexts/SearchContext";
 import arrowDown from "../img/arrow_down.svg";
 import "./Header.css";
 
 export default function Header() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { setSearchQuery, setSpecialization } = useSearch();
 
-  function handleLogout() {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("currentUserId");
+  async function handleLogout() {
+    await logout();
+    setSearchQuery("");
+    setSpecialization("");
+    localStorage.clear();
     navigate("/login");
   }
 

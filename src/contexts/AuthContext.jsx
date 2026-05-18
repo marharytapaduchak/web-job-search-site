@@ -33,8 +33,13 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await authService.logout();
-    setUser(null);
+    try {
+      await authService.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setUser(null);
+    }
   }
 
   return (
