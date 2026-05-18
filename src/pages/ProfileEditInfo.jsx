@@ -16,7 +16,8 @@ function getAvatarUrl(style, seed) {
   if (!style || !seed) return "";
 
   if (style === "custom") {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    const baseUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
     return baseUrl.replace("/api", "/api/static/") + seed;
   }
 
@@ -101,15 +102,19 @@ function RecommendationCard({ recommendation }) {
         </div>
       </div>
 
-      <p className="profile-edit-recommendation-card__label">
-        Підтверджені навички:
-      </p>
+      {recommendation.skills?.length > 0 && (
+        <>
+          <p className="recommendation-card__subtitle">Підтверджені навички:</p>
 
-      <div className="profile-edit-recommendation-card__skills">
-        {recommendation.skills?.map((skill, index) => (
-          <span key={index}>{skill}</span>
-        ))}
-      </div>
+          <div className="recommendation-card__skills">
+            {recommendation.skills.map((skill) => (
+              <span className="recommendation-card__skill" key={skill}>
+                {skill}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
 
       <p className="profile-edit-recommendation-card__text">
         {recommendation.message}
@@ -492,11 +497,6 @@ export default function ProfileEditInfo() {
       return;
     }
 
-    if (recommendationForm.skills.length === 0) {
-      alert("Оберіть хоча б одну навичку для підтвердження");
-      return;
-    }
-
     const temporaryRecommendation = {
       id: `temp-${Date.now()}`,
       name,
@@ -639,7 +639,9 @@ export default function ProfileEditInfo() {
       );
 
       await Promise.all(
-        newSkills.map((skill) => profileService.createSkill(skill.name, skill.level))
+        newSkills.map((skill) =>
+          profileService.createSkill(skill.name, skill.level)
+        )
       );
 
       await Promise.all(

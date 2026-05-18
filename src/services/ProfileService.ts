@@ -29,25 +29,43 @@ export class ProfileService {
     }
 
     async getNotifications(): Promise<UserNotification | null> {
-        const data = await this.backend.get<UserNotification[]>(
-            `/userNotifications?userId=${this.userId}`
+      try {
+        return await this.backend.get<UserNotification>(
+          `/users/${this.userId}/notifications`
         );
+      } catch {
+        const data = await this.backend.get<UserNotification[]>(
+          `/userNotifications?userId=${this.userId}`
+        );
+    
         return (data[0] ?? null) as UserNotification | null;
+      }
     }
 
-    async updateNotifications(updates: UserNotificationUpdates): Promise<UserNotification> {
+    async updateNotifications(
+      updates: UserNotificationUpdates
+    ): Promise<UserNotification> {
+      try {
+        return await this.backend.patch<UserNotification>(
+          `/users/${this.userId}/notifications`,
+          updates
+        );
+      } catch {
         const data = await this.backend.get<UserNotification[]>(
-            `/userNotifications?userId=${this.userId}`
+          `/userNotifications?userId=${this.userId}`
         );
+    
         const notification = data[0];
+    
         if (!notification) {
-            throw new Error("Notifications not found");
+          throw new Error("Notifications not found");
         }
-        const updated = await this.backend.patch<UserNotification>(
-            `/userNotifications/${notification.id}`,
-            updates
+    
+        return await this.backend.patch<UserNotification>(
+          `/userNotifications/${notification.id}`,
+          updates
         );
-        return updated as UserNotification;
+      }
     }
 
     async getSkills(): Promise<UserSkill[]> {

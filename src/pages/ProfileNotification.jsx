@@ -12,20 +12,26 @@ export default function ProfileNotification() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [profileData, notificationsData] = await Promise.all([
-          profileService.getUser(),
-          profileService.getNotifications(),
-        ]);
-
+        const profileData = await profileService.getUser();
+  
         setProfile(profileData);
-        setNotifications(notificationsData);
+  
+        setNotifications(
+          profileData.notifications || {
+            allNewVacancies: true,
+            recommendedVacancies: false,
+            disableNotifications: false,
+            sendToMainEmail: true,
+            sendToOtherEmail: false,
+          }
+        );
       } catch (error) {
         console.error("Failed to load profile notification data:", error);
       } finally {
         setLoading(false);
       }
     }
-
+  
     loadData();
   }, []);
 
@@ -42,12 +48,14 @@ export default function ProfileNotification() {
     try {
       setSaving(true);
 
-      await profileService.updateNotifications({
-        allNewVacancies: notifications.allNewVacancies,
-        recommendedVacancies: notifications.recommendedVacancies,
-        disableNotifications: notifications.disableNotifications,
-        sendToMainEmail: notifications.sendToMainEmail,
-        sendToOtherEmail: notifications.sendToOtherEmail,
+      await profileService.updateUser({
+        notifications: {
+          allNewVacancies: notifications.allNewVacancies,
+          recommendedVacancies: notifications.recommendedVacancies,
+          disableNotifications: notifications.disableNotifications,
+          sendToMainEmail: notifications.sendToMainEmail,
+          sendToOtherEmail: notifications.sendToOtherEmail,
+        },
       });
 
       alert("Зміни збережено");

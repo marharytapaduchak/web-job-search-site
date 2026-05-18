@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -14,41 +14,94 @@ import MainVacancies from './pages/MainVacancies';
 import ProfileContacts from './pages/ProfileContacts';
 import ProfileNotification from './pages/ProfileNotification';
 import ProfileEditInfo from './pages/ProfileEditInfo';
-import Vacancy from './pages/Vacancy'
+import Vacancy from './pages/Vacancy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
 function App() {
+  const location = useLocation();
+
+  const hideHeader =
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
   return (
     <>
-      <Header />
+      {!hideHeader && <Header />}
+
       <Routes>
         <Route path="/" element={<MainVacancies />} />
         <Route path="/vacancy/:id" element={<Vacancy />} />
 
-        <Route path="/feedback_history" element={
-          <ProtectedRoute><FeedbackHistory /></ProtectedRoute>
-        } />
-        <Route path="/feedback_history/:id" element={
-          <ProtectedRoute><FeedbackDetails /></ProtectedRoute>
-        } />
+        <Route
+          path="/feedback_history"
+          element={
+            <ProtectedRoute>
+              <FeedbackHistory />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/useful_materials" element={<UsefulMaterials />} />
-        <Route path="/useful_materials/saved" element={<SavedMaterials />} />
-        <Route path="/useful_materials/article/:id" element={<MaterialArticle />} />
+        <Route
+          path="/feedback_history/:id"
+          element={
+            <ProtectedRoute>
+              <FeedbackDetails />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/profile_page" element={
-          <ProtectedRoute><ProfilePage /></ProtectedRoute>
-        } />
-        <Route path="/profile_contacts" element={
-          <ProtectedRoute><ProfileContacts /></ProtectedRoute>
-        } />
-        <Route path="/profile_notification" element={
-          <ProtectedRoute><ProfileNotification /></ProtectedRoute>
-        } />
-        <Route path="/profile_edit_info" element={
-          <ProtectedRoute><ProfileEditInfo /></ProtectedRoute>
-        } />
+        <Route
+          path="/useful_materials"
+          element={<UsefulMaterials />}
+        />
+
+        <Route
+          path="/useful_materials/saved"
+          element={<SavedMaterials />}
+        />
+
+        <Route
+          path="/useful_materials/article/:id"
+          element={<MaterialArticle />}
+        />
+
+        <Route
+          path="/profile_page"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile_contacts"
+          element={
+            <ProtectedRoute>
+              <ProfileContacts />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile_notification"
+          element={
+            <ProtectedRoute>
+              <ProfileNotification />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile_edit_info"
+          element={
+            <ProtectedRoute>
+              <ProfileEditInfo />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
