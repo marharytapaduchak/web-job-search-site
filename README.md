@@ -1,55 +1,221 @@
 # web-job-search-site
 
-Technologies used:
+A full-stack job search platform that allows users to browse vacancies, manage their profile, upload resume links, receive recommendations, and interact with job-related content.
 
-- [React](https://react.dev/) - UI framework/library
+## Technologies Used
 
-### Prerequisites
-### Local development setup
-1. Clone this Git repository: ...
-2. Install Node.js 22: https://nodejs.org/en/download/package-manager. You can use `nvm` as per the guide, or download a simple installer from that page.
-3. Configure your editor to use ESLint and to run it on file save. This will ensure the code looks great for everyone the same way.
+### Frontend
+- [React](https://react.dev/) — UI library
+- [React Router DOM](https://reactrouter.com/) — client-side routing
+- Context API — global state management
+- CSS Modules / custom CSS styling
 
-   - if using VSCode, run `sh -c scripts/configure-vscode.sh`. If encountering issues with `code` command not being available, follow this guide: https://claude.ai/share/084f7821-6d56-4407-90ea-8c8774381b8f.
-   - if using any other IDE, start questioning your life decisions.
+### Backend
+- REST API
+- [Gin Framework](https://gin-gonic.com/) — Go web framework
+- [PostgreSQL](https://www.postgresql.org/) — relational database
 
-4. Install the dependencies using NPM. We are using libraries and code that was already written by other devs.
+### DevOps & Tools
+- [Docker](https://www.docker.com/) — containerization
+- [Vite](https://vitejs.dev/) — frontend build tool
+- ESLint — code linting
+
+---
+
+# Features
+
+## Authentication
+- User registration
+- Login/logout system
+- Protected routes
+- Persistent session using local storage
+
+## Profile Management
+- Edit personal information
+- Avatar selection system
+- Resume link management
+- Portfolio links
+- Certificates & recommendations
+- Skills and languages management
+- Notification settings
+
+## Vacancies
+- Vacancy search
+- Filtering by multiple parameters
+- Dynamic vacancy pages
+- Company information pages
+
+## Interactive Features
+- SPA navigation without page reload
+- Dynamic UI updates
+- Recommendation system
+- Search synchronization using global state
+
+---
+
+# Project Architecture
+
+## Frontend Structure
+
+```shell
+src/
+├── components/
+├── contexts/
+├── img/
+├── models/
+├── pages/
+├── services/
+├── App.jsx
+└── main.jsx
+```
+
+## Main Frontend Concepts
+
+### Routing
+Implemented with React Router DOM:
+- multi-page SPA structure
+- dynamic routes
+- protected pages
+- navigation without page reload
+
+### State Management
+- React Context API for global state
+- useState for local component state
+- shared search state
+- reactive UI updates
+
+### Services Layer
+Frontend communicates with backend using service classes:
+- ProfileService
+- JobService
+- CompanyService
+- ArticleService
+- JobApplicationService
+
+---
+
+# Backend
+
+The backend is built with Go and Gin Framework.
+
+Main backend responsibilities:
+- REST API endpoints
+- authentication
+- profile management
+- vacancies
+- notifications
+- recommendations
+- PostgreSQL integration
+
+---
+
+# Database
+
+The project uses PostgreSQL.
+
+Example entities:
+- users
+- jobs
+- companies
+- notifications
+- recommendations
+- resumes
+- certificates
+
+---
+
+# Local Development Setup
+
+## Prerequisites
+
+Install:
+- Node.js 22
+- npm
+- Docker Desktop
+- PostgreSQL (optional if using Docker)
+
+---
+
+# Installation
+
+## 1. Clone the repository
+
+```shell
+git clone <repository-url>
+cd web-job-search-site
+```
+
+## 2. Install dependencies
 
 ```shell
 npm install
 ```
+
+Install React Router DOM:
+
 ```shell
 npm install react-router-dom
 ```
 
-5. Start the project!
+---
+
+# Environment Variables
+
+Create a `.env` file:
 
 ```shell
-npx json-server --watch data/db.json --port 3001
+VITE_API_BASE_URL=http://localhost:8080/api
 ```
+
+---
+
+# Running the Project
+
+## Frontend
 
 ```shell
 npm run dev
 ```
 
-6. Build the project
+## Backend
+
+Run backend containers:
+
+```shell
+docker compose up
+```
+
+or
+
+```shell
+docker-compose up
+```
+
+---
+
+# Build
 
 ```shell
 npm run build
 ```
 
-## Useful Materials
+---
 
-Some useful links for learning stuff we're dealing with:
+# Useful Materials
 
-Web basics, https://internetingishard.netlify.app/ - a GREAT website that can help you better understand HTML & CSS.
+## React
+- Official guide: https://react.dev/learn
+- Cheatsheet: https://devhints.io/react
 
-JavaScript: https://www.geeksforgeeks.org/introduction-to-javascript/, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Introduction, ask mentor for more.
+## JavaScript
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Introduction
+- https://www.geeksforgeeks.org/introduction-to-javascript/
 
-React.js: official guide https://react.dev/learn, short hints https://devhints.io/react.
+## CSS & HTML
+- https://internetingishard.netlify.app/
 
-Firebase: official guide https://firebase.google.com/docs/web/setup.
+## Git
+- https://training.github.com/downloads/github-git-cheat-sheet.pdf
 
-Git: cheat sheet https://training.github.com/downloads/github-git-cheat-sheet.pdf.
-
-TailwindCSS: official documentation https://tailwindcss.com/docs/styling-with-utility-classes.
+## TailwindCSS
+- https://tailwindcss.com/docs/styling-with-utility-classes
