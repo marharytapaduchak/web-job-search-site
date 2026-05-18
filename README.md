@@ -167,6 +167,8 @@ Create a `.env` file:
 VITE_API_BASE_URL=http://localhost:8080/api
 ```
 
+Create a new db/password.txt file with any password for the database.
+
 ---
 
 # Running the Project
