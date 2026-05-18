@@ -26,8 +26,8 @@ type UpdateArticleRequest struct {
 	Saved *bool `json:"saved"`
 }
 
-func GetAllArticles(ctx context.Context, conn *pgxpool.Pool, saved *bool) ([]*Article, error) {
-	rows, err := conn.Query(ctx, queries.GetAllArticlesSQL, saved)
+func GetAllArticles(ctx context.Context, conn *pgxpool.Pool, userID uint64, saved *bool) ([]*Article, error) {
+	rows, err := conn.Query(ctx, queries.GetAllArticlesSQL, userID, saved)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get articles: %w", err)
 	}
@@ -44,9 +44,9 @@ func GetAllArticles(ctx context.Context, conn *pgxpool.Pool, saved *bool) ([]*Ar
 	return articles, nil
 }
 
-func GetArticleByID(ctx context.Context, conn *pgxpool.Pool, id uint64) (*Article, error) {
+func GetArticleByID(ctx context.Context, conn *pgxpool.Pool, userID uint64, id uint64) (*Article, error) {
 	a := &Article{}
-	err := conn.QueryRow(ctx, queries.GetArticleByIDSQL, id).
+	err := conn.QueryRow(ctx, queries.GetArticleByIDSQL, userID, id).
 		Scan(&a.ID, &a.Title, &a.Tags, &a.Excerpt, &a.Content, &a.Views, &a.Date, &a.Saved)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -57,15 +57,18 @@ func GetArticleByID(ctx context.Context, conn *pgxpool.Pool, id uint64) (*Articl
 	return a, nil
 }
 
-func (req *UpdateArticleRequest) Update(ctx context.Context, conn *pgxpool.Pool, id uint64) (*Article, error) {
-	a := &Article{}
-	err := conn.QueryRow(ctx, queries.UpdateArticleSQL, req.Saved, id).
-		Scan(&a.ID, &a.Title, &a.Tags, &a.Excerpt, &a.Content, &a.Views, &a.Date, &a.Saved)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, nil
-	}
+func SaveArticle(ctx context.Context, conn *pgxpool.Pool, userID uint64, articleID uint64) error {
+	_, err := conn.Exec(ctx, queries.SaveArticleSQL, userID, articleID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update article %d: %w", id, err)
+		return fmt.Errorf("failed to save article %d for user %d: %w", articleID, userID, err)
 	}
-	return a, nil
+	return nil
+}
+
+func UnsaveArticle(ctx context.Context, conn *pgxpool.Pool, userID uint64, articleID uint64) error {
+	_, err := conn.Exec(ctx, queries.UnsaveArticleSQL, userID, articleID)
+	if err != nil {
+		return fmt.Errorf("failed to unsave article %d for user %d: %w", articleID, userID, err)
+	}
+	return nil
 }
