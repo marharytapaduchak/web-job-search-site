@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useServices } from "../services/ServicesContext";
 import { useAuth } from "../contexts/AuthContext";
+import { calculateMatchScore } from "../utils/matchScore";
 import "./FeedbackDetails.css";
 import eyeIcon from "../img/eye.svg";
 
@@ -17,9 +18,12 @@ function formatDate(dateStr) {
 
 export default function FeedbackDetails() {
   const { id } = useParams();
-  const { jobApplicationService } = useServices();
+  const { jobApplicationService, profileService, jobService } = useServices();
   const { user } = useAuth();
   const [feedback, setFeedback] = useState(null);
+  const [fullUser, setFullUser] = useState(null);
+  const [userSkills, setUserSkills] = useState([]);
+  const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,14 +33,26 @@ export default function FeedbackDetails() {
         const data = await jobApplicationService.getByUserId(user.id);
         const found = data.find((item) => String(item.id) === String(id));
         setFeedback(found ?? null);
-      } catch {
+
+        if (found) {
+          const [userData, skillsData, jobData] = await Promise.all([
+            profileService.getUser(),
+            profileService.getSkills(),
+            jobService.getById(found.job_id)
+          ]);
+          setFullUser(userData);
+          setUserSkills(skillsData);
+          setJob(jobData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch feedback details:", err);
         setFeedback(null);
       } finally {
         setLoading(false);
       }
     };
     fetch();
-  }, [jobApplicationService, user, id]);
+  }, [jobApplicationService, profileService, jobService, user, id]);
 
   if (loading) {
     return (
@@ -60,7 +76,7 @@ export default function FeedbackDetails() {
     );
   }
 
-  const match = ((feedback.id * 13) % 45) + 50;
+  const matchScore = (job && fullUser) ? calculateMatchScore(job, fullUser, userSkills) : 0;
 
   return (
     <main className="feedback-details-page">
@@ -96,7 +112,7 @@ export default function FeedbackDetails() {
         </div>
 
         <div className="feedback-details-card__match">
-          <strong>{match}%</strong>
+          <strong>{matchScore}%</strong>
           <span>сумісність</span>
         </div>
       </section>

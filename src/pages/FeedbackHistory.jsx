@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useServices } from "../services/ServicesContext";
 import { useAuth } from "../contexts/AuthContext";
+import { calculateMatchScore } from "../utils/matchScore";
 import "./FeedbackHistory.css";
 import eyeIcon from "../img/eye.svg";
 
@@ -15,9 +16,7 @@ function formatDate(dateStr) {
   return `${date.getDate()} ${months[date.getMonth()]}`;
 }
 
-function FeedbackCard({ item }) {
-  const match = ((item.id * 13) % 45) + 50;
-
+function FeedbackCard({ item, matchScore }) {
   const logoText = item.company_name ? item.company_name.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : "?";
 
   return (
@@ -51,7 +50,7 @@ function FeedbackCard({ item }) {
       </div>
 
       <div className="feedback-card__match">
-        <strong>{match}%</strong>
+        <strong>{matchScore}%</strong>
         <span>сумісність</span>
       </div>
     </Link>
@@ -59,26 +58,37 @@ function FeedbackCard({ item }) {
 }
 
 export default function FeedbackHistory() {
-  const { jobApplicationService } = useServices();
+  const { jobApplicationService, profileService, jobService } = useServices();
   const { user } = useAuth();
   const [applications, setApplications] = useState([]);
+  const [fullUser, setFullUser] = useState(null);
+  const [userSkills, setUserSkills] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    const fetchApplications = async () => {
+    const fetchData = async () => {
       try {
-        const data = await jobApplicationService.getByUserId(user.id);
-        setApplications(data);
+        const [appData, userData, skillsData, jobsData] = await Promise.all([
+          jobApplicationService.getByUserId(user.id),
+          profileService.getUser(),
+          profileService.getSkills(),
+          jobService.getAll()
+        ]);
+        setApplications(appData);
+        setFullUser(userData);
+        setUserSkills(skillsData);
+        setJobs(jobsData);
       } catch (err) {
-        console.error("Failed to fetch applications:", err);
+        console.error("Failed to fetch data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchApplications();
-  }, [jobApplicationService, user]);
+    fetchData();
+  }, [jobApplicationService, profileService, jobService, user]);
 
   if (loading) {
     return (
@@ -94,9 +104,11 @@ export default function FeedbackHistory() {
     <main className="feedback-history-page">
       <div className="feedback-history-list">
         {applications.length > 0 ? (
-          applications.map((item) => (
-            <FeedbackCard key={item.id} item={item} />
-          ))
+          applications.map((item) => {
+            const job = jobs.find(j => j.id === item.job_id);
+            const score = job ? calculateMatchScore(job, fullUser, userSkills) : 0;
+            return <FeedbackCard key={item.id} item={item} matchScore={score} />;
+          })
         ) : (
           <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
             Ви ще не подали жодної заявки.
